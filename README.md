@@ -1,193 +1,161 @@
-# React + TypeScript + Vite
+# 🚀 TURNVE Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div align="center">
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-5-purple?style=for-the-badge&logo=vite)
+![Tailwind](https://img.shields.io/badge/Tailwind-4-teal?style=for-the-badge&logo=tailwind-css)
+![Status](https://img.shields.io/badge/Status-Active-green?style=for-the-badge)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**AI-Powered Career Simulation Platform for Professionals**
 
-## React Compiler
+</div>
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🎯 What is TURNVE?
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+TURNVE is a game-changer for career growth! 🎮
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Imagine practicing real-world management scenarios—without the risk. Our platform lets you:
+- **Build management skills** through realistic business simulations
+- **Create portfolios** that showcase your problem-solving abilities  
+- **Prepare for certifications** with AI-guided coaching
+- **Land managerial roles** by proving your capabilities
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+> *"It's like a flight simulator, but for managing teams and companies!"*
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 🛠️ Tech Stack (Don't worry, we keep it simple!)
+
+| Technology | What it does | Level |
+|------------|--------------|-------|
+| **React 19** | Powers the user interface | 🔥 Hot |
+| **TypeScript** | Keeps our code bug-free | 🛡️ Safe |
+| **Vite** | Makes development lightning fast | ⚡ Fast |
+| **Tailwind CSS** | Beautiful styling without the headache | 🎨 Pretty |
+| **Supabase** | Handles database & authentication | 💾 Storage |
+
+---
+
+## 🚦 Quick Start
+
+### Prerequisites
+- Node.js 18+ 
+- npm or pnpm
+
+### Installation
+
+```bash
+# Clone the repo
+git clone https://github.com/TURNVE/New_frontend.git
+cd New_frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+That's it! 🎉 Open http://localhost:5173 and you're ready to go!
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 📁 Project Structure
+
 ```
-project root 
-ai-simulation-web/
-│
-├── public/
-│
+New_frontend/
+├── public/                 # Static files (images, icons)
 ├── src/
-│
-├── tests/                   # E2E only (Playwright / Cypress)
-│
-├── .env.example
-├── index.html
-├── package.json
-├── vite.config.ts           
-├── vitest.config.ts
-├── playwright.config.ts
-└── README.md
+│   ├── app/               # Main app & routing
+│   ├── components/        # Reusable UI pieces
+│   │   ├── communications/  # Notifications & messages
+│   │   ├── company/          # Company-related UI
+│   │   ├── layout/           # Header, footer, etc.
+│   │   ├── pmtools/          # Project management tools
+│   │   ├── simulation/       # Core simulation components
+│   │   └── ui/               # Basic UI elements (buttons, inputs)
+│   ├── pages/              # Full page components
+│   ├── hooks/              # Reusable logic pieces
+│   ├── lib/                # Utilities & helpers
+│   ├── contexts/           # Global state providers
+│   └── styles/             # Global styles
+├── supabase/              # Database migrations
+└── docs/                  # Documentation
+```
 
+---
 
-src/
-├── app/
-│   ├── App.tsx
-│   ├── App.test.tsx
-│   ├── router.tsx
-│   └── router.test.tsx
-│
-├── pages/
-│   ├── Landing/
-│   │   ├── Landing.page.tsx
-│   │   └── Landing.page.test.tsx
-│   │
-│   ├── Dashboard/
-│   │   ├── Dashboard.page.tsx
-│   │   └── Dashboard.page.test.tsx
-│   │
-│   ├── Simulations/
-│   │   ├── Simulations.page.tsx
-│   │   └── Simulations.page.test.tsx
-│   │
-│   └── SimulationRoom/
-│       ├── SimulationRoom.page.tsx
-│       └── SimulationRoom.page.test.tsx
-│
-├── components/
-│   ├── common/
-│   │   ├── Button/
-│   │   │   ├── Button.tsx
-│   │   │   └── Button.test.tsx
-│   │   ├── Modal/
-│   │   │   ├── Modal.tsx
-│   │   │   └── Modal.test.tsx
-│   │   └── Loader/
-│   │       ├── Loader.tsx
-│   │       └── Loader.test.tsx
-│   │
-│   ├── layout/
-│   │   ├── Navbar/
-│   │   │   ├── Navbar.tsx
-│   │   │   └── Navbar.test.tsx
-│   │   └── Sidebar/
-│   │       ├── Sidebar.tsx
-│   │       └── Sidebar.test.tsx
-│   │
-│   └── simulation/
-│       ├── SimulationCard/
-│       │   ├── SimulationCard.tsx
-│       │   └── SimulationCard.test.tsx
-│       ├── SimulationProgress/
-│       │   ├── SimulationProgress.tsx
-│       │   └── SimulationProgress.test.tsx
-│       └── SimulationChat/
-│           ├── SimulationChat.tsx
-│           └── SimulationChat.test.tsx
-│
-├── features/
-│   ├── auth/
-│   │   ├── auth.logic.ts
-│   │   ├── auth.state.ts
-│   │   └── auth.test.ts
-│   │
-│   ├── projects/
-│   │   ├── project.logic.ts
-│   │   ├── project.state.ts
-│   │   └── project.test.ts
-│   │
-│   ├── simulations/
-│   │   ├── simulation.logic.ts
-│   │   ├── simulation.state.ts
-│   │   └── simulation.test.ts
-│   │
-│   └── assessments/
-│       ├── assessment.logic.ts
-│       └── assessment.test.ts
-│
-├── hooks/
-│   ├── useSimulation.ts
-│   └── useSimulation.test.ts
-│
-├── services/
-│   ├── apiClient.ts          # backend-agnostic HTTP layer
-│   ├── simulation.mock.ts    # fake AI responses
-│   └── apiClient.test.ts
-│
-├── store/
-│   ├── index.ts
-│   └── store.test.ts
-│
-├── utils/
-│   ├── formatScore.ts
-│   └── formatScore.test.ts
-│
-├── styles/
-│   ├── globals.css
-│   └── theme.css
-│
-└── test/
-    ├── setup.ts
-    ├── mocks/
-    └── factories/
+## 🎮 Key Features
 
-# Turnve_Frontend
+### ✨ Simulation Engine
+Real-time business simulations where your decisions matter!
+
+### 📊 Metrics Dashboard  
+Track progress, KPIs, and performance metrics
+
+### 👥 Stakeholder Management  
+Balance the needs of employees, investors, and customers
+
+### 📄 Portfolio Builder  
+Showcase your achievements and growth
+
+### 🎓 AI Coaching  
+Get personalized guidance from AI mentors
+
+---
+
+## 🔧 Available Scripts
+
+| Command | What it does |
+|---------|--------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Check code quality |
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file (copy from `.env.example`):
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📞 Need Help?
+
+- 📖 Check the [docs](./docs/) folder
+- 🐛 Report bugs via GitHub Issues
+- 💬 Join our community discussions
+
+---
+
+<div align="center">
+
+**Built with ❤️ by the TURNVE Team**
+
+*Level up your career, one simulation at a time.*
+
+![TURNVE](https://img.shields.io/badge/TURNVE-2024-purple?style=for-the-badge)
+
+</div>
