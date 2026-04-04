@@ -36,12 +36,12 @@ const industries = [
     name: 'Finance',
     description: 'Financial analysis, investment banking, and fintech',
     icon: DollarSign,
-    color: 'from-violet-500 to-violet-600',
-    bgColor: 'bg-violet-50',
-    borderColor: 'border-violet-200',
-    textColor: 'text-violet-700',
-    iconBgColor: 'bg-violet-100',
-    iconColor: 'text-violet-600',
+    color: 'from-sky-500 to-sky-600',
+    bgColor: 'bg-sky-50',
+    borderColor: 'border-sky-200',
+    textColor: 'text-sky-700',
+    iconBgColor: 'bg-sky-100',
+    iconColor: 'text-sky-600',
     stats: { simulations: 15, avgDuration: '5 weeks', level: 'Intermediate' }
   },
   {

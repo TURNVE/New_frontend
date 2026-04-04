@@ -320,15 +320,15 @@ const DashboardPage = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               <Link
                 to="/industries"
-                className={`flex flex-col items-center p-3 sm:p-4 rounded-xl transition-all duration-200 tap-target ${isFirstTimeUser ? 'bg-violet-50 hover:bg-violet-100' : 'bg-blue-50 hover:bg-blue-100'}`}
+                className={`flex flex-col items-center p-3 sm:p-4 rounded-xl transition-all duration-200 tap-target ${isFirstTimeUser ? 'bg-sky-50 hover:bg-sky-100' : 'bg-blue-50 hover:bg-blue-100'}`}
               >
-                <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center mb-2 ${isFirstTimeUser ? 'bg-violet-500' : 'bg-blue-500'}`}>
+                <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center mb-2 ${isFirstTimeUser ? 'bg-sky-500' : 'bg-blue-500'}`}>
                   <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <span className="text-xs sm:text-sm font-medium text-gray-900">New Simulation</span>
               </Link>
-              <Link to="/projects" className="flex flex-col items-center p-3 sm:p-4 rounded-xl bg-violet-50 hover:bg-violet-100 transition-all duration-200 tap-target">
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-violet-500 flex items-center justify-center mb-2">
+              <Link to="/projects" className="flex flex-col items-center p-3 sm:p-4 rounded-xl bg-sky-50 hover:bg-sky-100 transition-all duration-200 tap-target">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-sky-500 flex items-center justify-center mb-2">
                   <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <span className="text-xs sm:text-sm font-medium text-gray-900">Projects</span>
@@ -353,21 +353,21 @@ const DashboardPage = () => {
             {/* Left Column - Ongoing Simulations */}
             <div>
               {isFirstTimeUser ? (
-                <div className="bg-white rounded-xl sm:rounded-2xl border border-violet-100 shadow-sm overflow-hidden">
-                  <div className="bg-violet-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-violet-100 flex items-center justify-between">
+                <div className="bg-white rounded-xl sm:rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+                  <div className="bg-sky-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-sky-100 flex items-center justify-between">
                     <h2 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <Play className="h-4 w-4 sm:h-5 sm:w-5 text-violet-600" />
+                      <Play className="h-4 w-4 sm:h-5 sm:w-5 text-sky-600" />
                       Recommended for You
                     </h2>
                   </div>
                   <div className="p-4 sm:p-6">
-                    <Link to="/industries" className="block group p-4 sm:p-5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-700 text-white hover:shadow-lg transition-all duration-300 tap-target">
+                    <Link to="/industries" className="block group p-4 sm:p-5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-700 text-white hover:shadow-lg transition-all duration-300 tap-target">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold text-base sm:text-lg">Start Your First Simulation</h3>
                         <Play className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
                       </div>
-                      <p className="text-violet-100 text-sm mb-4">Choose an industry and begin your journey toward real-world management experience.</p>
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-violet-200">
+                      <p className="text-sky-100 text-sm mb-4">Choose an industry and begin your journey toward real-world management experience.</p>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-sky-200">
                         <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                         <span>Beginner-friendly</span>
                         <span>•</span>
@@ -393,7 +393,7 @@ const DashboardPage = () => {
                         className="block group p-3 sm:p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors mb-3 last:mb-0 tap-target"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sim.status === 'active' ? 'bg-blue-100 text-blue-700' : sim.status === 'in-progress' ? 'bg-emerald-100 text-emerald-700' : 'bg-violet-100 text-violet-700'}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sim.status === 'active' ? 'bg-blue-100 text-blue-700' : sim.status === 'in-progress' ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}`}>
                             {sim.status}
                           </span>
                           <span className="text-xs text-gray-500">{sim.industry}</span>

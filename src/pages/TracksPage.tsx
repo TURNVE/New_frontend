@@ -21,8 +21,8 @@ const careerTracks = [
     name: 'Technical',
     description: 'Build robust systems and analyze data for insights',
     icon: <Code className="w-8 h-8" />,
-    bgColor: 'bg-violet-50',
-    color: 'from-violet-500 to-violet-600',
+    bgColor: 'bg-sky-50',
+    color: 'from-sky-500 to-sky-600',
     roles: [
       { id: 'web-dev', name: 'Web Dev' },
       { id: 'data-analytics', name: 'Data Analytics' }
