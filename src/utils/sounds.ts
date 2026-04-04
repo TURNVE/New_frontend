@@ -1,8 +1,8 @@
 const AUDIO_CONTEXT = typeof window !== 'undefined' ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;
 
-export const playSound = (type: 'notification' | 'success' | 'warning' | 'error' | 'email' | 'message') => {
+export const playSound = (type: 'notification' | 'success' | 'warning' | 'error' | 'email' | 'message' | 'call') => {
   if (!AUDIO_CONTEXT) return;
-  
+
   // Resume audio context if suspended (required by browsers)
   if (AUDIO_CONTEXT.state === 'suspended') {
     AUDIO_CONTEXT.resume();
@@ -10,7 +10,7 @@ export const playSound = (type: 'notification' | 'success' | 'warning' | 'error'
 
   const oscillator = AUDIO_CONTEXT.createOscillator();
   const gainNode = AUDIO_CONTEXT.createGain();
-  
+
   oscillator.connect(gainNode);
   gainNode.connect(AUDIO_CONTEXT.destination);
 
@@ -61,7 +61,7 @@ export const playSound = (type: 'notification' | 'success' | 'warning' | 'error'
       gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
       oscillator.start(now);
       oscillator.stop(now + 0.25);
-      
+
       // Second beep
       const osc2 = AUDIO_CONTEXT.createOscillator();
       const gain2 = AUDIO_CONTEXT.createGain();
@@ -96,6 +96,27 @@ export const playSound = (type: 'notification' | 'success' | 'warning' | 'error'
       oscillator.start(now);
       oscillator.stop(now + 0.15);
       break;
+
+    case 'call':
+      // Distinctive strategy call ring
+      const frequencies = [480, 440];
+      frequencies.forEach((f, i) => {
+        const o = AUDIO_CONTEXT.createOscillator();
+        const g = AUDIO_CONTEXT.createGain();
+        o.connect(g);
+        g.connect(AUDIO_CONTEXT.destination);
+        o.frequency.setValueAtTime(f, now);
+        o.type = 'sine';
+        g.gain.setValueAtTime(0.1, now);
+        // Create a double-ring pattern
+        g.gain.setValueAtTime(0.1, now + 0.1);
+        g.gain.linearRampToValueAtTime(0, now + 0.4);
+        g.gain.setValueAtTime(0.1, now + 0.6);
+        g.gain.linearRampToValueAtTime(0, now + 1.0);
+        o.start(now);
+        o.stop(now + 1.2);
+      });
+      break;
   }
 };
 
@@ -115,7 +136,7 @@ export const disableSounds = () => {
 
 export const isSoundEnabled = () => soundEnabled;
 
-export const playSoundIfEnabled = (type: 'notification' | 'success' | 'warning' | 'error' | 'email' | 'message') => {
+export const playSoundIfEnabled = (type: 'notification' | 'success' | 'warning' | 'error' | 'email' | 'message' | 'call') => {
   if (soundEnabled) {
     playSound(type);
   }

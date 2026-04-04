@@ -52,17 +52,17 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
   ];
 
   return (
-    <div className="h-full flex bg-[#0a0a0a]">
+    <div className="h-full flex bg-white dark:bg-[#0a0a0a]">
       {/* Sidebar */}
-      <div className="w-56 border-r border-white/5 p-4 space-y-1">
+      <div className="w-56 border-r border-gray-200 dark:border-white/5 p-4 space-y-1">
         {sections.map(section => (
           <button
             key={section.id}
             onClick={() => setActiveSection(section.id as typeof activeSection)}
             className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors ${
               activeSection === section.id
-                ? 'bg-white/5 text-white'
-                : 'text-[#a1a1aa] hover:text-white hover:bg-white/5'
+                ? 'bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white'
+                : 'text-[#a1a1aa] hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:bg-white/5'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
               <span>{section.label}</span>
             </div>
             {section.count !== undefined && section.count > 0 && (
-              <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+              <span className="bg-blue-500 text-gray-900 dark:text-white text-xs px-1.5 py-0.5 rounded-full">
                 {section.count}
               </span>
             )}
@@ -84,7 +84,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-bold text-white">Company News</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Company News</h2>
                 <p className="text-sm text-[#a1a1aa]">Latest updates and announcements</p>
               </div>
               <div className="flex items-center gap-2">
@@ -102,7 +102,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
                   placeholder="Search news..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-[#a1a1aa] focus:outline-none focus:border-blue-500"
+                  className="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white placeholder-[#a1a1aa] focus:outline-none focus:border-blue-500"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
                 <select
                   value={newsFilter}
                   onChange={(e) => setNewsFilter(e.target.value as NewsCategory | 'all')}
-                  className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
                 >
                   <option value="all">All News</option>
                   {Object.entries(NEWS_CATEGORIES).map(([key, val]) => (
@@ -126,8 +126,8 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
                 <div
                   key={news.id}
                   onClick={() => markAsRead(news.id)}
-                  className={`glass-panel p-4 rounded-xl border transition-all cursor-pointer hover:border-white/20 ${
-                    news.isRead ? 'border-white/5' : 'border-l-2 border-l-blue-500'
+                  className={`glass-panel p-4 rounded-xl border transition-all cursor-pointer hover:border-gray-300 dark:hover:border-white/20 ${
+                    news.isRead ? 'border-gray-200 dark:border-white/5' : 'border-l-2 border-l-blue-500'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -144,7 +144,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
                       Week {news.week}
                     </div>
                   </div>
-                  <h3 className="font-semibold text-white mb-1">{news.title}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{news.title}</h3>
                   <p className="text-sm text-[#a1a1aa] mb-2">{news.summary || news.content.slice(0, 150)}...</p>
                   <div className="text-xs text-[#a1a1aa]">
                     By {news.author}
@@ -158,20 +158,20 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
         {activeSection === 'culture' && (
           <div className="p-6">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-2">{DEFAULT_COMPANY.name}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{DEFAULT_COMPANY.name}</h2>
               <p className="text-[#a1a1aa]">{DEFAULT_COMPANY.description}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="glass-panel p-4 rounded-xl border border-white/5">
-                <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+              <div className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <Target className="w-4 h-4 text-blue-400" />
                   Mission
                 </h3>
                 <p className="text-sm text-[#a1a1aa]">{DEFAULT_COMPANY.mission}</p>
               </div>
-              <div className="glass-panel p-4 rounded-xl border border-white/5">
-                <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+              <div className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <Star className="w-4 h-4 text-amber-400" />
                   Vision
                 </h3>
@@ -180,28 +180,28 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
             </div>
 
             <div className="mb-8">
-              <h3 className="font-semibold text-white mb-4">Core Values</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Core Values</h3>
               <div className="grid gap-3">
                 {DEFAULT_COMPANY.values.map((value, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                  <div key={i} className="flex items-start gap-3 p-3 bg-gray-100 dark:bg-white/5 rounded-lg">
                     <span className="text-blue-400 text-lg">{String.fromCharCode(65 + i)}</span>
-                    <span className="text-sm text-white">{value}</span>
+                    <span className="text-sm text-gray-900 dark:text-white">{value}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="glass-panel p-4 rounded-xl border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white">{DEFAULT_COMPANY.founded}</div>
+              <div className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5 text-center">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{DEFAULT_COMPANY.founded}</div>
                 <div className="text-xs text-[#a1a1aa]">Founded</div>
               </div>
-              <div className="glass-panel p-4 rounded-xl border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white">{DEFAULT_COMPANY.size}</div>
+              <div className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5 text-center">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{DEFAULT_COMPANY.size}</div>
                 <div className="text-xs text-[#a1a1aa]">Team Size</div>
               </div>
-              <div className="glass-panel p-4 rounded-xl border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white">{DEFAULT_COMPANY.headquarters}</div>
+              <div className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5 text-center">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{DEFAULT_COMPANY.headquarters}</div>
                 <div className="text-xs text-[#a1a1aa]">HQ</div>
               </div>
             </div>
@@ -211,22 +211,22 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
         {activeSection === 'industry' && (
           <div className="p-6">
             <div className="mb-8">
-              <h2 className="text-xl font-bold text-white mb-2">Industry Insights</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Industry Insights</h2>
               <p className="text-sm text-[#a1a1aa]">Stay informed about market trends and competitive landscape</p>
             </div>
 
             <div className="mb-8">
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-400" />
                 Key Trends
               </h3>
               <div className="space-y-3">
                 {INDUSTRY_TRENDS.map(trend => (
-                  <div key={trend.id} className="glass-panel p-4 rounded-xl border border-white/5">
+                  <div key={trend.id} className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5">
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <span className="text-xs text-[#a1a1aa]">{trend.category}</span>
-                        <h4 className="font-semibold text-white">{trend.title}</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{trend.title}</h4>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded ${
                         trend.impact === 'negative' ? 'bg-red-500/20 text-red-400' :
@@ -249,15 +249,15 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
             </div>
 
             <div>
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <Globe className="w-4 h-4 text-blue-400" />
                 Competitive Landscape
               </h3>
               <div className="space-y-3">
                 {COMPETITORS.map(comp => (
-                  <div key={comp.id} className="glass-panel p-4 rounded-xl border border-white/5">
+                  <div key={comp.id} className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5">
                     <div className="flex items-start justify-between mb-3">
-                      <h4 className="font-semibold text-white">{comp.name}</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{comp.name}</h4>
                       <span className="text-sm text-[#a1a1aa]">{comp.marketShare}% share</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-xs">
@@ -275,7 +275,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
                       </div>
                     </div>
                     {comp.recentNews && (
-                      <div className="mt-3 pt-3 border-t border-white/5 text-xs text-[#a1a1aa]">
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-white/5 text-xs text-[#a1a1aa]">
                         📰 {comp.recentNews}
                       </div>
                     )}
@@ -289,19 +289,19 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
         {activeSection === 'team' && (
           <div className="p-6">
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-white mb-2">Team Directory</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Team Directory</h2>
               <p className="text-sm text-[#a1a1aa]">Meet the people behind {DEFAULT_COMPANY.name}</p>
             </div>
 
             <div className="grid gap-4">
               {TEAM_MEMBERS.map(member => (
-                <div key={member.id} className="glass-panel p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all">
+                <div key={member.id} className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5 hover:border-gray-200 dark:border-white/10 transition-all">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-lg">
                       {member.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-white">{member.name}</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{member.name}</h3>
                       <p className="text-sm text-blue-400">{member.role}</p>
                       <p className="text-xs text-[#a1a1aa]">{member.department}</p>
                       {member.bio && (
@@ -309,7 +309,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
                       )}
                       <div className="flex flex-wrap gap-2 mt-3">
                         {member.skills?.map(skill => (
-                          <span key={skill} className="text-xs px-2 py-0.5 rounded bg-white/5 text-[#a1a1aa]">
+                          <span key={skill} className="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-white/5 text-[#a1a1aa]">
                             {skill}
                           </span>
                         ))}
@@ -321,17 +321,17 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
             </div>
 
             <div className="mt-8">
-              <h3 className="font-semibold text-white mb-4">Key Stakeholders</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Key Stakeholders</h3>
               <div className="grid gap-4">
                 {ENHANCED_STAKEHOLDERS.map(stakeholder => (
-                  <div key={stakeholder.id} className="glass-panel p-4 rounded-xl border border-white/5">
+                  <div key={stakeholder.id} className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h4 className="font-semibold text-white">{stakeholder.name}</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{stakeholder.name}</h4>
                         <p className="text-sm text-[#a1a1aa]">{stakeholder.role} - {stakeholder.department}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-white">Satisfaction: {stakeholder.satisfaction}%</div>
+                        <div className="text-sm text-gray-900 dark:text-white">Satisfaction: {stakeholder.satisfaction}%</div>
                         <span className={`text-xs px-2 py-0.5 rounded ${
                           stakeholder.relationshipStrength === 'strong' ? 'bg-emerald-500/20 text-emerald-400' :
                           stakeholder.relationshipStrength === 'neutral' ? 'bg-yellow-500/20 text-yellow-400' :
@@ -345,13 +345,13 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       <div>
                         <span className="text-[#a1a1aa]">Concerns:</span>
-                        <ul className="text-white">
+                        <ul className="text-gray-900 dark:text-white">
                           {stakeholder.concerns?.map((c, i) => <li key={i}>• {c}</li>)}
                         </ul>
                       </div>
                       <div>
                         <span className="text-[#a1a1aa]">Priorities:</span>
-                        <ul className="text-white">
+                        <ul className="text-gray-900 dark:text-white">
                           {stakeholder.priorities?.map((p, i) => <li key={i}>• {p}</li>)}
                         </ul>
                       </div>

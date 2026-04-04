@@ -28,7 +28,8 @@ const stakeholderEmailTemplates: Record<string, Record<string, { subject: string
 
 export function useSimulationNotifications(
   gameState: GameState | null,
-  isRunning: boolean
+  isRunning: boolean,
+  onActionClick?: (actionId: string) => void
 ) {
   const { addNotification, addEmail } = useNotifications();
   const lastWeekRef = useRef<number>(0);
@@ -47,12 +48,28 @@ export function useSimulationNotifications(
       type: signal.priority === 'high' ? 'warning' : 'info',
       title: titles[signal.source] || 'Update',
       message: signal.message,
+      onClick: () => {
+        // Scroll to signals section or highlight
+        const element = document.getElementById(`signal-${signal.id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          element.classList.add('bg-blue-500/10');
+          setTimeout(() => element.classList.remove('bg-blue-500/10'), 2000);
+        }
+      }
     });
   }, [addNotification]);
 
   const processTimelineEvent = useCallback((event: TimelineEvent, stakeholders: GameState['stakeholders']) => {
-    if (processedEventsRef.current.has(event.title)) return;
-    processedEventsRef.current.add(event.title);
+    const uniqueId = `event-${event.week}-${event.title}`;
+    if (processedEventsRef.current.has(uniqueId)) return;
+    processedEventsRef.current.add(uniqueId);
+
+    // Determine if this event should trigger a specific action
+    let targetActionId: string | null = null;
+    if (event.type === 'crisis') targetActionId = 't1';
+    if (event.title.toLowerCase().includes('ceo') || event.title.toLowerCase().includes('briefing')) targetActionId = 't2';
+    if (event.title.toLowerCase().includes('decision')) targetActionId = 't3';
 
     const eventTypes: Record<string, { icon: string; type: 'error' | 'success' | 'info' | 'warning' }> = {
       crisis: { icon: '🚨', type: 'error' },
@@ -68,6 +85,7 @@ export function useSimulationNotifications(
       type: config.type,
       title: `${config.icon} ${event.title}`,
       message: event.description,
+      onClick: targetActionId && onActionClick ? () => onActionClick(targetActionId!) : undefined
     });
 
     // Stakeholder reactions - send emails based on event type
@@ -81,19 +99,19 @@ export function useSimulationNotifications(
 
         reactingStakeholders.forEach((stakeholder, idx) => {
           const roleKey = stakeholder.role.toLowerCase().includes('ceo') ? 'ceo' :
-                         stakeholder.role.toLowerCase().includes('cto') ? 'cto' :
-                         stakeholder.role.toLowerCase().includes('cfo') ? 'cfo' : 'ceo';
-          
+            stakeholder.role.toLowerCase().includes('cto') ? 'cto' :
+              stakeholder.role.toLowerCase().includes('cfo') ? 'cfo' : 'ceo';
+
           const template = templates[roleKey];
           if (template) {
             setTimeout(() => {
               addEmail({
-                from: stakeholder.name,
+                fromName: stakeholder.name,
                 subject: template.subject,
                 body: `${template.body}\n\n${stakeholder.name}\n${stakeholder.role}`,
                 archived: false,
               });
-              
+
               addNotification({
                 type: 'info',
                 title: `📧 Email from ${stakeholder.name}`,
@@ -109,6 +127,19 @@ export function useSimulationNotifications(
   useEffect(() => {
     if (!gameState || !isRunning) return;
 
+    // Welcome email on kickoff
+    if (gameState.week === 1 && !processedEventsRef.current.has('welcome-email')) {
+      processedEventsRef.current.add('welcome-email');
+      setTimeout(() => {
+        addEmail({
+          fromName: 'HR Department',
+          subject: 'Welcome to FlowDesk! 🚀',
+          body: `Hi there,\n\nWe're thrilled to have you lead the ${gameState.company.name} project. Your impact starts today. Please review the dashboard, check your signals, and make your first strategic decisions.\n\nThe team is counting on you!\n\nBest regards,\nHR Team`,
+          archived: false,
+        });
+      }, 2000);
+    }
+
     // Week change notification
     if (gameState.week > lastWeekRef.current) {
       addNotification({
@@ -119,15 +150,16 @@ export function useSimulationNotifications(
       lastWeekRef.current = gameState.week;
     }
 
-    // Process new signals
-    if (gameState.signals && gameState.signals.length > lastSignalCountRef.current) {
-      const newSignals = gameState.signals.slice(lastSignalCountRef.current);
-      newSignals.forEach(signal => {
-        processSignal(signal);
-        processedEventsRef.current.add(signal.id);
+    // Process new signals with strict ID tracking
+    if (gameState.signals) {
+      gameState.signals.forEach(signal => {
+        const uniqueId = `signal-${signal.id}`;
+        if (!processedEventsRef.current.has(uniqueId)) {
+          processedEventsRef.current.add(uniqueId);
+          processSignal(signal);
+        }
       });
     }
-    lastSignalCountRef.current = gameState.signals?.length || 0;
 
     // Check budget/morale warnings
     if (gameState.budget < gameState.initialBudget * 0.3 && !processedEventsRef.current.has('budget-warning')) {
@@ -158,14 +190,18 @@ export function useSimulationNotifications(
     }
   }, [gameState, isRunning, addNotification, processSignal]);
 
-  // Reset on new simulation
+  const lastInstanceIdRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!gameState) {
-      lastWeekRef.current = 0;
-      lastSignalCountRef.current = 0;
+    if (!gameState) return;
+
+    if (gameState.simulationInstanceId !== lastInstanceIdRef.current) {
+      console.log(`New simulation instance detected: ${gameState.simulationInstanceId}. Clearing notification history.`);
       processedEventsRef.current.clear();
+      lastWeekRef.current = gameState.week;
+      lastInstanceIdRef.current = gameState.simulationInstanceId;
     }
-  }, [gameState]);
+  }, [gameState?.simulationInstanceId, gameState?.week]);
 
   return {
     processTimelineEvent,

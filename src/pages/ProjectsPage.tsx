@@ -1,25 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Folder, Plus, ChevronRight, Search, Filter, Calendar, 
+import {
+  Folder, Plus, ChevronRight, Search, Filter, Calendar,
   Users, Clock, DollarSign, TrendingUp, MoreVertical, Star
 } from 'lucide-react';
 import { usePageSetup } from '../hooks/usePageSetup';
+import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 
 const ProjectsPage = () => {
   // Page setup with scroll-to-top, viewport fix, and device detection
   const { isMobile, isIOS, isAndroid } = usePageSetup();
+  const { user } = useAuth();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [projects, setProjects] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const projects = [
-    { id: 1, title: 'Product Launch Strategy', industry: 'Technology', status: 'active', progress: 75, deadline: 'Mar 25, 2026', team: 6, budget: 50000, rating: 4.9, color: 'from-blue-500 to-cyan-600' },
-    { id: 2, title: 'Marketing Campaign', industry: 'Marketing', status: 'active', progress: 45, deadline: 'Apr 2, 2026', team: 4, budget: 35000, rating: 4.7, color: 'from-emerald-500 to-green-600' },
-    { id: 3, title: 'Financial Analysis', industry: 'Finance', status: 'pending', progress: 20, deadline: 'Apr 15, 2026', team: 3, budget: 25000, rating: 4.5, color: 'from-violet-500 to-purple-600' },
-    { id: 4, title: 'UX Research Project', industry: 'Design', status: 'completed', progress: 100, deadline: 'Feb 28, 2026', team: 5, budget: 30000, rating: 4.9, color: 'from-amber-500 to-orange-600' },
-    { id: 5, title: 'E-commerce Platform', industry: 'Retail', status: 'completed', progress: 100, deadline: 'Feb 15, 2026', team: 8, budget: 75000, rating: 4.8, color: 'from-rose-500 to-pink-600' },
-    { id: 6, title: 'Data Analytics Dashboard', industry: 'Technology', status: 'active', progress: 60, deadline: 'Mar 30, 2026', team: 4, budget: 40000, rating: 4.6, color: 'from-indigo-500 to-blue-600' }
-  ];
+  useEffect(() => {
+    async function fetchProjects() {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('simulation_sessions')
+        .select('*, scenario:scenario_key(name, industry, difficulty, duration_weeks, team_size, budget)')
+        .eq('user_id', user.id)
+        .order('started_at', { ascending: false });
+
+      if (!error && data) {
+        // map data to match the UI shape
+        const mapped = data.map((d: any) => ({
+          id: d.id,
+          title: d.scenario?.name || 'Custom Simulation',
+          industry: d.scenario?.industry || 'Technology',
+          status: d.status,
+          progress: d.status === 'completed' ? 100 : Math.round((d.current_week / (d.total_weeks || 12)) * 100),
+          deadline: new Date(new Date(d.started_at).getTime() + (d.total_weeks || 12) * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+          team: d.scenario?.team_size || 4,
+          budget: d.scenario?.budget ? d.scenario.budget * 1000 : 50000,
+          rating: 4.8,
+          color: getRandomColor(d.id)
+        }));
+        setProjects(mapped);
+      }
+      setIsLoading(false);
+    }
+    fetchProjects();
+  }, [user]);
+
+  function getRandomColor(id: string) {
+    const colors = ['from-blue-500 to-cyan-600', 'from-emerald-500 to-green-600', 'from-violet-500 to-purple-600', 'from-amber-500 to-orange-600', 'from-rose-500 to-pink-600', 'from-indigo-500 to-blue-600'];
+    let v = 0;
+    for (let c of id) v += c.charCodeAt(0);
+    return colors[v % colors.length];
+  }
 
   const statuses = ['all', 'active', 'pending', 'completed'];
 
@@ -40,8 +77,8 @@ const ProjectsPage = () => {
               <p className="text-gray-600 mt-1">Manage and track all your projects</p>
             </div>
             <div className="flex gap-3">
-              <Link 
-                to="/dashboard" 
+              <Link
+                to="/dashboard"
                 className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
               >
                 <ChevronRight className="h-4 w-4 rotate-180" />
@@ -115,11 +152,10 @@ const ProjectsPage = () => {
                 <button
                   key={status}
                   onClick={() => setFilterStatus(status)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium capitalize transition-colors ${
-                    filterStatus === status
+                  className={`px-4 py-2 rounded-xl text-sm font-medium capitalize transition-colors ${filterStatus === status
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {status === 'all' ? 'All Status' : status}
                 </button>
@@ -135,11 +171,10 @@ const ProjectsPage = () => {
               {/* Cover */}
               <div className={`h-32 bg-gradient-to-br ${project.color} relative`}>
                 <div className="absolute top-3 right-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    project.status === 'active' ? 'bg-emerald-500 text-white' :
-                    project.status === 'pending' ? 'bg-amber-500 text-white' :
-                    'bg-violet-500 text-white'
-                  }`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${project.status === 'active' ? 'bg-emerald-500 text-white' :
+                      project.status === 'pending' ? 'bg-amber-500 text-white' :
+                        'bg-violet-500 text-white'
+                    }`}>
                     {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                   </span>
                 </div>
@@ -158,7 +193,7 @@ const ProjectsPage = () => {
                     <span className="font-semibold text-gray-900">{project.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div 
+                    <div
                       className={`bg-gradient-to-r ${project.color} h-2 rounded-full`}
                       style={{ width: `${project.progress}%` }}
                     />

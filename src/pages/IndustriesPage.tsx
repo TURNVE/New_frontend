@@ -1,4 +1,5 @@
-import { ArrowRight, ArrowLeft, Building2, Sparkles, Code2, TrendingUp, DollarSign, Heart, Users, ShoppingCart, GraduationCap, Factory, Lock, Clock, BarChart3 } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, ArrowLeft, Building2, Sparkles, Code2, TrendingUp, DollarSign, Heart, Users, ShoppingCart, GraduationCap, Factory, Lock, Clock, BarChart3, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageSetup } from '../hooks/usePageSetup';
 
@@ -111,161 +112,192 @@ const industries = [
 ];
 
 const IndustriesPage = () => {
-
   usePageSetup();
+  const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      {/* Navigation Header - Mobile optimized */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
+    <div className="min-h-screen bg-[#fafafa]">
+      {/* Navigation Header */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center">
-              <img src="/logo.png" alt="TURNVE" className="h-7 sm:h-8 w-auto" />
+              <img src="/logo.png" alt="TURNVE" className="h-8 w-auto" />
             </Link>
-            <Link 
-              to="/dashboard" 
-              className="flex items-center text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900"
+            <Link
+              to="/dashboard"
+              className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-              <span className="hidden sm:inline">Back to Dashboard</span>
-              <span className="sm:hidden">Back</span>
+              <ArrowLeft className="h-4 w-4 mr-1.5" />
+              <span>Back to Dashboard</span>
             </Link>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12">
-        {/* Header Section - Compact on mobile */}
-        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-3">
-            <Building2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+        {/* Header Section */}
+        <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-16">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold tracking-wide uppercase shadow-sm mb-4">
+            <Building2 className="h-3.5 w-3.5 mr-1.5" />
             Step 1 of 3
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-920 tracking-tight mb-4">
             Choose Your Industry
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-            Select the industry where you want to gain practical experience. 
+          <p className="text-base sm:text-lg text-gray-500 leading-relaxed font-medium">
+            Select the industry where you want to gain practical experience.
             Each industry offers unique simulations tailored to real-world scenarios.
           </p>
         </div>
 
-        {/* Industry Grid - Mobile: 1 col, Small: 2 col, Large: 4 col */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-8 sm:mb-10">
+        {/* Industry Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-16">
           {industries.map((industry) => {
             const isTechnology = industry.id === 'technology';
             const IconComponent = industry.icon;
-            
+
             return (
               <Link
                 key={industry.id}
                 to={isTechnology ? `/tracks?industry=${industry.id}` : '#'}
                 onClick={(e) => {
-                  if (!isTechnology) {
-                    e.preventDefault();
-                  }
+                  if (!isTechnology) e.preventDefault();
                 }}
-                className={`group relative rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-5 border-2 transition-all duration-300 ${
-                  isTechnology
-                    ? `${industry.borderColor} shadow-md sm:shadow-lg hover:shadow-xl bg-gradient-to-br ${industry.color} text-white`
-                    : 'border-gray-200 bg-gray-50/80 cursor-not-allowed opacity-70 hover:opacity-80'
-                }`}
+                className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 block ${isTechnology
+                    ? 'bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:border-gray-200 transform hover:-translate-y-1'
+                    : 'bg-white/60 shadow-sm border border-gray-100/80 cursor-not-allowed opacity-75'
+                  }`}
               >
-                {/* Locked Indicator - Smaller on mobile */}
-                {!isTechnology && (
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
-                    <div className={`${industry.iconBgColor} rounded-lg p-1 sm:p-1.5`}>
-                      <Lock className={`w-3 h-3 sm:w-4 sm:h-4 ${industry.iconColor}`} />
+                {/* Active/Locked State styling */}
+                <div className="absolute top-5 right-5">
+                  {isTechnology ? (
+                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ArrowRight className="w-4 h-4 text-blue-600" />
                     </div>
-                  </div>
-                )}
-
-                {/* Icon Container - Smaller on mobile */}
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center mb-2 sm:mb-3 transition-all duration-300 ${
-                  isTechnology ? 'bg-white/20' : industry.iconBgColor
-                }`}>
-                  <IconComponent className={`w-5 h-5 sm:w-6 sm:h-6 ${isTechnology ? 'text-white' : industry.iconColor}`} />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100">
+                      <Lock className="w-3.5 h-3.5 text-gray-400" />
+                    </div>
+                  )}
                 </div>
 
-                {/* Content */}
-                <h3 className={`text-sm sm:text-base font-bold mb-1 ${isTechnology ? 'text-white' : 'text-gray-900'}`}>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 ${isTechnology ? 'group-hover:scale-110 shadow-sm' : ''} ${industry.iconBgColor}`}>
+                  <IconComponent className={`w-7 h-7 ${industry.iconColor}`} />
+                </div>
+
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   {industry.name}
                 </h3>
-                <p className={`text-xs sm:text-sm leading-snug mb-3 ${isTechnology ? 'text-white/80' : 'text-gray-600'}`}>
+                <p className="text-sm text-gray-500 leading-relaxed mb-6 min-h-[44px]">
                   {industry.description}
                 </p>
 
-                {/* Stats Grid - Always visible, more compact on mobile */}
-                <div className={`grid grid-cols-3 gap-1 sm:gap-2 pt-2 sm:pt-3 border-t ${isTechnology ? 'border-white/20' : 'border-gray-200'}`}>
-                  <div className="text-center">
-                    <div className={`flex items-center justify-center mb-0.5 ${isTechnology ? 'text-white/70' : 'text-gray-500'}`}>
-                      <BarChart3 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                    </div>
-                    <p className={`text-[10px] sm:text-xs font-semibold ${isTechnology ? 'text-white' : 'text-gray-900'}`}>
-                      {industry.stats.simulations}
-                    </p>
+                <div className="grid grid-cols-3 gap-2 py-4 border-t border-gray-100/80">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-400 mb-1 flex items-center gap-1">Sims</p>
+                    <p className="text-sm font-bold text-gray-800">{industry.stats.simulations}</p>
                   </div>
-                  <div className="text-center">
-                    <div className={`flex items-center justify-center mb-0.5 ${isTechnology ? 'text-white/70' : 'text-gray-500'}`}>
-                      <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                    </div>
-                    <p className={`text-[10px] sm:text-xs font-semibold ${isTechnology ? 'text-white' : 'text-gray-900'}`}>
-                      {industry.stats.avgDuration.split(' ')[0]}
-                    </p>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-400 mb-1 flex items-center gap-1">Time</p>
+                    <p className="text-sm font-bold text-gray-800">{industry.stats.avgDuration.split(' ')[0]}w</p>
                   </div>
-                  <div className="text-center">
-                    <div className={`flex items-center justify-center mb-0.5 ${isTechnology ? 'text-white/70' : 'text-gray-500'}`}>
-                      <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                    </div>
-                    <p className={`text-[10px] sm:text-xs font-semibold ${isTechnology ? 'text-white' : industry.textColor}`}>
-                      {industry.stats.level.split(' ')[0]}
-                    </p>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-400 mb-1 flex items-center gap-1">Level</p>
+                    <p className={`text-sm font-bold truncate ${industry.textColor}`}>{industry.stats.level.split(' ')[0]}</p>
                   </div>
                 </div>
-
-                {/* Continue button for active card - Only on mobile */}
-                {isTechnology && (
-                  <div className="mt-3 sm:hidden">
-                    <div className="flex items-center justify-center text-xs font-semibold bg-white/20 rounded-lg py-2">
-                      <span>Continue</span>
-                      <ArrowRight className="w-3 h-3 ml-1" />
-                    </div>
-                  </div>
-                )}
-
-                {/* Desktop hover arrow */}
-                {isTechnology && (
-                  <div className="hidden sm:block absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                      <ArrowRight className="w-3.5 h-3.5 text-white" />
-                    </div>
-                  </div>
-                )}
               </Link>
             );
           })}
         </div>
 
-        {/* Help Section - Compact on mobile */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-blue-100">
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+        {/* Help Section */}
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col sm:flex-row items-center gap-6 sm:gap-8 justify-between">
+          <div className="flex items-center gap-6">
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-center border border-blue-100 shadow-sm flex-shrink-0">
+              <Sparkles className="h-6 w-6 text-blue-600" />
             </div>
-            <div className="flex-1 text-center sm:text-left">
-              <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-0.5 sm:mb-1">Not sure which industry to choose?</h3>
-              <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                Take our quick career assessment to discover the best fit for your skills and goals.
+            <div className="text-center sm:text-left">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1.5">Not sure which industry to choose?</h3>
+              <p className="text-gray-500 text-sm font-medium">
+                Take our quick assessment to find the perfect simulation track.
               </p>
             </div>
-            <button className="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-white text-blue-600 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl border border-blue-200 hover:bg-blue-50 transition-colors whitespace-nowrap mt-2 sm:mt-0">
-              Take Assessment
-            </button>
           </div>
+          <button
+            onClick={() => setShowAssessmentModal(true)}
+            className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+          >
+            Take Assessment
+          </button>
         </div>
       </main>
+
+      {/* Assessment Modal */}
+      {showAssessmentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-bold text-gray-900">Career Assessment</h2>
+              </div>
+              <button
+                onClick={() => setShowAssessmentModal(false)}
+                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">What's your primary career goal?</label>
+                <select className="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-3 border outline-none text-sm text-gray-700 shadow-sm">
+                  <option>Product Management</option>
+                  <option>Marketing Strategy</option>
+                  <option>Data Analytics</option>
+                  <option>Finance</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Years of experience</label>
+                <select className="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-3 border outline-none text-sm text-gray-700 shadow-sm">
+                  <option>0-2 years (Beginner)</option>
+                  <option>3-5 years (Intermediate)</option>
+                  <option>5+ years (Advanced)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">How much time do you have weekly?</label>
+                <select className="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-3 border outline-none text-sm text-gray-700 shadow-sm">
+                  <option>1-2 hours</option>
+                  <option>3-5 hours</option>
+                  <option>6+ hours</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="p-6 bg-gray-50/80 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
+              <button
+                onClick={() => setShowAssessmentModal(false)}
+                className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl transition-all w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setShowAssessmentModal(false)}
+                className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg rounded-xl transition-all w-full sm:w-auto"
+              >
+                Find My Track
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

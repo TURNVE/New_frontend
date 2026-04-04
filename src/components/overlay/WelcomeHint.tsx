@@ -1,50 +1,62 @@
 import { useState } from 'react';
-import { 
+import {
   Lightbulb, Mail, Target, Clock, ChevronRight, X,
-  MessageSquare, Building2, FileText, Trophy
+  MessageSquare, Building2, FileText, Trophy, Zap, Bell,
+  LayoutList
 } from 'lucide-react';
+import { enableSounds } from '../../utils/sounds';
 
 interface WelcomeHintProps {
   isOpen: boolean;
   onClose: () => void;
+  companyName: string;
+  challengeTitle: string;
+  archetype: string;
 }
 
-export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose }) => {
+export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, companyName, challengeTitle, archetype }) => {
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    enableSounds();
+    onClose();
+  };
 
   const [step, setStep] = useState(0);
   const [isSkipped, setIsSkipped] = useState(false);
 
+  const archetypeLabel = archetype.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
   const steps = [
     {
       icon: Trophy,
-      title: 'Welcome to Your PM Simulation! 🎯',
-      content: 'You\'ve joined FlowDesk as a Product Manager. Your decisions will shape the product and team success.',
-      highlight: 'This is a gamified environment - make smart decisions to win!',
+      title: `Welcome to ${companyName}! 🎯`,
+      content: `You've joined the team as a Senior Product Manager. Your decisions will shape the outcome of this ${archetypeLabel} simulation.`,
+      highlight: challengeTitle,
     },
     {
       icon: Target,
       title: 'Your Mission',
-      content: 'Lead this 12-week project to success. Balance budget, team morale, stakeholder trust, and risk.',
-      highlight: 'You can FAIL if: budget hits $0, risk > 90%, team morale < 20%, or stakeholders lose trust.',
+      content: 'Navigate the weekly challenges. Balance budget, team morale, stakeholder satisfaction, and project risk.',
+      highlight: 'Watch out: Critical risks or zero budget will end the simulation early.',
     },
     {
-      icon: Clock,
-      title: 'How Time Works',
-      content: 'Each "day" = 20 minutes real-time. Click "Next Week" to advance. Take breaks when needed - your progress saves automatically.',
-      highlight: 'Pace yourself! There\'s no rush.',
+      icon: Zap,
+      title: 'Strategic Actions ⚡',
+      content: 'Each week brings new actions. These aren\'t just choices—you might need to draft decision memos, submit PRDs, or approve engineering plans.',
+      highlight: 'Click any action to open the interactive workspace!',
     },
     {
-      icon: Mail,
-      title: 'Check Your Email 📧',
-      content: 'You have a welcome email from HR! Click the Mail icon in the top bar to read it.',
-      highlight: 'Important: Company updates and stakeholder messages come through email.',
+      icon: LayoutList,
+      title: 'The Activity Backlog 📂',
+      content: 'The Backlog is your central hub. It tracks every signal, event, and overdue action. Check it often to stay on top of the project.',
+      highlight: 'A notification badge will appear when items require your urgent attention.',
     },
     {
-      icon: MessageSquare,
-      title: 'Need Help? Message the Team',
-      content: 'Click Messages to chat with team members. They\'ll auto-respond with helpful insights!',
-      highlight: 'Rate limited: 1 message per 2 minutes to prevent spam.',
+      icon: Bell,
+      title: 'Communications Hub 🔔',
+      content: 'Stakeholders will reach out via the Notification Center. Read emails and messages to gather insights before making big decisions.',
+      highlight: 'Pro Tip: Team members provide technical and market context in their messages!',
     },
   ];
 
@@ -54,9 +66,8 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose }) => 
       {steps.map((_, i) => (
         <div
           key={i}
-          className={`h-1 flex-1 rounded-full transition-colors ${
-            i <= step ? 'bg-blue-500' : 'bg-white/20'
-          }`}
+          className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? 'bg-blue-500' : 'bg-white/20'
+            }`}
         />
       ))}
     </div>
@@ -67,9 +78,9 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose }) => 
       <div className="bg-[#141414] border border-white/10 rounded-2xl max-w-lg w-full p-6 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl" />
-        
+
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 p-1 hover:bg-white/10 rounded transition-colors"
         >
           <X className="w-5 h-5 text-[#a1a1aa]" />
@@ -100,12 +111,12 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose }) => 
 
         <div className="flex items-center justify-between">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-sm text-[#a1a1aa] hover:text-white transition-colors"
           >
             Skip tutorial
           </button>
-          
+
           <div className="flex gap-2">
             {step > 0 && (
               <button
@@ -116,7 +127,7 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose }) => 
               </button>
             )}
             <button
-              onClick={() => step < steps.length - 1 ? setStep(s => s + 1) : onClose()}
+              onClick={() => step < steps.length - 1 ? setStep(s => s + 1) : handleClose()}
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
             >
               {step < steps.length - 1 ? 'Next' : 'Get Started'}

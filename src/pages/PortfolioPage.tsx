@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   FileText, Calendar, Users, Clock, DollarSign, Eye, Download, 
   Share2, Heart, Star, Filter, Grid3X3, List, Search, Plus,
@@ -6,82 +6,66 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageSetup } from '../hooks/usePageSetup';
-
-// Portfolio items data
-const portfolioItems = [
-  { 
-    id: 1, 
-    title: 'Marketing Campaign Strategy', 
-    description: 'Developed multi-channel strategy increasing brand awareness by 35%', 
-    industry: 'Marketing', 
-    role: 'Marketing Lead', 
-    date: '2026-02-15', 
-    duration: '3 weeks', 
-    budget: 25000, 
-    teamSize: 4, 
-    rating: 4.8, 
-    achievements: ['Innovation Challenge', 'Team Excellence'], 
-    likes: 124,
-    coverColor: 'from-blue-500 to-cyan-600',
-    tags: ['Strategy', 'Digital Marketing', 'Analytics'] 
-  },
-  { 
-    id: 2, 
-    title: 'Product Launch Simulation', 
-    description: 'Led cross-functional team to successfully launch SaaS product', 
-    industry: 'Technology', 
-    role: 'Product Manager', 
-    date: '2026-01-22', 
-    duration: '4 weeks', 
-    budget: 45000, 
-    teamSize: 6, 
-    rating: 4.9, 
-    achievements: ['Leadership Excellence', 'On-time Delivery'], 
-    likes: 186,
-    coverColor: 'from-violet-500 to-purple-600',
-    tags: ['Product', 'Agile', 'Strategy'] 
-  },
-  { 
-    id: 3, 
-    title: 'Financial Analysis Report', 
-    description: 'Created analysis identifying $2.1M annual cost-saving opportunities', 
-    industry: 'Finance', 
-    role: 'Financial Analyst', 
-    date: '2026-01-05', 
-    duration: '2 weeks', 
-    budget: 15000, 
-    teamSize: 2, 
-    rating: 4.7, 
-    achievements: ['Process Improvement', 'ROI Excellence'], 
-    likes: 98,
-    coverColor: 'from-emerald-500 to-green-600',
-    tags: ['Analysis', 'Finance', 'Excel'] 
-  },
-  { 
-    id: 4, 
-    title: 'UX Research Project', 
-    description: 'Conducted user research improving conversion rate by 28%', 
-    industry: 'Design', 
-    role: 'UX Researcher', 
-    date: '2025-12-18', 
-    duration: '3 weeks', 
-    budget: 18000, 
-    teamSize: 3, 
-    rating: 4.9, 
-    achievements: ['User Impact', 'Research Excellence'], 
-    likes: 156,
-    coverColor: 'from-amber-500 to-orange-600',
-    tags: ['UX', 'Research', 'Testing'] 
-  }
-];
+import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 
 const PortfolioPage = () => {
   // Page setup with scroll-to-top, viewport fix, and device detection
   const { isMobile, isIOS, isAndroid } = usePageSetup();
+  const { user } = useAuth();
+  
+  const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
   const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPortfolio() {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+      
+      const { data: scoresData, error: scoresError } = await supabase
+        .from('simulation_scores')
+        .select('*, session:session_id(*, scenario:scenario_key(*))')
+        .eq('user_id', user.id);
+
+      if (!scoresError && scoresData) {
+        const mappedItems = scoresData.map((score: any) => {
+           const scenario = score.session?.scenario;
+           return {
+            id: score.id,
+            title: scenario?.name || 'Simulation Project',
+            description: scenario?.description || 'Completed project simulation.',
+            industry: scenario?.industry || 'Technology',
+            role: 'Product Manager',
+            date: new Date(score.completed_at).toISOString().split('T')[0],
+            duration: `${scenario?.duration_weeks || 12} weeks`,
+            budget: scenario ? scenario.budget * 1000 : 150000,
+            teamSize: scenario?.team_size || 4,
+            rating: (score.overall_score / 20).toFixed(1), // Assuming score out of 100 
+            achievements: score.strengths || ['Completed Successfully'],
+            likes: Math.floor(Math.random() * 150) + 10,
+            coverColor: getRandomColor(score.id),
+            tags: [scenario?.industry || 'Project', 'Strategy']
+           }
+        });
+        setPortfolioItems(mappedItems);
+      }
+      setIsLoading(false);
+    }
+    fetchPortfolio();
+  }, [user]);
+
+  function getRandomColor(id: string) {
+    const colors = ['from-blue-500 to-cyan-600', 'from-emerald-500 to-green-600', 'from-violet-500 to-purple-600', 'from-amber-500 to-orange-600', 'from-rose-500 to-pink-600', 'from-indigo-500 to-blue-600'];
+    let val = 0;
+    for (let i = 0; i < id.length; i++) val += id.charCodeAt(i);
+    return colors[val % colors.length];
+  }
 
   // Calculate stats
   const totalProjects = portfolioItems.length;

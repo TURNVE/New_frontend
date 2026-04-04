@@ -28,36 +28,36 @@ export interface SimulationTemplate {
   name: string;
   companyName: string;
   industry: string;
-  archetype: 'crisis' | 'growth' | 'platform' | 'zero_to_one';
-  
+  archetype: 'crisis' | 'growth' | 'platform' | 'zero_to_one' | 'creative';
+
   // Company branding
   logo: string;
   primaryColor: string;
-  
+
   // Company details
   description: string;
   founded: string;
   employees: string;
   headquarters: string;
-  
+
   // Financial
   budget: number;
   fundingStatus: string;
-  
+
   // Challenge
   challenge: string;
   challengeDetails: string;
-  
+
   // Unique Briefing - drives simulation behavior
   briefing: ProjectBriefingData;
-  
+
   // Tasks
   tasks: SimulationTask[];
-  
+
   // Difficulty
   difficulty: 'intro' | 'intermediate' | 'advanced';
   durationHours: number;
-  
+
   // Thresholds
   passThreshold: number;
   strongPassThreshold: number;
@@ -138,7 +138,7 @@ const paylinkBriefing: ProjectBriefingData = {
   id: 'sim-pm-001',
   title: '72-Hour Launch Crisis - PayLink',
   description: 'Launch day crisis management at fintech startup',
-  totalWeeks: 3, // 72 hours compressed
+  totalWeeks: 12, // Transitioned to longer-term crisis management
   clientName: 'PayLink',
   projectType: 'Crisis Management',
   budget: 250000,
@@ -297,6 +297,34 @@ const newwaveBriefing: ProjectBriefingData = {
 // TEMPLATES MAP
 // ============================================================================
 export const simulationTemplates: Record<string, SimulationTemplate> = {
+  'pm-01': {
+    id: 'pm-01',
+    route: '/simulation/pm-01',
+    name: '72-Hour Launch Crisis',
+    companyName: 'PayLink',
+    industry: 'Fintech/Payments',
+    archetype: 'crisis',
+    logo: '/logos/paylink.svg',
+    primaryColor: '#ef4444',
+    description: 'A fintech startup revolutionizing digital payments for small businesses.',
+    founded: '2022',
+    employees: '45',
+    headquarters: 'San Francisco, CA',
+    budget: 250000,
+    fundingStatus: 'Series A ($8M)',
+    challenge: 'Launch Day Meltdown',
+    challengeDetails: `You are the Senior PM at PayLink. Launch day for your new payment feature is in 72 hours. Suddenly, compliance flags critical issues, technical debt surfaces, and the CEO is pushing for immediate launch despite risks. The clock is ticking. Every decision counts.`,
+    briefing: paylinkBriefing,
+    tasks: [
+      { id: 't1', type: 'crisis_assessment', title: 'Initial Crisis Assessment', description: 'Analyze the current situation and identify all critical issues.', requirements: ['List all immediate threats', 'Assess severity of each', 'Prioritize response'] },
+      { id: 't2', type: 'stakeholder_comms', title: 'CEO Briefing', description: 'Communicate findings to the CEO and recommend a course of action.', requirements: ['Clear recommendation', 'Data-backed justification', 'Risk acknowledgment'] },
+      { id: 't3', type: 'decision_memo', title: 'Go/No-Go Decision', description: 'Make the final call on launch timing.', requirements: ['Clear decision', 'Contingency plan', 'Stakeholder alignment'] }
+    ],
+    difficulty: 'advanced',
+    durationHours: 72,
+    passThreshold: 60,
+    strongPassThreshold: 85
+  },
   'sim-pm-001': {
     id: 'sim-pm-001',
     route: '/simulation/sim-pm-001',
@@ -304,39 +332,39 @@ export const simulationTemplates: Record<string, SimulationTemplate> = {
     companyName: 'PayLink',
     industry: 'Fintech/Payments',
     archetype: 'crisis',
-    
+
     // PayLink branding - urgent, red
     logo: '/logos/paylink.svg',
     primaryColor: '#ef4444',
-    
+
     description: 'A fintech startup revolutionizing digital payments for small businesses.',
     founded: '2022',
     employees: '45',
     headquarters: 'San Francisco, CA',
-    
+
     budget: 250000,
     fundingStatus: 'Series A ($8M)',
-    
+
     challenge: 'Launch Day Meltdown',
     challengeDetails: `You are the Senior PM at PayLink. Launch day for your new payment feature is in 72 hours.
 Suddenly, compliance flags critical issues, technical debt surfaces, and the CEO is pushing for immediate launch despite risks.
     
 The clock is ticking. Every decision counts.`,
-    
+
     briefing: paylinkBriefing,
-    
+
     tasks: [
       { id: 't1', type: 'crisis_assessment', title: 'Initial Crisis Assessment', description: 'Analyze the current situation and identify all critical issues.', requirements: ['List all immediate threats', 'Assess severity of each', 'Prioritize response'] },
       { id: 't2', type: 'stakeholder_comms', title: 'CEO Briefing', description: 'Communicate findings to the CEO and recommend a course of action.', requirements: ['Clear recommendation', 'Data-backed justification', 'Risk acknowledgment'] },
       { id: 't3', type: 'decision_memo', title: 'Go/No-Go Decision', description: 'Make the final call on launch timing.', requirements: ['Clear decision', 'Contingency plan', 'Stakeholder alignment'] }
     ],
-    
+
     difficulty: 'advanced',
     durationHours: 72,
     passThreshold: 60,
     strongPassThreshold: 85
   },
-  
+
   'sim-pm-002': {
     id: 'sim-pm-002',
     route: '/simulation/sim-pm-002',
@@ -344,40 +372,40 @@ The clock is ticking. Every decision counts.`,
     companyName: 'ShopEase',
     industry: 'E-commerce',
     archetype: 'growth',
-    
+
     // ShopEase branding - energetic, purple
     logo: '/logos/shopease.svg',
     primaryColor: '#8b5cf6',
-    
+
     description: 'A rapidly growing e-commerce platform serving 2M+ consumers.',
     founded: '2020',
     employees: '120',
     headquarters: 'Austin, TX',
-    
+
     budget: 500000,
     fundingStatus: 'Series B ($25M)',
-    
+
     challenge: 'The BNPL Decision',
     challengeDetails: `You are the PM at ShopEase. Revenue has plateaued for 3 quarters. The board demands +40% growth.
 The CEO proposes launching BNPL (Buy Now, Pay Later). This is NOT just a feature - it impacts risk, compliance, cash flow, and company survival.
     
 Build the case - or the case against.`,
-    
+
     briefing: shopeaseBriefing,
-    
+
     tasks: [
       { id: 't1', type: 'product_brief', title: 'Product Brief', description: 'Define the BNPL product opportunity.', requirements: ['Problem statement', 'Target users', 'Success metrics', 'Initial risks'] },
       { id: 't2', type: 'financial_model', title: 'Unit Economics', description: 'Build financial projections with realistic assumptions.', requirements: ['Revenue projections', 'Default risk analysis', 'CAC vs LTV', 'Sensitivity analysis'] },
       { id: 't3', type: 'risk_assessment', title: 'Risk Review', description: 'Assess all risks and propose mitigations.', requirements: ['Fraud risk', 'Regulatory exposure', 'Worst-case scenarios', 'Mitigation strategies'] },
       { id: 't4', type: 'decision_memo', title: 'Final Recommendation', description: 'Submit your final recommendation with justification.', requirements: ['Clear decision', 'Data support', 'Risk acknowledgment', 'Tradeoffs explicit'] }
     ],
-    
+
     difficulty: 'intermediate',
     durationHours: 48,
     passThreshold: 60,
     strongPassThreshold: 80
   },
-  
+
   'sim-pm-003': {
     id: 'sim-pm-003',
     route: '/simulation/sim-pm-003',
@@ -385,40 +413,40 @@ Build the case - or the case against.`,
     companyName: 'TechCore Systems',
     industry: 'Enterprise SaaS',
     archetype: 'platform',
-    
+
     // TechCore branding - stable, blue
     logo: '/logos/techcore.svg',
     primaryColor: '#3b82f6',
-    
+
     description: 'Enterprise SaaS company serving Fortune 500 clients with mission-critical software.',
     founded: '2015',
     employees: '350',
     headquarters: 'Seattle, WA',
-    
+
     budget: 1200000,
     fundingStatus: 'Profitable (Bootstrapped)',
-    
+
     challenge: 'The Infrastructure Dilemma',
     challengeDetails: `You are the Platform PM at TechCore. The legacy payment infrastructure is failing.
 Engineering wants a complete rewrite (18 months). But the business cannot tolerate downtime - each hour of outage costs $100K+.
     
 How do you migrate safely while keeping the business running?`,
-    
+
     briefing: techcoreBriefing,
-    
+
     tasks: [
       { id: 't1', type: 'architecture_proposal', title: 'System Design', description: 'Propose a new architecture for the payment system.', requirements: ['High-level design', 'Scalability considerations', 'Security requirements'] },
       { id: 't2', type: 'migration_plan', title: 'Migration Strategy', description: 'Plan the transition from legacy to new system.', requirements: ['Phased approach', 'Rollback strategy', 'Timeline with milestones'] },
       { id: 't3', type: 'risk_mitigation', title: 'Risk Plan', description: 'Address all risks associated with the migration.', requirements: ['Technical risks', 'Business risks', 'Mitigation strategies', 'Contingencies'] },
       { id: 't4', type: 'stakeholder_alignment', title: 'Executive Alignment', description: 'Get leadership buy-in for your plan.', requirements: ['Clear communication', 'Tradeoff explanation', 'Resource requirements'] }
     ],
-    
+
     difficulty: 'advanced',
     durationHours: 60,
     passThreshold: 65,
     strongPassThreshold: 85
   },
-  
+
   'sim-pm-004': {
     id: 'sim-pm-004',
     route: '/simulation/sim-pm-004',
@@ -426,38 +454,242 @@ How do you migrate safely while keeping the business running?`,
     companyName: 'NewWave',
     industry: 'EdTech',
     archetype: 'zero_to_one',
-    
+
     // NewWave branding - fresh, teal
     logo: '/logos/newwave.svg',
     primaryColor: '#14b8a6',
-    
+
     description: 'An emerging EdTech startup focused on personalized learning.',
     founded: '2023',
     employees: '18',
     headquarters: 'Denver, CO',
-    
+
     budget: 150000,
     fundingStatus: 'Seed ($3M)',
-    
+
     challenge: 'Finding Product-Market Fit',
     challengeDetails: `You are the founding PM at NewWave. The CEO says: "We need a new revenue stream. Figure it out."
 No problem defined. No users interviewed. Just ambiguity and 3 months of runway.
     
 How do you find the right opportunity when you don't know what you don't know?`,
-    
+
     briefing: newwaveBriefing,
-    
+
     tasks: [
       { id: 't1', type: 'opportunity_analysis', title: 'Market Opportunity', description: 'Identify potential market opportunities.', requirements: ['Market size estimation', 'Competition analysis', 'Initial hypothesis'] },
       { id: 't2', type: 'user_research', title: 'User Discovery', description: 'Conduct user research to validate opportunities.', requirements: ['Interview methodology', 'Key insights', 'Pivot/refine hypothesis'] },
       { id: 't3', type: 'mvp_concept', title: 'MVP Definition', description: 'Define the minimum viable product.', requirements: ['Core feature set', 'Target users', 'Success criteria'] },
       { id: 't4', type: 'gtm_plan', title: 'Go-to-Market Strategy', description: 'Plan how to launch and acquire users.', requirements: ['Channels', 'Messaging', 'Launch timeline', 'Success metrics'] }
     ],
-    
+
     difficulty: 'intermediate',
     durationHours: 40,
     passThreshold: 55,
     strongPassThreshold: 80
+  },
+
+  // ============================================================================
+  // BRAND-01: Brand Identity Refresh - Nike Vision (Creative)
+  // ============================================================================
+  'brand-01': {
+    id: 'brand-01',
+    route: '/simulation/brand-01',
+    name: 'Brand Identity Refresh',
+    companyName: 'Nike Vision',
+    industry: 'Technology/Sports',
+    archetype: 'creative',
+
+    // Nike Vision branding - vibrant, Gen Z focused
+    logo: '/logos/nike-vision.svg',
+    primaryColor: '#FF6B6B',
+
+    description: 'Creative agency for Gen Z-focused athletic brand.',
+    founded: '2024',
+    employees: '12',
+    headquarters: 'Los Angeles, CA',
+
+    budget: 85000,
+    fundingStatus: 'Client Project',
+
+    challenge: 'Brand Perception Gap',
+    challengeDetails: `You are the creative lead on the Nike Vision rebrand. Initial research shows Gen Z disconnect from current brand identity.
+    
+Your mission: Create a cohesive visual language that resonates with Gen Z, submit brand color codes, design creative assets, and set up Meta advertising campaigns.`,
+
+    briefing: {
+      id: 'sim-brand-001',
+      title: 'Global Rebranding & Identity Refresh',
+      description: 'Lead the creative direction for a brand identity refresh targeting Gen Z athletes',
+      totalWeeks: 6,
+      clientName: 'Nike Vision',
+      projectType: 'Brand Identity',
+      budget: 85000,
+      teamSize: 5,
+      kpis: [
+        { id: 'brand-sentiment', label: 'Brand Sentiment', value: 45, maxValue: 100, status: 'warning', goal: 'Reach 70%', progress: 45 },
+        { id: 'engagement', label: 'Social Engagement', value: 4.2, maxValue: 10, status: 'warning', goal: '8%', progress: 42 },
+        { id: 'roas', label: 'Meta ROAS', value: 0, maxValue: 10, status: 'warning', goal: '2.5x', progress: 0 },
+      ],
+      successCriteria: [
+        { id: '1', description: 'Complete brand research and Gen Z insights', completed: false, weekDue: 1, priority: 'high' },
+        { id: '2', description: 'Submit color palette with HEX codes', completed: false, weekDue: 2, priority: 'high' },
+        { id: '3', description: 'Create moodboard and visual direction', completed: false, weekDue: 2, priority: 'high' },
+        { id: '4', description: 'Design social media assets', completed: false, weekDue: 4, priority: 'high' },
+        { id: '5', description: 'Setup Meta campaign and import stats', completed: false, weekDue: 5, priority: 'medium' },
+        { id: '6', description: 'Complete brand style guide', completed: false, weekDue: 6, priority: 'high' },
+      ],
+      timelinePhases: [
+        { id: 'phase1', name: 'Brand Research & Discovery', status: 'active', description: 'Understand current brand perception and Gen Z preferences' },
+        { id: 'phase2', name: 'Moodboard & Visual Direction', status: 'pending', description: 'Define visual vibe, core colors, typography direction' },
+        { id: 'phase3', name: 'Brand Assets Development', status: 'pending', description: 'Create primary brand assets and color codes' },
+        { id: 'phase4', name: 'Campaign Creative Development', status: 'pending', description: 'Create social media assets and campaign creative' },
+        { id: 'phase5', name: 'Meta Advertising Setup', status: 'pending', description: 'Set up and track Meta advertising campaigns' },
+        { id: 'phase6', name: 'Brand Book & Launch', status: 'pending', description: 'Finalize brand book and launch campaign' },
+      ],
+      stakeholders: [
+        { id: 'creative_director', name: 'Alex Rivera', role: 'Creative Director', department: 'Creative', influence: 9, satisfaction: 70, communicationStyle: 'direct', concerns: ['brand_consistency', 'gen_z_appeal'], priorities: ['innovative_design'] },
+        { id: 'marketing_lead', name: 'Jordan Chen', role: 'Marketing Lead', department: 'Marketing', influence: 8, satisfaction: 65, communicationStyle: 'formal', concerns: ['roi', 'campaign_performance'], priorities: ['roas', 'engagement'] },
+        { id: 'brand_strategist', name: 'Sam Patel', role: 'Brand Strategist', department: 'Brand', influence: 7, satisfaction: 60, communicationStyle: 'diplomatic', concerns: ['brand_equity', 'positioning'], priorities: ['market_position'] },
+        { id: 'client', name: 'Nike Brand Team', role: 'Client', department: 'External', influence: 10, satisfaction: 50, communicationStyle: 'direct', concerns: ['launch_timeline', 'gen_z_resonance'], priorities: ['brand_refresh'] },
+      ],
+      keyDecisions: [],
+      currentRisks: [
+        { id: 'r1', title: '6 weeks to brand launch', severity: 'critical', likelihood: 'certain' },
+        { id: 'r2', title: '$85K creative budget constraint', severity: 'high', likelihood: 'certain' },
+        { id: 'r3', title: 'Must preserve Swoosh logo core identity', severity: 'medium', likelihood: 'certain' },
+      ],
+      marketContext: 'Technology/Sports - Gen Z athletic brand',
+      technicalStack: 'Figma, Canva, Meta Ads Manager'
+    },
+
+    tasks: [
+      { id: 't1', type: 'brand_research', title: 'Brand Research', description: 'Conduct brand audit and Gen Z research', requirements: ['Brand perception analysis', 'Competitor research', 'Gen Z insights'] },
+      { id: 't2', type: 'color_palette', title: 'Submit Color Palette', description: 'Define official brand colors with HEX codes', requirements: ['Primary colors (3-5)', 'Secondary colors', 'HEX/RGB codes', 'Color psychology rationale'] },
+      { id: 't3', type: 'moodboard', title: 'Create Moodboard', description: 'Build visual moodboard with inspiration', requirements: ['Color palette visualization', 'Typography samples', 'Inspiration images'] },
+      { id: 't4', type: 'brand_assets', title: 'Design Brand Assets', description: 'Create logo variants and brand assets', requirements: ['Logo variants', 'Pattern library', 'Icon system'] },
+      { id: 't5', type: 'social_assets', title: 'Design Social Assets', description: 'Create social media content', requirements: ['Instagram posts', 'TikTok templates', 'Ad creative variants'] },
+      { id: 't6', type: 'meta_campaign', title: 'Meta Ads Setup', description: 'Set up Meta advertising and import stats', requirements: ['Campaign structure', 'Import Meta stats', 'Performance analysis'] },
+      { id: 't7', type: 'brand_guide', title: 'Finalize Brand Guide', description: 'Complete comprehensive brand style guide', requirements: ['Logo usage', 'Color system', 'Typography', 'Application examples'] },
+    ],
+
+    difficulty: 'advanced',
+    durationHours: 40,
+    passThreshold: 70,
+    strongPassThreshold: 90
+  },
+
+  // ============================================================================
+  // WEB-DEV-01: Checkout Performance Under Fire (Technical, Engineering)
+  // ============================================================================
+  'web-dev-01': {
+    id: 'web-dev-01',
+    route: '/simulation/web-dev-01',
+    name: 'Checkout Performance Under Fire',
+    companyName: 'TurnVe Commerce',
+    industry: 'E-commerce / Technology',
+    archetype: 'crisis',
+
+    // TurnVe branding - urgent, orange/red
+    logo: '/logos/turnve.svg',
+    primaryColor: '#f97316',
+
+    description: 'Shopify Plus merchant handling $50M+ annually, preparing for Black Friday.',
+    founded: '2019',
+    employees: '85',
+    headquarters: 'Austin, TX',
+
+    budget: 85000,
+    fundingStatus: 'Series B ($12M)',
+
+    challenge: 'Checkout Latency Crisis',
+    challengeDetails: `You are a Senior Backend Engineer at TurnVe Commerce (Shopify Plus). Black Friday is 8 weeks away.
+    
+Current situation:
+- Checkout latency has increased 65% over past 3 months (now averaging 2.3s)
+- Transaction success rate dropped from 97.2% to 94.8%
+- Multiple P1 incidents in last 2 weeks due to checkout timeouts
+- Engineering team is burned out and morale is low
+
+Your mission: Diagnose the root cause, implement optimizations, and get ready for Black Friday traffic (expected 5x normal volume).
+
+Constraints:
+- Zero-downtime migration required
+- $85K budget cap
+- Node.js/PostgreSQL/Redis/Kubernetes stack only
+- Must maintain feature parity with existing checkout
+
+Success metrics:
+- Reduce checkout latency by 45% (target: <1.3s)
+- Increase transaction success rate to 99%+
+- Handle 5x Black Friday traffic with <2s p99 latency`,
+
+    briefing: {
+      id: 'sim-web-dev-001',
+      title: 'Checkout Performance Under Fire',
+      description: 'Optimize Shopify Plus checkout microservice for Black Friday',
+      totalWeeks: 8,
+      clientName: 'TurnVe Commerce',
+      projectType: 'Performance Engineering',
+      budget: 85000,
+      teamSize: 3,
+      kpis: [
+        { id: 'latency', label: 'Checkout Latency', value: 2300, maxValue: 5000, status: 'critical', goal: '<1300ms', progress: 46 },
+        { id: 'success-rate', label: 'Transaction Success', value: 94.8, maxValue: 100, status: 'warning', goal: '>99%', progress: 94.8 },
+        { id: 'team-morale', label: 'Team Morale', value: 45, maxValue: 100, status: 'critical', goal: '>70%', progress: 45 },
+        { id: 'budget', label: 'Budget Used', value: 15, maxValue: 100, status: 'good', goal: '<100%', progress: 15 },
+        { id: 'risk', label: 'Risk Level', value: 75, maxValue: 100, status: 'critical', goal: '<30%', progress: 75 },
+      ],
+      successCriteria: [
+        { id: '1', description: 'Complete initial diagnosis and hypothesis', completed: false, weekDue: 1, priority: 'high' },
+        { id: '2', description: 'Submit root cause analysis document', completed: false, weekDue: 2, priority: 'high' },
+        { id: '3', description: 'Present architecture decision to CTO', completed: false, weekDue: 3, priority: 'high' },
+        { id: '4', description: 'Implement caching layer', completed: false, weekDue: 4, priority: 'high' },
+        { id: '5', description: 'Optimize database queries', completed: false, weekDue: 5, priority: 'medium' },
+        { id: '6', description: 'Complete load testing', completed: false, weekDue: 6, priority: 'high' },
+        { id: '7', description: 'Execute production rollout', completed: false, weekDue: 7, priority: 'high' },
+        { id: '8', description: 'Go/No-Go decision for Black Friday', completed: false, weekDue: 8, priority: 'high' },
+      ],
+      timelinePhases: [
+        { id: 'phase1', name: 'Diagnosis & Hypothesis', status: 'active', description: 'Analyze metrics, logs, and identify root cause' },
+        { id: 'phase2', name: 'Architecture Decision', status: 'pending', description: 'Evaluate approaches and select solution' },
+        { id: 'phase3', name: 'Implementation', status: 'pending', description: 'Build and test the solution' },
+        { id: 'phase4', name: 'Load Testing', status: 'pending', description: 'Validate performance under load' },
+        { id: 'phase5', name: 'Production Rollout', status: 'pending', description: 'Deploy with zero downtime' },
+        { id: 'phase6', name: 'Launch Decision', status: 'pending', description: 'Final Go/No-Go for Black Friday' },
+      ],
+      stakeholders: [
+        { id: 'cto', name: 'Sarah Chen', role: 'CTO', department: 'Engineering', influence: 10, satisfaction: 70, communicationStyle: 'direct', concerns: ['system_reliability', 'timeline', 'technical_debt'], priorities: ['black_friday_success', 'zero_downtime'] },
+        { id: 'cfo', name: 'Diana Rodriguez', role: 'CFO', department: 'Finance', influence: 9, satisfaction: 65, communicationStyle: 'formal', concerns: ['budget_adherence', 'roi'], priorities: ['stay_within_budget', 'prove_roi'] },
+        { id: 'product', name: 'Mike Johnson', role: 'VP Product', department: 'Product', influence: 8, satisfaction: 60, communicationStyle: 'casual', concerns: ['roadmap_impact', 'feature_parity'], priorities: ['minimize_delays', 'ship_features'] },
+        { id: 'devops', name: 'Alex Kim', role: 'DevOps Lead', department: 'Infrastructure', influence: 7, satisfaction: 55, communicationStyle: 'direct', concerns: ['infrastructure_stability', 'rollback_capability'], priorities: ['reliability', 'easy_rollback'] },
+      ],
+      keyDecisions: [],
+      currentRisks: [
+        { id: 'r1', title: 'Root cause may be unknown/misleading', severity: 'critical', likelihood: 'certain' },
+        { id: 'r2', title: 'Team burnout could cause delays', severity: 'high', likelihood: 'high' },
+        { id: 'r3', title: 'Black Friday deadline is immovable', severity: 'critical', likelihood: 'certain' },
+        { id: 'r4', title: 'Caching could cause data consistency issues', severity: 'medium', likelihood: 'medium' },
+        { id: 'r5', title: 'Load testing may reveal new issues', severity: 'high', likelihood: 'high' },
+      ],
+      marketContext: 'E-commerce - Shopify Plus, Black FridayPreparing for 5x traffic spike',
+      technicalStack: 'Node.js, PostgreSQL, Redis, Kubernetes, AWS'
+    },
+
+    tasks: [
+      { id: 't1', type: 'diagnosis', title: 'Initial Diagnosis', description: 'Analyze metrics, logs, and identify potential root causes', requirements: ['Gather all available data', 'Form hypothesis', 'Prioritize investigation'] },
+      { id: 't2', type: 'root_cause_doc', title: 'Root Cause Analysis', description: 'Document findings and present to stakeholders', requirements: ['Evidence-based conclusions', 'Recommended approach', 'Risk acknowledgment'] },
+      { id: 't3', type: 'architecture_decision', title: 'Architecture Decision', description: 'Present solution approach to CTO for approval', requirements: ['Tradeoff analysis', 'Budget estimate', 'Timeline'] },
+      { id: 't4', type: 'caching_implementation', title: 'Implement Caching', description: 'Build and deploy Redis caching layer', requirements: ['Cache invalidation strategy', 'Fallback logic', 'Monitoring'] },
+      { id: 't5', type: 'db_optimization', title: 'Database Optimization', description: 'Optimize slow queries and add indexes', requirements: ['Query analysis', 'Index strategy', 'Connection pooling'] },
+      { id: 't6', type: 'load_testing', title: 'Load Testing', description: 'Run performance tests and analyze results', requirements: ['Realistic load simulation', 'p99 latency targets', 'Failure mode testing'] },
+      { id: 't7', type: 'production_rollout', title: 'Production Rollout', description: 'Deploy with zero-downtime strategy', requirements: ['Canary deployment', 'Rollback plan', 'Monitoring'] },
+      { id: 't8', type: 'go_no_go', title: 'Launch Decision', description: 'Final Go/No-Go decision for Black Friday', requirements: ['Clear recommendation', 'Risk acknowledgment', 'Contingency plan'] },
+    ],
+
+    difficulty: 'advanced',
+    durationHours: 40,
+    passThreshold: 70,
+    strongPassThreshold: 90
   }
 };
 

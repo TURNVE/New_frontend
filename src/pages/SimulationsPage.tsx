@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Briefcase, Clock, CheckCircle, TrendingUp,
   Play, Calendar, Users, DollarSign, Flag, Star, ArrowLeft
 } from 'lucide-react';
+import { simulations, auth } from '../lib/supabase';
+import { usePageSetup } from '../hooks/usePageSetup';
 
 interface Simulation {
-  id: number;
+  id: string; // db id
   title: string;
   industry: string;
   client: string;
@@ -14,111 +16,71 @@ interface Simulation {
   duration: string;
   progress: number;
   deadline: string;
-  status: 'ongoing' | 'in-progress' | 'completed';
+  status: 'ongoing' | 'in-progress' | 'completed' | 'abandoned' | 'active';
   color: string;
   teamSize: number;
-  rating?: number;
+  rating?: string | number;
   completedDate?: string;
+  scenario_key?: string;
 }
 
 const SimulationsPage = () => {
+  usePageSetup();
   const [filter, setFilter] = useState<'all' | 'ongoing' | 'in-progress' | 'completed'>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [simulationsList, setSimulationsList] = useState<Simulation[]>([]);
 
-  const simulations: Simulation[] = [
-    {
-      id: 1,
-      title: 'Product Launch Strategy',
-      industry: 'Technology',
-      client: 'TechStart Inc.',
-      budget: 50000,
-      duration: '4 weeks',
-      progress: 75,
-      deadline: '3 days left',
-      status: 'ongoing',
-      color: 'bg-blue-500',
-      teamSize: 4
-    },
-    {
-      id: 2,
-      title: 'Marketing Campaign',
-      industry: 'Marketing',
-      client: 'Growth Labs',
-      budget: 35000,
-      duration: '3 weeks',
-      progress: 45,
-      deadline: '1 week left',
-      status: 'in-progress',
-      color: 'bg-emerald-500',
-      teamSize: 3
-    },
-    {
-      id: 3,
-      title: 'Financial Analysis',
-      industry: 'Finance',
-      client: 'FinCorp',
-      budget: 75000,
-      duration: '6 weeks',
-      progress: 20,
-      deadline: '2 weeks left',
-      status: 'ongoing',
-      color: 'bg-violet-500',
-      teamSize: 5
-    },
-    {
-      id: 4,
-      title: 'E-commerce Platform Redesign',
-      industry: 'Retail',
-      client: 'ShopMax',
-      budget: 60000,
-      duration: '5 weeks',
-      progress: 100,
-      deadline: 'Completed',
-      status: 'completed',
-      color: 'bg-amber-500',
-      teamSize: 4,
-      rating: 4.9,
-      completedDate: 'Feb 2026'
-    },
-    {
-      id: 5,
-      title: 'Mobile Banking App',
-      industry: 'Finance',
-      client: 'BankFlow',
-      budget: 80000,
-      duration: '6 weeks',
-      progress: 100,
-      deadline: 'Completed',
-      status: 'completed',
-      color: 'bg-pink-500',
-      teamSize: 6,
-      rating: 4.8,
-      completedDate: 'Jan 2026'
-    },
-    {
-      id: 6,
-      title: 'SaaS Analytics Dashboard',
-      industry: 'Technology',
-      client: 'DataViz Pro',
-      budget: 45000,
-      duration: '4 weeks',
-      progress: 100,
-      deadline: 'Completed',
-      status: 'completed',
-      color: 'bg-cyan-500',
-      teamSize: 3,
-      rating: 4.7,
-      completedDate: 'Dec 2025'
+  useEffect(() => {
+    async function loadSimulations() {
+      setIsLoading(true);
+      const user = (await auth.getUser()).user;
+      if (!user) return;
+
+      const { sessions } = await simulations.getActiveSessions(); // Add a custom fetch for all if necessary, wait, let's use supabase directly since we need all status types
+      const { data: allSessions } = await simulations.supabase.from('simulation_sessions').select('*').eq('user_id', user.id).order('updated_at', { ascending: false });
+      const { scores } = await simulations.getScores();
+
+      if (allSessions) {
+        const mapped = allSessions.map(session => {
+          const scoreMatch = scores?.find(sc => sc.session_id === session.id);
+          const stateData: any = session.state || {};
+          const isCompleted = session.status === 'completed';
+
+          return {
+            id: session.id,
+            title: stateData.project?.title || session.scenario_key || 'Simulation Project',
+            industry: stateData.industry || 'Technology',
+            client: stateData.company?.name || 'Unknown Client',
+            budget: stateData.budget || 50000,
+            duration: `${session.total_weeks} weeks`,
+            progress: session.total_weeks ? Math.round((session.current_week / session.total_weeks) * 100) : 0,
+            deadline: isCompleted ? 'Completed' : `${session.total_weeks - session.current_week} weeks left`,
+            status: isCompleted ? 'completed' : 'ongoing',
+            color: isCompleted ? 'bg-blue-500' : 'bg-emerald-500',
+            teamSize: stateData.teamSize || 4,
+            rating: scoreMatch ? (scoreMatch.overall_score / 20).toFixed(1) : undefined,
+            completedDate: scoreMatch ? new Date(scoreMatch.completed_at).toLocaleDateString() : undefined,
+            scenario_key: session.scenario_key
+          };
+        });
+        setSimulationsList(mapped as any);
+      }
+      setIsLoading(false);
     }
-  ];
+    loadSimulations();
+  }, []);
 
-  const filteredSimulations = filter === 'all' 
-    ? simulations 
-    : simulations.filter(sim => sim.status === filter);
+  const filteredSimulations = filter === 'all'
+    ? simulationsList
+    : simulationsList.filter(sim => sim.status === filter || (filter === 'ongoing' && sim.status === 'active' as any));
 
   const stats = {
-    ongoing: simulations.filter(s => s.status === 'ongoing').length,
-    inProgress: simulations.filter(s => s.status === 'in-progress').length,
-    completed: simulations.filter(s => s.status === 'completed').length
+    ongoing: simulationsList.filter(s => s.status === 'ongoing' || s.status === 'active' as any).length,
+    inProgress: simulationsList.filter(s => s.status === 'in-progress').length,
+    completed: simulationsList.filter(s => s.status === 'completed').length,
+    avgRating: simulationsList.filter(s => s.rating).length > 0
+      ? (simulationsList.filter(s => s.rating).reduce((sum, s) => sum + Number(s.rating), 0) / simulationsList.filter(s => s.rating).length).toFixed(1)
+      : '0.0'
   };
 
   const getStatusBadge = (status: string) => {
@@ -216,7 +178,7 @@ const SimulationsPage = () => {
                 <Star className="h-5 w-5 text-amber-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">4.8</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.avgRating}</p>
                 <p className="text-sm text-gray-500">Avg Rating</p>
               </div>
             </div>
@@ -228,43 +190,39 @@ const SimulationsPage = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                filter === 'all'
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === 'all'
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-600 hover:bg-gray-100'
-              }`}
+                }`}
             >
               All Simulations
             </button>
             <button
               onClick={() => setFilter('ongoing')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
-                filter === 'ongoing'
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${filter === 'ongoing'
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-600 hover:bg-gray-100'
-              }`}
+                }`}
             >
               <Play className="h-4 w-4" />
               Ongoing
             </button>
             <button
               onClick={() => setFilter('in-progress')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
-                filter === 'in-progress'
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${filter === 'in-progress'
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-600 hover:bg-gray-100'
-              }`}
+                }`}
             >
               <TrendingUp className="h-4 w-4" />
               In Progress
             </button>
             <button
               onClick={() => setFilter('completed')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
-                filter === 'completed'
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${filter === 'completed'
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-600 hover:bg-gray-100'
-              }`}
+                }`}
             >
               <CheckCircle className="h-4 w-4" />
               Completed
@@ -347,7 +305,7 @@ const SimulationsPage = () => {
                       <span className="text-xs text-gray-500">{simulation.deadline}</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div 
+                      <div
                         className={`${simulation.color} h-2 rounded-full transition-all`}
                         style={{ width: `${simulation.progress}%` }}
                       />
@@ -371,7 +329,7 @@ const SimulationsPage = () => {
             <Briefcase className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-gray-900 mb-2">No simulations found</h3>
             <p className="text-gray-500 mb-6">
-              {filter === 'all' 
+              {filter === 'all'
                 ? "You haven't started any simulations yet"
                 : `No ${filter} simulations at the moment`}
             </p>

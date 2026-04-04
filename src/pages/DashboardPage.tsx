@@ -1,28 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  Home,
-  Folder,
-  Users,
-  Award,
-  BarChart3,
-  Settings,
-  Plus,
-  Briefcase,
-  FileText,
-  Menu,
-  X,
-  Bell,
-  Search,
-  Clock,
-  Zap,
-  TrendingUp,
-  User,
-  Trophy,
-  Play,
-  CheckCircle
+  Home, Folder, Users, Award, BarChart3, Settings, Plus,
+  Briefcase, FileText, Menu, X, Bell, Search, Clock, Zap,
+  TrendingUp, User, Trophy, Play, CheckCircle
 } from 'lucide-react';
 import { usePageSetup } from '../hooks/usePageSetup';
+import { simulations, auth } from '../lib/supabase';
 
 const DashboardPage = () => {
   usePageSetup();
@@ -33,9 +17,9 @@ const DashboardPage = () => {
   useEffect(() => {
     const hasCompletedOnboarding = localStorage.getItem('turnve_onboarding_complete');
     const hasStartedSimulation = localStorage.getItem('turnve_started_simulation');
-    
+
     setIsFirstTimeUser(!hasCompletedOnboarding);
-    
+
     if (hasStartedSimulation) {
       setOnboardingProgress(50);
     } else if (!hasCompletedOnboarding) {
@@ -45,18 +29,56 @@ const DashboardPage = () => {
     }
   }, []);
 
-  const recentActivity = [
-    { id: 1, title: 'UX Research Project Completed', desc: 'Successfully completed user research phase', time: '2 hours ago', icon: 'briefcase' },
-    { id: 2, title: 'New Team Member', desc: 'Sarah Chen joined your marketing team', time: '5 hours ago', icon: 'users' },
-    { id: 3, title: 'Portfolio Updated', desc: 'Added 3 new project artifacts', time: '1 day ago', icon: 'file' },
-    { id: 4, title: 'Achievement Unlocked', desc: 'Earned "Rising Star" badge', time: '2 days ago', icon: 'award' }
-  ];
+  const location = useLocation();
+  const [userName, setUserName] = useState('User');
+  const [userInitials, setUserInitials] = useState('U');
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [ongoingSimulations, setOngoingSimulations] = useState<any[]>([]);
 
-  const ongoingSimulations = [
-    { id: 1, title: 'Product Launch Strategy', industry: 'Technology', progress: 75, dueDate: '3 days left', status: 'active', color: 'bg-blue-500' },
-    { id: 2, title: 'Marketing Campaign', industry: 'Marketing', progress: 45, dueDate: '1 week left', status: 'in-progress', color: 'bg-emerald-500' },
-    { id: 3, title: 'Financial Analysis', industry: 'Finance', progress: 20, dueDate: '2 weeks left', status: 'new', color: 'bg-violet-500' }
-  ];
+  useEffect(() => {
+    async function loadData() {
+      const { user } = await auth.getUser();
+      if (user) {
+        const { profile } = await auth.getProfile(user.id);
+        const name = profile?.full_name || user.email?.split('@')[0] || 'User';
+        setUserName(name);
+        setUserInitials(name.substring(0, 2).toUpperCase());
+
+        const { sessions } = await simulations.getActiveSessions();
+        const { scores } = await simulations.getScores();
+
+        if (sessions) {
+          const sims = sessions.map(session => {
+            const stateData: any = session.state || {};
+            return {
+              id: session.id,
+              title: stateData.project?.title || session.scenario_key || 'Simulation Project',
+              industry: stateData.industry || 'Technology',
+              progress: session.total_weeks ? Math.round((session.current_week / session.total_weeks) * 100) : 0,
+              dueDate: session.total_weeks ? `${session.total_weeks - session.current_week} weeks left` : 'Ongoing',
+              status: 'active',
+              color: 'bg-blue-500'
+            };
+          });
+          setOngoingSimulations(sims.slice(0, 3));
+
+          let activities: any[] = [];
+          scores?.slice(0, 2).forEach(sc => {
+            activities.push({
+              id: sc.id, title: 'Simulation Completed', desc: `Finished with a score of ${sc.overall_score}%`, time: new Date(sc.completed_at).toLocaleDateString(), icon: 'briefcase'
+            });
+          });
+          sessions?.slice(0, 2).forEach(s => {
+            activities.push({
+              id: s.id, title: 'Simulation Updated', desc: `Progressed to week ${s.current_week}`, time: new Date(s.updated_at).toLocaleDateString(), icon: 'trend'
+            });
+          });
+          setRecentActivity(activities.slice(0, 4));
+        }
+      }
+    }
+    loadData();
+  }, []);
 
   const sidebarItems = [
     { name: 'Dashboard', href: '/dashboard', icon: 'home' },
@@ -81,17 +103,17 @@ const DashboardPage = () => {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div 
-            className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" 
-            onClick={() => setSidebarOpen(false)} 
+          <div
+            className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"
+            onClick={() => setSidebarOpen(false)}
           />
           <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-2xl animate-slide-in-left">
             <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100">
               <Link to="/" className="flex items-center space-x-2">
                 <img src="/logo.png" alt="TURNVE" className="h-8 w-auto" />
               </Link>
-              <button 
-                onClick={() => setSidebarOpen(false)} 
+              <button
+                onClick={() => setSidebarOpen(false)}
                 className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 tap-target"
               >
                 <X className="h-5 w-5" />
@@ -99,10 +121,10 @@ const DashboardPage = () => {
             </div>
             <nav className="flex-1 px-3 py-4 space-y-1">
               {sidebarItems.map((item) => (
-                <Link 
-                  key={item.name} 
-                  to={item.href} 
-                  className="flex items-center px-3 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors tap-target" 
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="flex items-center px-3 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors tap-target"
                   onClick={() => setSidebarOpen(false)}
                 >
                   <IconComponent iconName={item.icon} className="mr-3 h-5 w-5 text-gray-400" />
@@ -113,7 +135,7 @@ const DashboardPage = () => {
             {/* Mobile sidebar footer */}
             <div className="p-4 border-t border-gray-100">
               {isFirstTimeUser && (
-                <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-xl p-4 text-white mb-4">
+                <div className="bg-gradient-to-br from-sky-600 to-blue-700 rounded-xl p-4 text-white mb-4">
                   <div className="flex items-center space-x-2 mb-2">
                     <Zap className="h-4 w-4" />
                     <span className="font-semibold text-xs">Onboarding</span>
@@ -121,11 +143,11 @@ const DashboardPage = () => {
                   <div className="w-full bg-white/20 rounded-full h-1.5 mb-2">
                     <div className="bg-white h-1.5 rounded-full transition-all" style={{ width: `${onboardingProgress}%` }} />
                   </div>
-                  <p className="text-xs text-violet-100 mb-2">Complete onboarding to start</p>
-                  <Link 
-                    to="/industries" 
+                  <p className="text-xs text-sky-100 mb-2">Complete onboarding to start</p>
+                  <Link
+                    to="/industries"
                     onClick={() => setSidebarOpen(false)}
-                    className="text-xs font-semibold bg-white text-violet-600 px-3 py-1.5 rounded-lg hover:bg-violet-50 transition-colors block text-center"
+                    className="text-xs font-semibold bg-white text-sky-600 px-3 py-1.5 rounded-lg hover:bg-sky-50 transition-colors block text-center"
                   >
                     Get Started
                   </Link>
@@ -146,9 +168,9 @@ const DashboardPage = () => {
           </div>
           <nav className="flex-1 px-4 py-4 space-y-1">
             {sidebarItems.map((item) => (
-              <Link 
-                key={item.name} 
-                to={item.href} 
+              <Link
+                key={item.name}
+                to={item.href}
                 className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors tap-target ${location.pathname === item.href ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
               >
                 <IconComponent iconName={item.icon} className={`mr-3 h-5 w-5 ${location.pathname === item.href ? 'text-blue-600' : 'text-gray-400'}`} />
@@ -167,8 +189,8 @@ const DashboardPage = () => {
                   <div className="bg-white h-1.5 rounded-full transition-all" style={{ width: `${onboardingProgress}%` }} />
                 </div>
                 <p className="text-xs text-violet-100 mb-2">Complete onboarding to start</p>
-                <Link 
-                  to="/industries" 
+                <Link
+                  to="/industries"
                   className="text-xs font-semibold bg-white text-violet-600 px-3 py-1.5 rounded-lg hover:bg-violet-50 transition-colors block text-center"
                 >
                   Get Started
@@ -193,8 +215,8 @@ const DashboardPage = () => {
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100">
           <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 lg:px-6">
             <div className="flex items-center flex-1">
-              <button 
-                onClick={() => setSidebarOpen(true)} 
+              <button
+                onClick={() => setSidebarOpen(true)}
                 className="p-2 mr-2 sm:mr-4 rounded-lg text-gray-500 hover:bg-gray-100 md:hidden tap-target"
               >
                 <Menu className="h-6 w-6" />
@@ -203,10 +225,10 @@ const DashboardPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Search projects, simulations..." 
-                  className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                <input
+                  type="text"
+                  placeholder="Search projects, simulations..."
+                  className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -217,11 +239,11 @@ const DashboardPage = () => {
               </button>
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-semibold text-gray-900">John Doe</p>
-                  <p className="text-xs text-gray-500">Product Manager</p>
+                  <p className="text-sm font-semibold text-gray-900">{userName}</p>
+                  <p className="text-xs text-gray-500">Explorer</p>
                 </div>
                 <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-                  JD
+                  {userInitials}
                 </div>
               </div>
             </div>
@@ -239,14 +261,14 @@ const DashboardPage = () => {
               </div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Let's build your career together!</h1>
               <p className="text-sm sm:text-base text-gray-600 max-w-2xl">
-                You're about to step into a real-world management simulation. 
+                You're about to step into a real-world management simulation.
                 Choose an industry, select your role, and start making impactful decisions.
               </p>
             </div>
           ) : (
             <div className="mb-6 sm:mb-8 animate-fade-in">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Welcome back, John! 👋</h1>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Welcome back, {userName.split(' ')[0]}! 👋</h1>
                 {onboardingProgress < 100 && (
                   <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs sm:text-sm font-semibold">
                     {onboardingProgress}% complete
@@ -267,15 +289,15 @@ const DashboardPage = () => {
                     Start your first simulation journey. Choose your industry and role to begin making real-world management decisions.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center md:justify-start">
-                    <Link 
-                      to="/industries" 
+                    <Link
+                      to="/industries"
                       className="inline-flex items-center justify-center gap-2 bg-white text-violet-700 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-violet-50 transition-all shadow-lg hover:shadow-xl tap-target"
                     >
                       <Play className="h-4 w-4 sm:h-5 sm:w-5" />
                       Start Simulation
                     </Link>
-                    <Link 
-                      to="/tracks" 
+                    <Link
+                      to="/tracks"
                       className="inline-flex items-center justify-center gap-2 bg-violet-500/30 hover:bg-violet-500/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition-all tap-target"
                     >
                       <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -296,7 +318,7 @@ const DashboardPage = () => {
           <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
             <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-              <Link 
+              <Link
                 to="/industries"
                 className={`flex flex-col items-center p-3 sm:p-4 rounded-xl transition-all duration-200 tap-target ${isFirstTimeUser ? 'bg-violet-50 hover:bg-violet-100' : 'bg-blue-50 hover:bg-blue-100'}`}
               >
@@ -365,9 +387,9 @@ const DashboardPage = () => {
                   </div>
                   <div className="p-4 sm:p-6">
                     {ongoingSimulations.slice(0, 2).map((sim) => (
-                      <Link 
-                        key={sim.id} 
-                        to={`/simulation/${sim.id}`} 
+                      <Link
+                        key={sim.id}
+                        to={`/simulation/${sim.id}`}
                         className="block group p-3 sm:p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors mb-3 last:mb-0 tap-target"
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -395,8 +417,8 @@ const DashboardPage = () => {
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">No active simulations</h3>
                   <p className="text-sm text-gray-500 mb-6">Start your first simulation journey today!</p>
-                  <Link 
-                    to="/industries" 
+                  <Link
+                    to="/industries"
                     className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors tap-target"
                   >
                     <Play className="h-4 w-4" />

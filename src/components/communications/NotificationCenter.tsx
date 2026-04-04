@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { 
+import {
   Bell, Mail, MessageSquare, X, Check, AlertTriangle,
   Info, CheckCircle, Send, Search, Star, ChevronRight
 } from 'lucide-react';
@@ -43,7 +43,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const addNotification = useCallback((notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     const newNotification: Notification = {
       ...notification,
-      id: `notif-${Date.now()}`,
+      id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date(),
       read: false,
     };
@@ -53,16 +53,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const addEmail = useCallback((email: Omit<Email, 'id' | 'timestamp' | 'read'>) => {
     const newEmail: Email = {
       ...email,
-      id: `email-${Date.now()}`,
+      id: `email-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date(),
       read: false,
       archived: false,
     };
     setEmails(prev => [newEmail, ...prev]);
-    
+
     addNotification({
       type: 'info',
-      title: `📧 New Email from ${email.from}`,
+      title: `📧 New Email from ${email.fromName || (email as any).from || 'Unknown'}`,
       message: email.subject,
     });
   }, [addNotification]);
@@ -82,7 +82,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const sendMessage = useCallback((toId: string, content: string) => {
     const now = new Date();
     const twoMinutes = 2 * 60 * 1000;
-    
+
     if (lastMessageTime[toId] && (now.getTime() - lastMessageTime[toId].getTime()) < twoMinutes) {
       addNotification({
         type: 'warning',
@@ -93,7 +93,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const teamMember = TEAM_MEMBERS_FOR_MESSAGING.find(m => m.id === toId);
-    
+
     const newMessage: Message = {
       id: `msg-${Date.now()}`,
       fromId: 'user',
@@ -122,7 +122,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         aiResponse: aiResponse,
       };
       setMessages(prev => [...prev, responseMessage]);
-      
+
       addNotification({
         type: 'message',
         title: `Message from ${teamMember?.name}`,
@@ -248,12 +248,12 @@ interface NotificationCenterProps {
 }
 
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose }) => {
-  const { 
-    notifications, emails, messages, 
+  const {
+    notifications, emails, messages,
     unreadNotifications, unreadEmails, unreadMessages,
-    markNotificationRead, markEmailRead, markMessageRead, sendMessage 
+    markNotificationRead, markEmailRead, markMessageRead, sendMessage
   } = useNotifications();
-  
+
   const [activeTab, setActiveTab] = useState<'notifications' | 'emails' | 'messages'>('notifications');
   const [messageDraft, setMessageDraft] = useState('');
   const [selectedTeamMember, setSelectedTeamMember] = useState<string>('');
@@ -264,7 +264,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose}>
-      <div 
+      <div
         className="absolute right-0 top-0 h-full w-full max-w-lg bg-[#0a0a0a] border-l border-white/10 flex flex-col"
         onClick={e => e.stopPropagation()}
       >
@@ -314,9 +314,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, 
                   <div
                     key={notif.id}
                     onClick={() => markNotificationRead(notif.id)}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                      notif.read ? 'bg-white/5' : 'bg-blue-500/10 border border-blue-500/20'
-                    }`}
+                    className={`p-3 rounded-lg cursor-pointer transition-colors ${notif.read ? 'bg-white/5' : 'bg-blue-500/10 border border-blue-500/20'
+                      }`}
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -337,18 +336,16 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, 
                 <div
                   key={email.id}
                   onClick={() => markEmailRead(email.id)}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                    email.read ? 'bg-white/5' : 'bg-blue-500/10 border border-blue-500/20'
-                  }`}
+                  className={`p-3 rounded-lg cursor-pointer transition-colors ${email.read ? 'bg-white/5' : 'bg-blue-500/10 border border-blue-500/20'
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-white">{email.fromName}</span>
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${
-                        email.type === 'welcome' ? 'bg-emerald-500/20 text-emerald-400' :
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${email.type === 'welcome' ? 'bg-emerald-500/20 text-emerald-400' :
                         email.type === 'stakeholder' ? 'bg-purple-500/20 text-purple-400' :
-                        'bg-gray-500/20 text-gray-400'
-                      }`}>
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
                         {email.type}
                       </span>
                     </div>

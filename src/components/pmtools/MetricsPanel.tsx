@@ -39,12 +39,12 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ gameState }) => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#0a0a0a]">
+    <div className="h-full flex flex-col bg-white dark:bg-[#0a0a0a]">
       {/* Header */}
-      <div className="p-4 border-b border-white/5">
+      <div className="p-4 border-b border-gray-200 dark:border-white/5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white">Key Metrics</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Key Metrics</h2>
             <p className="text-xs text-[#a1a1aa]">Real-time KPI tracking</p>
           </div>
           <div className="bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded">
@@ -58,7 +58,7 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ gameState }) => {
         {metrics.map((metric, idx) => (
           <div
             key={idx}
-            className="glass-panel p-4 rounded-xl border border-white/5"
+            className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-[#a1a1aa]">{metric.name}</span>
@@ -90,13 +90,13 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ gameState }) => {
 
       {/* Detailed Breakdown */}
       <div className="flex-1 overflow-y-auto p-4 pt-0">
-        <h3 className="text-sm font-semibold text-white mb-3">Detailed Breakdown</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Detailed Breakdown</h3>
         
         <div className="space-y-3">
           {/* Velocity */}
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-gray-100 dark:bg-white/5 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white flex items-center gap-2">
+              <span className="text-sm text-gray-900 dark:text-white flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-blue-400" />
                 Development Velocity
               </span>
@@ -109,9 +109,9 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ gameState }) => {
           </div>
 
           {/* Quality */}
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-gray-100 dark:bg-white/5 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white flex items-center gap-2">
+              <span className="text-sm text-gray-900 dark:text-white flex items-center gap-2">
                 <Shield className="w-4 h-4 text-emerald-400" />
                 Code Quality
               </span>
@@ -124,9 +124,9 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ gameState }) => {
           </div>
 
           {/* Team */}
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-gray-100 dark:bg-white/5 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white flex items-center gap-2">
+              <span className="text-sm text-gray-900 dark:text-white flex items-center gap-2">
                 <Users className="w-4 h-4 text-purple-400" />
                 Team Engagement
               </span>
@@ -139,9 +139,9 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ gameState }) => {
           </div>
 
           {/* Risks */}
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-gray-100 dark:bg-white/5 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white flex items-center gap-2">
+              <span className="text-sm text-gray-900 dark:text-white flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-yellow-400" />
                 Active Risks
               </span>
@@ -166,7 +166,7 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ gameState }) => {
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-white/5 bg-white/[0.02]">
+      <div className="p-4 border-t border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02]">
         <div className="text-xs text-[#a1a1aa] text-center">
           Last updated: Just now
         </div>

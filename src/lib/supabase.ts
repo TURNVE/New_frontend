@@ -142,27 +142,27 @@ export const auth = {
   getProfile: async (userId?: string) => {
     const id = userId || (await supabase.auth.getUser()).data.user?.id
     if (!id) return { profile: null, error: new Error('No user ID') }
-    
+
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', id)
       .single()
-    
+
     return { profile: profile as Profile | null, error }
   },
 
   updateProfile: async (updates: Partial<Profile>) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { profile: null, error: new Error('Not authenticated') }
-    
+
     const { data: profile, error } = await supabase
       .from('profiles')
       .update(updates)
       .eq('id', user.id)
       .select()
       .single()
-    
+
     return { profile: profile as Profile | null, error }
   },
 
@@ -178,7 +178,7 @@ export const simulations = {
       .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
-    
+
     return { scenarios: data as SimulationScenario[], error }
   },
 
@@ -188,14 +188,14 @@ export const simulations = {
       .select('*')
       .eq('key', key)
       .single()
-    
+
     return { scenario: data as SimulationScenario | null, error }
   },
 
   createSession: async (scenarioKey: string) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { session: null, error: new Error('Not authenticated') }
-    
+
     const { data, error } = await supabase
       .from('simulation_sessions')
       .insert({
@@ -204,7 +204,7 @@ export const simulations = {
       })
       .select()
       .single()
-    
+
     return { session: data as SimulationSession | null, error }
   },
 
@@ -214,21 +214,21 @@ export const simulations = {
       .select('*')
       .eq('id', sessionId)
       .single()
-    
+
     return { session: data as SimulationSession | null, error }
   },
 
   getActiveSessions: async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { sessions: [], error: new Error('Not authenticated') }
-    
+
     const { data, error } = await supabase
       .from('simulation_sessions')
       .select('*')
       .eq('user_id', user.id)
       .eq('status', 'active')
       .order('updated_at', { ascending: false })
-    
+
     return { sessions: data as SimulationSession[], error }
   },
 
@@ -239,7 +239,7 @@ export const simulations = {
       .eq('id', sessionId)
       .select()
       .single()
-    
+
     return { session: data as SimulationSession | null, error }
   },
 
@@ -249,7 +249,7 @@ export const simulations = {
       .insert(decision)
       .select()
       .single()
-    
+
     return { decision: data as SimulationDecision | null, error }
   },
 
@@ -259,35 +259,38 @@ export const simulations = {
       .select('*')
       .eq('session_id', sessionId)
       .order('created_at', { ascending: true })
-    
+
     return { decisions: data as SimulationDecision[], error }
   },
 
-  createScore: async (score: Omit<SimulationScore, 'id' | 'completed_at'>) => {
+  createScore: async (score: Omit<SimulationScore, 'id' | 'completed_at' | 'user_id'>) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { score: null, error: new Error('Not authenticated') }
+
     const { data, error } = await supabase
       .from('simulation_scores')
-      .insert(score)
+      .insert({ ...score, user_id: user.id })
       .select()
       .single()
-    
+
     return { score: data as SimulationScore | null, error }
   },
 
   getScores: async (sessionId?: string) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { scores: [], error: new Error('Not authenticated') }
-    
+
     let query = supabase
       .from('simulation_scores')
       .select('*')
       .eq('user_id', user.id)
-    
+
     if (sessionId) {
       query = query.eq('session_id', sessionId)
     }
-    
+
     const { data, error } = await query.order('completed_at', { ascending: false })
-    
+
     return { scores: data as SimulationScore[], error }
   }
 }

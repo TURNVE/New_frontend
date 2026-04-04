@@ -1,65 +1,95 @@
-import { useState } from 'react';
-import { 
-  MapPin, Calendar, Briefcase, Award, Globe, 
+import { useState, useEffect } from 'react';
+import {
+  MapPin, Calendar, Briefcase, Award, Globe,
   Camera, Edit3, Save, X, Plus, Settings, LogOut, ChevronRight,
   Building, FileText, Users, Link as LinkIcon, Star
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageSetup } from '../hooks/usePageSetup';
+import { useAuth } from '../hooks/useAuth';
+import { auth, simulations, supabase } from '../lib/supabase';
 
 const ProfilePage = () => {
   usePageSetup();
+  const { user } = useAuth();
+
   const [editing, setEditing] = useState(false);
   const [editMode, setEditMode] = useState<'personal' | 'professional' | null>(null);
-  
+  const [isLoading, setIsLoading] = useState(true);
+
   // User data state
-  const [userData, setUserData] = useState({
-    name: 'John Doe',
-    title: 'Junior Product Manager',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA',
-    bio: 'Passionate about creating user-centered products and driving innovation. Experienced in agile methodologies and cross-functional collaboration.',
-    website: 'https://johndoe.dev',
-    linkedin: 'linkedin.com/in/johndoe',
-    twitter: '@johndoe_pm',
-    industry: 'Technology',
-    experience: '2 years',
-    education: 'MSc Computer Science',
-    institution: 'Stanford University',
-    skills: ['Product Strategy', 'UI/UX Design', 'Data Analysis', 'Stakeholder Management', 'Agile']
+  const [userData, setUserData] = useState<any>({
+    name: '', title: '', email: '', phone: '', location: '', bio: '', website: '', linkedin: '', twitter: '', industry: 'Technology', experience: 'N/A', education: 'University', institution: '', skills: [], avatar_url: null
   });
 
-  // Stats
-  const stats = [
-    { name: 'Simulations', value: '8', icon: Briefcase, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-    { name: 'Projects', value: '12', icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
-    { name: 'Team Members', value: '18', icon: Users, color: 'text-violet-600', bgColor: 'bg-violet-50' },
-    { name: 'Achievements', value: '5', icon: Award, color: 'text-amber-600', bgColor: 'bg-amber-50' }
-  ];
+  const [stats, setStats] = useState<any[]>([
+    { name: 'Simulations', value: '0', icon: Briefcase, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+    { name: 'Projects', value: '0', icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+    { name: 'Avg Score', value: '0.0', icon: Star, color: 'text-amber-600', bgColor: 'bg-amber-50' }
+  ]);
+  const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
+  const [achievements, setAchievements] = useState<any[]>([]);
 
-  // Portfolio highlights
-  const portfolioItems = [
-    { id: 1, title: 'E-commerce Platform Redesign', date: 'Feb 2026', industry: 'Retail', rating: 4.9 },
-    { id: 2, title: 'Mobile Banking App', date: 'Jan 2026', industry: 'Finance', rating: 4.8 },
-    { id: 3, title: 'SaaS Analytics Dashboard', date: 'Dec 2025', industry: 'Tech', rating: 4.7 }
-  ];
+  useEffect(() => {
+    async function loadData() {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
-  // Achievements
-  const achievements = [
-    { id: 1, title: 'Innovation Award', date: 'Feb 2026', description: 'Outstanding solution in UX design', icon: '🏆' },
-    { id: 2, title: 'Team Leadership', date: 'Jan 2026', description: 'Led cross-functional team of 5', icon: '👥' },
-    { id: 3, title: 'Process Improvement', date: 'Nov 2025', description: 'Optimized workflow saving 100+ hours', icon: '⚡' }
-  ];
+      const { profile } = await auth.getProfile(user.id);
 
-  const handleInputChange = (field: keyof typeof userData, value: string) => {
-    setUserData(prev => ({ ...prev, [field]: value }));
+      if (profile) {
+        setUserData((prev: any) => ({
+          ...prev,
+          name: profile.full_name || user.email?.split('@')[0] || 'User',
+          title: profile.role || 'Professional',
+          email: user.email || '',
+          website: profile.website || '',
+          linkedin: 'linkedin.com/in/' + (profile.username || ''),
+          twitter: '@' + (profile.username || ''),
+          bio: 'Completed profile.',
+          avatar_url: profile.avatar_url
+        }));
+      }
+
+      const { scores } = await simulations.getScores(undefined);
+
+      // We can also fetch the sessions just to figure out how many projects
+      const { data: allSessions } = await supabase.from('simulation_sessions').select('*').eq('user_id', user.id);
+
+      const sessionCount = allSessions?.length || 0;
+      const completedCount = scores?.length || 0;
+      const avgScore = completedCount > 0 ? (scores.reduce((sum: number, sc: any) => sum + sc.overall_score, 0) / completedCount / 20).toFixed(1) : '0.0';
+
+      setStats([
+        { name: 'Simulations', value: sessionCount.toString(), icon: Briefcase, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+        { name: 'Projects', value: completedCount.toString(), icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+        { name: 'Avg Score', value: avgScore, icon: Star, color: 'text-amber-600', bgColor: 'bg-amber-50' }
+      ]);
+
+      if (scores && scores.length > 0) {
+        setPortfolioItems(scores.slice(0, 3).map((s: any, i: number) => ({
+          id: s.id, title: 'Simulation Project #' + (i + 1), date: new Date(s.completed_at).toLocaleDateString(), industry: 'Tech', rating: (s.overall_score / 20).toFixed(1)
+        })));
+        setAchievements(scores.slice(0, 3).map((s: any, i: number) => ({
+          id: s.id, title: 'Simulation Passed', date: new Date(s.completed_at).toLocaleDateString(), description: 'Successfully finished the simulation.', icon: '🏆'
+        })));
+      }
+      setIsLoading(false);
+    }
+    loadData();
+  }, [user]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setUserData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const saveProfile = () => {
+  const saveProfile = async () => {
     setEditing(false);
     setEditMode(null);
-    // Here you would typically save to backend
+    if (!user) return;
+    await auth.updateProfile({ full_name: userData.name, website: userData.website });
   };
 
   return (
@@ -73,8 +103,8 @@ const ProfilePage = () => {
               Back to Dashboard
             </Link>
             <div className="flex items-center gap-3">
-              <Link 
-                to="/settings" 
+              <Link
+                to="/settings"
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <Settings className="h-5 w-5" />
@@ -92,19 +122,36 @@ const ProfilePage = () => {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
           {/* Cover */}
           <div className="h-32 sm:h-40 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
-          
+
           <div className="px-6 pb-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-end -mt-12 sm:-mt-16 gap-4">
-              {/* Avatar */}
               <div className="relative">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center border-4 border-white shadow-lg">
-                  <span className="text-3xl sm:text-4xl font-bold text-white">JD</span>
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
+                  {userData.avatar_url ? (
+                    <img src={userData.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-3xl sm:text-4xl font-bold text-white">{userData.name?.substring(0, 2).toUpperCase() || 'JD'}</span>
+                  )}
                 </div>
-                <button className="absolute bottom-0 right-0 p-2 bg-white rounded-xl shadow-md border border-gray-200 hover:bg-gray-50 transition-colors">
+                <label className="absolute bottom-0 right-0 p-2 bg-white rounded-xl shadow-md border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
                   <Camera className="h-4 w-4 text-gray-600" />
-                </button>
+                  <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file || !user) return;
+                    setIsLoading(true);
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+                    const { data, error } = await supabase.storage.from('avatars').upload(fileName, file);
+                    if (!error && data) {
+                      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(data.path);
+                      await auth.updateProfile({ avatar_url: publicUrl });
+                      setUserData((prev: any) => ({ ...prev, avatar_url: publicUrl }));
+                    }
+                    setIsLoading(false);
+                  }} />
+                </label>
               </div>
-              
+
               {/* Info */}
               <div className="flex-1 pt-12 sm:pt-16">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -152,13 +199,13 @@ const ProfilePage = () => {
                         </button>
                       </>
                     ) : (
-                  <button
-                    onClick={() => setEditing(true)}
-                    className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center gap-2 whitespace-nowrap"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                    Edit Profile
-                  </button>
+                      <button
+                        onClick={() => setEditing(true)}
+                        className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center gap-2 whitespace-nowrap"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        Edit Profile
+                      </button>
                     )}
                   </div>
                 </div>

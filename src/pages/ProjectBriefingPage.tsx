@@ -477,7 +477,7 @@ const ProjectBriefingPage = () => {
       <div className="flex flex-wrap gap-3">
         <TeamAvatar name="Alex C." role="Senior Engineer" color="from-blue-500 to-blue-600" />
         <TeamAvatar name="Sarah M." role="Junior Engineer" color="from-green-500 to-green-600" />
-        <TeamAvatar name="Jordan P." role="Product Designer" color="from-purple-500 to-purple-600" />
+        <TeamAvatar name="Jordan P." role="Product Designer" color="from-sky-500 to-sky-600" />
         <TeamAvatar name="Taylor K." role="QA Engineer" color="from-amber-500 to-amber-600" />
       </div>
     </CollapsibleSection>

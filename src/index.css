@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: #ffffff;
   --color-foreground: #0a142f;
@@ -30,7 +32,7 @@
   * {
     border-color: var(--color-border);
   }
-  
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -305,7 +307,7 @@ html {
   html {
     scroll-behavior: auto;
   }
-  
+
   *,
   *::before,
   *::after {
@@ -342,25 +344,33 @@ html {
 }
 
 @keyframes blob {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
   }
+
   25% {
     transform: translate(20px, -30px) scale(1.1);
   }
+
   50% {
     transform: translate(-20px, 20px) scale(0.9);
   }
+
   75% {
     transform: translate(30px, 10px) scale(1.05);
   }
 }
 
 @keyframes gradient {
-  0%, 100% {
+
+  0%,
+  100% {
     background-size: 200% 200%;
     background-position: left center;
   }
+
   50% {
     background-size: 200% 200%;
     background-position: right center;
@@ -372,6 +382,7 @@ html {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -383,6 +394,7 @@ html {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -394,6 +406,7 @@ html {
     transform: translateX(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -405,6 +418,7 @@ html {
     transform: translateY(100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -416,6 +430,7 @@ html {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -427,6 +442,7 @@ html {
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -434,18 +450,24 @@ html {
 }
 
 @keyframes pulse-soft {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
 }
 
 @keyframes bounce-subtle {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
@@ -506,18 +528,53 @@ html {
 }
 
 /* Animation delay utilities */
-.animate-delay-100 { animation-delay: 0.1s; }
-.animate-delay-200 { animation-delay: 0.2s; }
-.animate-delay-300 { animation-delay: 0.3s; }
-.animate-delay-400 { animation-delay: 0.4s; }
-.animate-delay-500 { animation-delay: 0.5s; }
-.animate-delay-600 { animation-delay: 0.6s; }
-.animate-delay-700 { animation-delay: 0.7s; }
-.animate-delay-800 { animation-delay: 0.8s; }
-.animate-delay-900 { animation-delay: 0.9s; }
-.animate-delay-1000 { animation-delay: 1s; }
-.animate-delay-1200 { animation-delay: 1.2s; }
-.animate-delay-1400 { animation-delay: 1.4s; }
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animate-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.animate-delay-600 {
+  animation-delay: 0.6s;
+}
+
+.animate-delay-700 {
+  animation-delay: 0.7s;
+}
+
+.animate-delay-800 {
+  animation-delay: 0.8s;
+}
+
+.animate-delay-900 {
+  animation-delay: 0.9s;
+}
+
+.animate-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animate-delay-1200 {
+  animation-delay: 1.2s;
+}
+
+.animate-delay-1400 {
+  animation-delay: 1.4s;
+}
 
 /* Animation delay for 2000 and 4000 */
 .animation-delay-200 {
@@ -572,7 +629,7 @@ html {
   .min-h-screen {
     min-height: -webkit-fill-available;
   }
-  
+
   .h-screen {
     height: -webkit-fill-available;
   }
@@ -607,7 +664,10 @@ html {
 
 /* Prevent zoom on input focus for iOS */
 @media screen and (max-width: 768px) {
-  input, textarea, select {
+
+  input,
+  textarea,
+  select {
     font-size: 16px !important;
   }
 }
@@ -628,17 +688,17 @@ html {
     width: 6px;
     height: 6px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 3px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
   }
@@ -706,6 +766,17 @@ body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-panel {
+  background-color: var(--color-background);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-panel {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Text balance for better readability */

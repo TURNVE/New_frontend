@@ -69,19 +69,19 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#0a0a0a]">
+    <div className="h-full flex flex-col bg-white dark:bg-[#0a0a0a]">
       {/* Header */}
-      <div className="p-6 border-b border-white/5">
+      <div className="p-6 border-b border-gray-200 dark:border-white/5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold text-white">Documents & Artifacts</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Documents & Artifacts</h2>
             <p className="text-sm text-[#a1a1aa]">
               Generate and download PM documents for your portfolio
             </p>
           </div>
           <button
             onClick={() => setShowGenerateModal(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
+            className="bg-blue-500 hover:bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Generate Document
@@ -97,7 +97,7 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
               placeholder="Search documents..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-[#a1a1aa] focus:outline-none focus:border-blue-500"
+              className="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white placeholder-[#a1a1aa] focus:outline-none focus:border-blue-500"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -105,7 +105,7 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as ArtifactType | 'all')}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
             >
               <option value="all">All Types</option>
               {artifactTypes.map(type => (
@@ -123,13 +123,13 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
         {filteredArtifacts.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-12 h-12 text-[#a1a1aa] mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-semibold text-white mb-2">No Documents Yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Documents Yet</h3>
             <p className="text-sm text-[#a1a1aa] mb-4">
               Generate your first PM document to start building your portfolio
             </p>
             <button
               onClick={() => setShowGenerateModal(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
+              className="bg-blue-500 hover:bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Generate Document
@@ -140,7 +140,7 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
             {filteredArtifacts.map(artifact => (
               <div
                 key={artifact.id}
-                className="glass-panel p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all"
+                className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5 hover:border-gray-200 dark:border-white/10 transition-all"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
@@ -148,7 +148,7 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
                       {ARTIFACT_TYPE_ICONS[artifact.type]}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white">{artifact.title}</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{artifact.title}</h4>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-xs text-[#a1a1aa]">
                           {ARTIFACT_TYPE_LABELS[artifact.type]}
@@ -167,21 +167,21 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onViewArtifact(artifact)}
-                      className="p-2 hover:bg-white/5 rounded-lg text-[#a1a1aa] hover:text-white transition-colors"
+                      className="p-2 hover:bg-gray-100 dark:bg-white/5 rounded-lg text-[#a1a1aa] hover:text-gray-900 dark:text-white transition-colors"
                       title="View"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onExportArtifact(artifact, 'pdf')}
-                      className="p-2 hover:bg-white/5 rounded-lg text-[#a1a1aa] hover:text-white transition-colors"
+                      className="p-2 hover:bg-gray-100 dark:bg-white/5 rounded-lg text-[#a1a1aa] hover:text-gray-900 dark:text-white transition-colors"
                       title="Export PDF"
                     >
                       <Download className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onDeleteArtifact(artifact)}
-                      className="p-2 hover:bg-white/5 rounded-lg text-[#a1a1aa] hover:text-red-400 transition-colors"
+                      className="p-2 hover:bg-gray-100 dark:bg-white/5 rounded-lg text-[#a1a1aa] hover:text-red-400 transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -195,10 +195,10 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
       </div>
 
       {/* Quick Stats */}
-      <div className="p-4 border-t border-white/5 bg-white/[0.02]">
+      <div className="p-4 border-t border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02]">
         <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white">{artifacts.length}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{artifacts.length}</div>
             <div className="text-xs text-[#a1a1aa]">Total Documents</div>
           </div>
           <div className="text-center">
@@ -225,8 +225,8 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
       {/* Generate Modal */}
       {showGenerateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#141414] rounded-xl border border-white/10 max-w-2xl w-full p-6">
-            <h3 className="text-lg font-bold text-white mb-2">Generate New Document</h3>
+          <div className="bg-white dark:bg-[#141414] rounded-xl border border-gray-200 dark:border-white/10 max-w-2xl w-full p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Generate New Document</h3>
             <p className="text-sm text-[#a1a1aa] mb-6">
               Choose a document type to generate based on your current simulation state
             </p>
@@ -239,11 +239,11 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
                     onGenerateArtifact(type);
                     setShowGenerateModal(false);
                   }}
-                  className="text-left p-4 rounded-lg border border-white/10 hover:bg-white/5 hover:border-white/20 transition-all"
+                  className="text-left p-4 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:bg-white/5 hover:border-gray-300 dark:hover:border-white/20 transition-all"
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-2xl">{ARTIFACT_TYPE_ICONS[type]}</span>
-                    <span className="font-semibold text-white">{ARTIFACT_TYPE_LABELS[type]}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{ARTIFACT_TYPE_LABELS[type]}</span>
                   </div>
                   <p className="text-xs text-[#a1a1aa]">
                     {type === 'prd' && 'Product requirements with user stories and acceptance criteria'}
@@ -260,7 +260,7 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
 
             <button
               onClick={() => setShowGenerateModal(false)}
-              className="w-full py-2 text-sm text-[#a1a1aa] hover:text-white transition-colors"
+              className="w-full py-2 text-sm text-[#a1a1aa] hover:text-gray-900 dark:text-white transition-colors"
             >
               Cancel
             </button>
