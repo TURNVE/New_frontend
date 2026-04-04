@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App';
 import Program1Page from './pages/program1/Program1Page';
 import AuthPage from './pages/auth/AuthPage';
@@ -6,7 +6,6 @@ import SignUpPage from './pages/auth/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
 import SimulationsPage from './pages/SimulationsPage';
-import SimulationPage from './pages/SimulationPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import PortfolioPage from './pages/PortfolioPage';
@@ -21,6 +20,9 @@ import { NotificationProvider } from './components/communications/NotificationCe
 
 // ── Modular simulation pages (new architecture) ───────────────
 import PayLinkSimulation from './features/sim-pm-001-paylink/PayLinkSimulation';
+import ShopEaseSimulation from './features/sim-pm-002-shopease/ShopEaseSimulation';
+import TechCoreSimulation from './features/sim-pm-003-techcore/TechCoreSimulation';
+import NewWaveSimulation from './features/sim-pm-004-newwave/NewWaveSimulation';
 
 function Router() {
   return (
@@ -40,9 +42,15 @@ function Router() {
           {/* ── Modular simulations (new SimulationShell architecture) ── */}
           <Route path="/simulation/pm-01/*" element={<PayLinkSimulation />} />
           <Route path="/simulation/sim-pm-001/*" element={<PayLinkSimulation />} />
+          <Route path="/simulation/pm-02/*" element={<ShopEaseSimulation />} />
+          <Route path="/simulation/sim-pm-002/*" element={<ShopEaseSimulation />} />
+          <Route path="/simulation/pm-03/*" element={<TechCoreSimulation />} />
+          <Route path="/simulation/sim-pm-003/*" element={<TechCoreSimulation />} />
+          <Route path="/simulation/pm-04/*" element={<NewWaveSimulation />} />
+          <Route path="/simulation/sim-pm-004/*" element={<NewWaveSimulation />} />
 
-          {/* ── Legacy simulation page (other sim IDs fall here) ── */}
-          <Route path="/simulation/:id" element={<SimulationPage />} />
+          {/* ── Legacy simulation route - redirect to simulations list ── */}
+          <Route path="/simulation/:id" element={<Navigate to="/simulations" replace />} />
 
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />

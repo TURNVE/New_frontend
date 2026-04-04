@@ -8,13 +8,10 @@ import {
   PanelRight, PanelRightClose, AlertCircle, Zap, Target,
   Clock, CheckCircle, X, Moon, Sun, AlertTriangle
 } from 'lucide-react';
-import useSimulation from '../../../src/hooks/useSimulation';
 import { useTheme } from '../contexts/ThemeContext';
-import { createDefaultScenario, createScenarioFromTemplate, type ScenarioAction, type ActionChoice } from '../../../src/simulation/core/SimulationEngine';
-import { webDev01Scenario } from '../../../src/simulation/content/web-dev-01';
+import { createDefaultScenario, createScenarioFromTemplate, type ScenarioAction, type ActionChoice } from '../simulation/core/SimulationEngine';
 import { getSimulationByRoute } from '../config/simulationTemplates';
-import { DEFAULT_BACKLOG_ITEMS } from '../../../src/pmtools/types';
-import type { RoadmapPhase, BacklogItem } from '../../../src/pmtools/types';
+import type { RoadmapPhase, BacklogItem } from '../pmtools/types';
 import { DocumentsPanel } from '../components/simulation/DocumentsPanel';
 import { PortfolioBuilder } from '../components/simulation/PortfolioBuilder';
 import { CompanyPanel } from '../components/company/CompanyPanel';

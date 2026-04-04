@@ -387,50 +387,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
         const res = completeWeeklyAction(actionId, result);
         setFeedback(res.feedback);
         setTimeout(() => setFeedback(''), 5000);
-
-        // Simulated "Automated Email" triggers
-        if (actionId === 'action-w1-triage') {
-            setTimeout(() => {
-                addNotification({
-                    title: 'CEO Office: Bandwidth Reallocated',
-                    message: "Marcus here. Sarah confirmed the team has pivoted per your triage. We're tracking the updated timelines now.",
-                    type: 'message',
-                    sender: 'Marcus Johnson',
-                    senderInitials: 'MJ',
-                    senderColor: 'bg-amber-500/20 text-amber-400'
-                });
-                playSound('notification');
-            }, 3000);
-        }
-
-        if (actionId === 'action-w1-investors') {
-            setTimeout(() => {
-                addNotification({
-                    title: 'Lars (Lead Investor): Communication Received',
-                    message: "Acknowledged. This approach carries risks, but we appreciate the clarity. Keep us posted on the Board's reaction.",
-                    type: 'message',
-                    sender: 'Lars Vance',
-                    senderInitials: 'LV',
-                    senderColor: 'bg-blue-500/20 text-blue-400'
-                });
-                playSound('notification');
-            }, 5000);
-        }
-
-        if (actionId === 'action-w2-morale') {
-            setTimeout(() => {
-                addNotification({
-                    title: 'HR: Morale Program Initiated',
-                    message: "The team has been notified of the bonuses and revised scope. Engineering bandwidth has stabilized slightly.",
-                    type: 'message',
-                    sender: 'HR Team',
-                    senderInitials: 'HR',
-                    senderColor: 'bg-indigo-500/20 text-indigo-400'
-                });
-                playSound('notification');
-            }, 4000);
-        }
-    }, [completeWeeklyAction, addNotification, playSound]);
+    }, [completeWeeklyAction]);
 
     const NAV_ITEMS: { name: string; icon: React.ComponentType<{ className?: string }>; id: ActiveTab; badge?: number }[] = [
         { name: 'Dashboard', icon: Home, id: 'dashboard' },
