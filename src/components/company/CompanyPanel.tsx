@@ -53,6 +53,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
   ];
 
   const activeSectionLabel = sections.find(s => s.id === activeSection)?.label || 'News Feed';
+  const ActiveSectionIcon = sections.find(s => s.id === activeSection)?.icon || Newspaper;
 
   return (
     <div className="h-full flex flex-col lg:flex-row bg-white dark:bg-[#0a0a0a]">
@@ -63,9 +64,7 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
           className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-white/5"
         >
           <div className="flex items-center gap-3">
-            {sections.find(s => s.id === activeSection)?.icon && (
-              <sections.find(s => s.id === activeSection)!.icon className="w-5 h-5 text-gray-500" />
-            )}
+            <ActiveSectionIcon className="w-5 h-5 text-gray-500" />
             <span className="font-medium text-gray-900 dark:text-white">{activeSectionLabel}</span>
           </div>
           {mobileMenuOpen ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}

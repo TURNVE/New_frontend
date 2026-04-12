@@ -760,7 +760,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                 {/* KPI Row */}
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
                                     {metrics.map((m) => (
-                                        <div key={m.label} className="bg-white dark:bg-gray-800/80 rounded-[20px] p-3 sm:p-4 border border-gray-200 dark:border-gray-700/60 shadow-sm">
+                                        <div key={m.label} className="bg-white dark:bg-gray-800/80 rounded-[20px] p-3 sm:p-4 border border-gray-200 dark:border-gray-700/60">
                                             <div className="flex items-center gap-2 mb-1 sm:mb-2">
                                                 <div className={`w-2 h-2 rounded-full ${m.dot}`} />
                                                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium truncate">{m.label}</div>
@@ -778,7 +778,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                     {/* LEFT: Signals & Events Preview */}
                                     <div className="space-y-3 sm:space-y-4">
                                         {/* Signals */}
-                                        <div className="glass-panel rounded-[20px] border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+                                        <div className="glass-panel rounded-[20px] border border-gray-200 dark:border-white/5 overflow-hidden">
                                             <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
                                                 <h3 className="text-sm font-semibold dark:text-white flex items-center gap-2">
                                                     <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
@@ -810,7 +810,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                         </div>
 
                                         {/* Events */}
-                                        <div className="glass-panel rounded-[20px] border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+                                        <div className="glass-panel rounded-[20px] border border-gray-200 dark:border-white/5 overflow-hidden">
                                             <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
                                                 <h3 className="text-sm font-semibold dark:text-white flex items-center gap-2">
                                                     <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
@@ -839,7 +839,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                                                 if (action) setOpenModal({ kind: 'weekly', item: action as any });
                                                             }
                                                         }}
-                                                        className={`p-3 rounded-lg border transition-all ${e.requiresAction ? 'cursor-pointer hover:border-amber-500 border-amber-500/30 bg-amber-500/5 shadow-sm' : 'bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800'}`}
+                                                        className={`p-3 rounded-lg border transition-all ${e.requiresAction ? 'cursor-pointer hover:border-amber-500 border-amber-500/30 bg-amber-500/5' : 'bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800'}`}
                                                     >
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <span className={`w-6 h-6 rounded-full ${e.fromColor} flex items-center justify-center text-[10px] font-bold`}>{e.fromInitials}</span>
@@ -853,7 +853,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                         </div>
 
                                         {/* Stakeholders */}
-                                        <div className="glass-panel rounded-[12px] border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+                                        <div className="glass-panel rounded-[12px] border border-gray-200 dark:border-white/5 overflow-hidden">
                                             <div className="px-4 py-3 border-b border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/5">
                                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Key Stakeholders</h3>
                                             </div>
@@ -883,7 +883,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
 
                                     {/* RIGHT: Strategic Actions */}
                                     <div className="space-y-4">
-                                        <div className="bg-white dark:bg-gray-800/50 rounded-[12px] border-2 border-dashed overflow-hidden shadow-xl" style={{ borderColor: `${config.primaryColor}40` }}>
+                                        <div className="bg-white dark:bg-gray-800/50 rounded-[12px] border-2 border-dashed overflow-hidden" style={{ borderColor: `${config.primaryColor}40` }}>
                                             <div className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: config.primaryColor }}>
                                                 <div className="flex items-center gap-2">
                                                     <Zap className="w-5 h-5 text-white" />

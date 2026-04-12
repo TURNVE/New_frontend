@@ -23,7 +23,6 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
   };
 
   const [step, setStep] = useState(0);
-  const [isSkipped, setIsSkipped] = useState(false);
 
   const archetypeLabel = archetype.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
@@ -61,58 +60,45 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
   ];
 
   const currentStep = steps[step];
-  const Progress = () => (
-    <div className="flex gap-1 mb-4">
-      {steps.map((_, i) => (
-        <div
-          key={i}
-          className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? 'bg-blue-500' : 'bg-white/20'
-            }`}
-        />
-      ))}
-    </div>
-  );
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-[#141414] border border-white/10 rounded-2xl max-w-lg w-full p-6 relative overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white border border-gray-200 rounded-[20px] max-w-lg w-full p-6 relative overflow-hidden shadow-2xl">
         {/* Background decoration */}
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl" />
 
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 p-1 hover:bg-white/10 rounded transition-colors"
+          className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <X className="w-5 h-5 text-[#a1a1aa]" />
+          <X className="w-5 h-5 text-gray-500" />
         </button>
 
-        <Progress />
-
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-            <currentStep.icon className="w-6 h-6 text-blue-400" />
+          <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+            <currentStep.icon className="w-6 h-6 text-blue-500" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">{currentStep.title}</h2>
-            <p className="text-xs text-[#a1a1aa]">Step {step + 1} of {steps.length}</p>
+            <h2 className="text-xl font-bold text-gray-900">{currentStep.title}</h2>
+            <p className="text-xs text-gray-500">Step {step + 1} of {steps.length}</p>
           </div>
         </div>
 
-        <p className="text-[#a1a1aa] mb-4 leading-relaxed">
+        <p className="text-gray-600 mb-4 leading-relaxed">
           {currentStep.content}
         </p>
 
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-6">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
           <div className="flex items-start gap-2">
-            <Lightbulb className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-amber-200">{currentStep.highlight}</p>
+            <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-amber-700">{currentStep.highlight}</p>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <button
             onClick={handleClose}
-            className="text-sm text-[#a1a1aa] hover:text-white transition-colors"
+            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
             Skip tutorial
           </button>
@@ -121,7 +107,7 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
             {step > 0 && (
               <button
                 onClick={() => setStep(s => s - 1)}
-                className="px-4 py-2 text-sm text-[#a1a1aa] hover:text-white transition-colors"
+                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
               >
                 Back
               </button>
