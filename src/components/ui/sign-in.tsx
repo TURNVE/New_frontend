@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 const GoogleIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 48 48">
-        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s12-5.373 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-2.641-.21-5.236-.611-7.743z" />
-        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
-        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
-        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.022 35.026 44 30.038 44 24c0-2.641-.21-5.236-.611-7.743z" />
-    </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 48 48">
+    <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s12-5.373 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-2.641-.21-5.236-.611-7.743z" />
+    <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+    <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+    <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.022 35.026 44 30.038 44 24c0-2.641-.21-5.236-.611-7.743z" />
+  </svg>
 );
 
 export interface Testimonial {
@@ -23,7 +22,8 @@ interface Props {
   description?: React.ReactNode;
   heroImageSrc?: string;
   testimonials?: Testimonial[];
-  onGoogleSignIn?: () => void;
+  onEmailSignIn?: (email: string, password: string) => Promise<{ error?: { message: string } | null }>;
+  onGoogleSignIn?: () => Promise<void> | void;
   onCreateAccount?: () => void;
   onSignedIn?: () => void;
 }
@@ -44,6 +44,7 @@ export const SignInPage: React.FC<Props> = ({
   description = "Access your account and continue your journey with us",
   heroImageSrc,
   testimonials = [],
+  onEmailSignIn,
   onGoogleSignIn,
   onCreateAccount,
   onSignedIn,
@@ -61,20 +62,10 @@ export const SignInPage: React.FC<Props> = ({
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setError(error.message || 'Failed to sign in');
-        return;
-      }
-
-      if (data.user) {
-        if (!data.user.email_confirmed_at) {
-          setError('Please verify your email address before signing in. Check your inbox for the verification link.');
-          await supabase.auth.signOut();
+      if (onEmailSignIn) {
+        const result = await onEmailSignIn(email, password);
+        if (result?.error) {
+          setError(result.error.message || 'Failed to sign in');
           return;
         }
         onSignedIn?.();
@@ -91,22 +82,7 @@ export const SignInPage: React.FC<Props> = ({
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/auth/callback',
-        },
-      });
-
-      if (error) {
-        setError(error.message || 'Failed to sign in with Google');
-        setIsOAuthLoading(false);
-        return;
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      }
+      await onGoogleSignIn?.();
     } catch (err) {
       setError('An error occurred. Please try again.');
       setIsOAuthLoading(false);
@@ -135,15 +111,15 @@ export const SignInPage: React.FC<Props> = ({
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-violet-600 transition-colors" />
+                  <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 </div>
-                <input 
-                  name="email" 
-                  type="email" 
+                <input
+                  name="email"
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email address" 
-                  className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-600 transition-all placeholder:text-gray-400" 
+                  placeholder="Enter your email address"
+                  className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
                   required
                 />
               </div>
@@ -155,20 +131,20 @@ export const SignInPage: React.FC<Props> = ({
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-violet-600 transition-colors" />
+                  <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 </div>
-                <input 
-                  name="password" 
-                  type={showPassword ? 'text' : 'password'} 
+                <input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password" 
-                  className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-600 transition-all placeholder:text-gray-400" 
+                  placeholder="Enter your password"
+                  className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
                   required
                 />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)} 
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -178,26 +154,26 @@ export const SignInPage: React.FC<Props> = ({
 
             <div className="animate-element animate-delay-500 flex items-center justify-between text-sm">
               <label className="flex items-center gap-2.5 cursor-pointer group">
-                <input 
-                  type="checkbox" 
-                  name="rememberMe" 
-                  className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 cursor-pointer" 
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
                 />
                 <span className="text-gray-600 group-hover:text-gray-800 transition-colors">Keep me signed in</span>
               </label>
-              <a 
-                href="#" 
-                onClick={(e) => { e.preventDefault(); }} 
-                className="font-medium text-violet-600 hover:text-violet-700 transition-colors"
+              <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); }}
+                className="font-medium text-primary hover:opacity-80 transition-colors"
               >
                 Reset password
               </a>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isLoading}
-              className="animate-element animate-delay-600 w-full rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3.5 font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="animate-element animate-delay-600 w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -208,8 +184,8 @@ export const SignInPage: React.FC<Props> = ({
             <span className="px-4 text-xs font-medium text-gray-400 bg-white absolute">Or continue with</span>
           </div>
 
-          <button 
-            onClick={handleGoogleSignIn} 
+          <button
+            onClick={handleGoogleSignIn}
             disabled={isOAuthLoading}
             className="animate-element animate-delay-800 w-full flex items-center justify-center gap-3 border border-gray-200 bg-white rounded-xl py-3.5 font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -219,10 +195,10 @@ export const SignInPage: React.FC<Props> = ({
 
           <p className="animate-element animate-delay-900 text-center text-sm text-gray-500 mt-8">
             New to our platform?{' '}
-            <a 
-              href="#" 
-              onClick={(e) => { e.preventDefault(); onCreateAccount?.(); }} 
-              className="font-semibold text-violet-600 hover:text-violet-700 hover:underline transition-colors"
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); onCreateAccount?.(); }}
+              className="font-semibold text-primary hover:opacity-80 hover:underline transition-colors"
             >
               Create Account
             </a>

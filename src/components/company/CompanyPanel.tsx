@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { 
   Newspaper, Building2, TrendingUp, Users, 
   Bell, Filter, Search, ExternalLink, Calendar,
-  ChevronRight, Star, Target, Award, Globe
+  ChevronRight, Star, Target, Award, Globe, ChevronDown, ChevronUp
 } from 'lucide-react';
 import type { CompanyNews, NewsCategory, IndustryTrend, StakeholderProfile, TeamMember } from '../../company/types';
 import { NEWS_CATEGORIES, INITIAL_NEWS, INDUSTRY_TRENDS, ENHANCED_STAKEHOLDERS, TEAM_MEMBERS, DEFAULT_COMPANY, COMPETITORS } from '../../company/types';
@@ -14,6 +14,7 @@ interface CompanyPanelProps {
 
 export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
   const [activeSection, setActiveSection] = useState<'news' | 'culture' | 'industry' | 'team'>('news');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [newsFilter, setNewsFilter] = useState<NewsCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [unreadCount, setUnreadCount] = useState(INITIAL_NEWS.filter(n => !n.isRead).length);
@@ -51,10 +52,58 @@ export const CompanyPanel: React.FC<CompanyPanelProps> = ({ currentWeek }) => {
     { id: 'team', label: 'Team', icon: Users },
   ];
 
+  const activeSectionLabel = sections.find(s => s.id === activeSection)?.label || 'News Feed';
+
   return (
-    <div className="h-full flex bg-white dark:bg-[#0a0a0a]">
-      {/* Sidebar */}
-      <div className="w-56 border-r border-gray-200 dark:border-white/5 p-4 space-y-1">
+    <div className="h-full flex flex-col lg:flex-row bg-white dark:bg-[#0a0a0a]">
+      {/* Mobile Dropdown Header */}
+      <div className="lg:hidden border-b border-gray-200 dark:border-white/5">
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-white/5"
+        >
+          <div className="flex items-center gap-3">
+            {sections.find(s => s.id === activeSection)?.icon && (
+              <sections.find(s => s.id === activeSection)!.icon className="w-5 h-5 text-gray-500" />
+            )}
+            <span className="font-medium text-gray-900 dark:text-white">{activeSectionLabel}</span>
+          </div>
+          {mobileMenuOpen ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+        </button>
+        
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-white/5">
+            {sections.map(section => (
+              <button
+                key={section.id}
+                onClick={() => {
+                  setActiveSection(section.id as typeof activeSection);
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors ${
+                  activeSection === section.id
+                    ? 'bg-blue-500/10 text-blue-500'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <section.icon className="w-4 h-4" />
+                  <span>{section.label}</span>
+                </div>
+                {section.count !== undefined && section.count > 0 && (
+                  <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {section.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:block w-56 border-r border-gray-200 dark:border-white/5 p-4 space-y-1">
         {sections.map(section => (
           <button
             key={section.id}

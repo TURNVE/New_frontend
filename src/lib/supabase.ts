@@ -94,51 +94,8 @@ export type SimulationScore = {
 
 export type { User, Session }
 
-export const auth = {
-  signUp: async (email: string, password: string, metadata?: Record<string, unknown>) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata
-      }
-    })
-    return { data, error }
-  },
-
-  signIn: async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    })
-    return { data, error }
-  },
-
-  signInWithOAuth: async (provider: 'google' | 'github' | 'linkedin_oidc') => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: window.location.origin + '/auth/callback'
-      }
-    })
-    return { data, error }
-  },
-
-  signOut: async () => {
-    const { error } = await supabase.auth.signOut()
-    return { error }
-  },
-
-  getSession: async () => {
-    const { data: { session }, error } = await supabase.auth.getSession()
-    return { session, error }
-  },
-
-  getUser: async () => {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    return { user, error }
-  },
-
+// ── Profile helpers (kept here since they're data-layer, not auth-state) ──
+export const profiles = {
   getProfile: async (userId?: string) => {
     const id = userId || (await supabase.auth.getUser()).data.user?.id
     if (!id) return { profile: null, error: new Error('No user ID') }
@@ -165,10 +122,6 @@ export const auth = {
 
     return { profile: profile as Profile | null, error }
   },
-
-  onAuthStateChange: (callback: (event: string, session: Session | null) => void) => {
-    return supabase.auth.onAuthStateChange(callback)
-  }
 }
 
 export const simulations = {

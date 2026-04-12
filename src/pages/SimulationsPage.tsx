@@ -4,7 +4,7 @@ import {
   Briefcase, Clock, CheckCircle, TrendingUp,
   Play, Calendar, Users, DollarSign, Flag, Star, ArrowLeft
 } from 'lucide-react';
-import { simulations, auth } from '../lib/supabase';
+import { simulations, supabase } from '../lib/supabase';
 import { usePageSetup } from '../hooks/usePageSetup';
 
 interface Simulation {
@@ -33,7 +33,7 @@ const SimulationsPage = () => {
   useEffect(() => {
     async function loadSimulations() {
       setIsLoading(true);
-      const user = (await auth.getUser()).user;
+      const user = (await supabase.auth.getUser()).data.user;
       if (!user) return;
 
       const { sessions } = await simulations.getActiveSessions(); // Add a custom fetch for all if necessary, wait, let's use supabase directly since we need all status types
@@ -191,8 +191,8 @@ const SimulationsPage = () => {
             <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-600 hover:bg-gray-100'
                 }`}
             >
               All Simulations
@@ -200,8 +200,8 @@ const SimulationsPage = () => {
             <button
               onClick={() => setFilter('ongoing')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${filter === 'ongoing'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-600 hover:bg-gray-100'
                 }`}
             >
               <Play className="h-4 w-4" />
@@ -210,8 +210,8 @@ const SimulationsPage = () => {
             <button
               onClick={() => setFilter('in-progress')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${filter === 'in-progress'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-600 hover:bg-gray-100'
                 }`}
             >
               <TrendingUp className="h-4 w-4" />
@@ -220,8 +220,8 @@ const SimulationsPage = () => {
             <button
               onClick={() => setFilter('completed')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${filter === 'completed'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-600 hover:bg-gray-100'
                 }`}
             >
               <CheckCircle className="h-4 w-4" />

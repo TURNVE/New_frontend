@@ -121,20 +121,20 @@ const TracksPage = () => {
 
         {!selectedTrackId ? (
           /* Track Selection Grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {careerTracks.map((track) => (
               <button
                 key={track.id}
                 onClick={() => setSelectedTrackId(track.id)}
-                className="group relative bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 text-left"
+                className="group relative bg-white rounded-[20px] p-6 sm:p-8 border border-gray-100 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 text-left"
               >
-                <div className={`w-16 h-16 ${track.bgColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                  <div className="text-blue-600">
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 ${track.bgColor} rounded-[16px] flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform`}>
+                  <div className="text-blue-600 scale-90 sm:scale-100">
                     {track.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{track.name}</h3>
-                <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">{track.name}</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 leading-relaxed">
                   {track.description}
                 </p>
                 <div className="flex items-center text-sm font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">
@@ -145,24 +145,24 @@ const TracksPage = () => {
           </div>
         ) : (
           /* Role Selection List */
-          <div className="max-w-3xl mx-auto space-y-4">
+          <div className="max-w-3xl mx-auto space-y-3 sm:space-y-4 px-4 sm:px-0">
             {selectedTrack?.roles.map((role) => (
               <button
                 key={role.id}
                 onClick={() => handleRoleSelect(role.id)}
-                className="w-full group bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-500 hover:shadow-lg transition-all duration-300 flex items-center justify-between text-left"
+                className="w-full group bg-white rounded-[20px] p-4 sm:p-6 border border-gray-100 hover:border-blue-500 hover:shadow-lg transition-all duration-300 flex items-center justify-between text-left"
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 ${selectedTrack.bgColor} rounded-xl flex items-center justify-center text-blue-600`}>
-                    <ArrowRight className="w-6 h-6" />
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 ${selectedTrack.bgColor} rounded-[12px] sm:rounded-xl flex items-center justify-center text-blue-600 flex-shrink-0`}>
+                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">{role.name}</h3>
-                    <p className="text-sm text-gray-600">Start your journey in {role.name}</p>
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">{role.name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">Start your journey in {role.name}</p>
                   </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                  <ArrowRight className="w-5 h-5" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all flex-shrink-0">
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
               </button>
             ))}

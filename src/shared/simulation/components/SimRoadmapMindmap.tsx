@@ -90,7 +90,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
                             <path d="M 560 336 L 710 336" stroke="currentColor" strokeWidth="2" fill="none" className="text-blue-500" />
                         </svg>
 
-                        <div className="w-48 p-6 bg-blue-600 rounded-2xl shadow-xl shadow-blue-500/20 text-white text-center border border-white/20 z-10">
+                        <div className="w-48 p-6 bg-blue-600 rounded-[16px] shadow-xl shadow-blue-500/20 text-white text-center border border-white/20 z-10">
                             <Zap className="w-8 h-8 mx-auto mb-3" />
                             <h3 className="font-bold">Project Alpha</h3>
                             <p className="text-[10px] opacity-70 uppercase tracking-widest mt-1">Sim 001</p>
@@ -101,7 +101,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
                     {[1, 2, 3].map(wk => (
                         <div key={wk} className="flex flex-col gap-6 relative">
                             {/* Week Header */}
-                            <div className={`p-3 rounded-xl border text-center mb-4 transition-all duration-500 ${wk < currentWeek ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                            <div className={`p-3 rounded-[12px] border text-center mb-4 transition-all duration-500 ${wk < currentWeek ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                                 wk === currentWeek ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 border-blue-400' :
                                     'bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-400 grayscale'
                                 }`}>
@@ -116,7 +116,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
                                         key={node.id}
                                         onClick={() => setSelectedNodeId(node.id)}
                                         disabled={node.status === 'locked'}
-                                        className={`group relative w-64 p-4 text-left rounded-2xl border-2 transition-all duration-300 ${selectedNodeId === node.id
+                                        className={`group relative w-64 p-4 text-left rounded-[16px] border-2 transition-all duration-300 ${selectedNodeId === node.id
                                             ? 'border-blue-500 bg-blue-500/5 shadow-lg shadow-blue-500/10 -translate-y-1'
                                             : node.status === 'completed' ? 'border-emerald-500/30 bg-emerald-500/5 opacity-80' :
                                                 node.status === 'active' ? 'border-blue-500/20 bg-white dark:bg-gray-900 hover:border-blue-500/50 hover:-translate-y-0.5' :
@@ -195,7 +195,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
                                         <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300">{c.user}</span>
                                         <span className="text-[9px] text-gray-400 ml-auto">{c.time}</span>
                                     </div>
-                                    <div className="bg-gray-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-gray-100 dark:border-white/5">
+                                    <div className="bg-gray-50 dark:bg-white/[0.03] p-3 rounded-[16px] border border-gray-100 dark:border-white/5">
                                         <p className="text-xs text-gray-600 dark:text-gray-400 leading-normal">{c.text}</p>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
 
                             {/* Simulation Tip */}
                             {selectedNode.status === 'active' && (
-                                <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl space-y-2">
+                                <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-[12px] space-y-2">
                                     <div className="flex items-center gap-2">
                                         <AlertTriangle className="w-4 h-4 text-amber-500" />
                                         <span className="text-xs font-bold text-amber-500 uppercase">Strategic Insight</span>
@@ -223,7 +223,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
                                     value={newComment}
                                     onChange={e => setNewComment(e.target.value)}
                                     placeholder="Add a thought..."
-                                    className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500"
+                                    className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-[12px] px-4 py-3 text-xs focus:outline-none focus:border-blue-500"
                                 />
                                 <button className="absolute right-2 top-2 p-1.5 bg-blue-500 text-white rounded-lg opacity-80 hover:opacity-100 transition-opacity">
                                     <Send className="w-3 h-3" />
@@ -236,7 +236,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
                             <div className="p-6 bg-blue-500">
                                 <button
                                     onClick={() => onTriggerAction(selectedNode.actionId || selectedNode.id)}
-                                    className="w-full bg-white text-blue-600 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-50 transition-colors shadow-lg shadow-black/10"
+                                    className="w-full bg-white text-blue-600 font-bold py-3 rounded-[12px] flex items-center justify-center gap-2 hover:bg-blue-50 transition-colors shadow-lg shadow-black/10"
                                 >
                                     Focus on This Feature <ArrowRight className="w-4 h-4" />
                                 </button>

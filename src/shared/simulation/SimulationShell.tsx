@@ -9,7 +9,7 @@ import {
     FolderHeart, Bell, Play, Pause, RotateCcw, ArrowRight, Moon, Sun,
     Zap, Clock, CheckCircle, AlertCircle, TrendingUp, TrendingDown,
     Trophy, X, AlertTriangle, FileText, Filter, Search, Tag, CreditCard,
-    Phone, PhoneCall, Video, User,
+    Phone, PhoneCall, Video, User, Menu,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import useSimulationCore from './useSimulationCore';
@@ -21,7 +21,6 @@ import { DocumentsPanel } from '../../components/simulation/DocumentsPanel';
 import { PortfolioBuilder } from '../../components/simulation/PortfolioBuilder';
 import { CompanyPanel } from '../../components/company/CompanyPanel';
 import { RoadmapPanel } from '../../components/pmtools/RoadmapPanel';
-import { MetricsPanel } from '../../components/pmtools/MetricsPanel';
 import { NotificationCenter, useNotifications } from '../../components/communications/NotificationCenter';
 import { ToastContainer } from '../../components/communications/ToastContainer';
 import { WelcomeHint } from '../../components/overlay/WelcomeHint';
@@ -29,7 +28,7 @@ import { enableSounds } from '../../utils/sounds';
 import ActionModal, { type ModalAction } from './components/ActionModal';
 import SimRoadmapMindmap from './components/SimRoadmapMindmap';
 
-type ActiveTab = 'dashboard' | 'backlog' | 'roadmap' | 'metrics' | 'documents' | 'portfolio' | 'company';
+type ActiveTab = 'dashboard' | 'backlog' | 'roadmap' | 'documents' | 'portfolio' | 'company';
 
 // ─── Priority badge ───────────────────────────────────────────
 const PRI: Record<string, string> = {
@@ -131,15 +130,6 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                         <h2 className="text-lg font-bold dark:text-white">Activity Backlog</h2>
                         <p className="text-xs text-gray-500 mt-0.5">{totalItems} items • Week {gameState.week}</p>
                     </div>
-                    <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            placeholder="Search..."
-                            className="pl-9 pr-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:border-blue-500 dark:text-white w-52"
-                        />
-                    </div>
                 </div>
                 <div className="flex gap-1 flex-wrap">
                     {tabs.map(t => (
@@ -166,7 +156,7 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                         </h3>
                         <div className="space-y-2">
                             {filtSignals.map(sig => (
-                                <div key={sig.id} className="bg-white dark:bg-gray-800/60 rounded-xl p-4 border border-gray-100 dark:border-gray-700 flex items-start gap-3">
+                                <div key={sig.id} className="bg-white dark:bg-gray-800/60 rounded-[12px] p-4 border border-gray-100 dark:border-gray-700 flex items-start gap-3">
                                     <div className={`w-8 h-8 rounded-full ${sig.sourceColor} flex items-center justify-center text-[10px] font-bold flex-shrink-0`}>
                                         {sig.sourceInitials}
                                     </div>
@@ -203,7 +193,7 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                         </h3>
                         <div className="space-y-2">
                             {filtEvents.map(evt => (
-                                <div key={evt.id} className={`bg-white dark:bg-gray-800/60 rounded-xl p-4 border transition-colors ${evt.requiresAction ? 'border-amber-500/30 bg-amber-500/5' : 'border-gray-100 dark:border-gray-700'}`}>
+                                <div key={evt.id} className={`bg-white dark:bg-gray-800/60 rounded-[12px] p-4 border transition-colors ${evt.requiresAction ? 'border-amber-500/30 bg-amber-500/5' : 'border-gray-100 dark:border-gray-700'}`}>
                                     <div className="flex items-start gap-3">
                                         <div className={`w-8 h-8 rounded-full ${evt.fromColor} flex items-center justify-center text-[10px] font-bold flex-shrink-0`}>
                                             {evt.fromInitials}
@@ -238,7 +228,7 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                                 return (
                                     <div
                                         key={action.id}
-                                        className={`bg-white dark:bg-gray-800/60 rounded-xl p-4 border transition-colors ${done ? 'opacity-60 border-gray-100 dark:border-gray-800' : overdue ? 'border-red-500/30 bg-red-500/5' : 'border-gray-100 dark:border-gray-700 hover:border-blue-500/40'}`}
+                                        className={`bg-white dark:bg-gray-800/60 rounded-[12px] p-4 border transition-colors ${done ? 'opacity-60 border-gray-100 dark:border-gray-800' : overdue ? 'border-red-500/30 bg-red-500/5' : 'border-gray-100 dark:border-gray-700 hover:border-blue-500/40'}`}
                                     >
                                         <div className="flex items-start gap-3">
                                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${done ? 'bg-emerald-500/20' : overdue ? 'bg-red-500/20' : 'bg-blue-500/10'}`}>
@@ -327,6 +317,12 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
     const [showNotifications, setShowNotifications] = useState(false);
     const [openModal, setOpenModal] = useState<ModalAction | null>(null);
     const [feedback, setFeedback] = useState('');
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+    
+    // Week countdown timer (7 days in seconds = 604800, but we'll use a shorter duration for gameplay)
+    const WEEK_DURATION = 300; // 5 minutes per week for gameplay
+    const [weekTimeLeft, setWeekTimeLeft] = useState(WEEK_DURATION);
+    const [weekAlertShown, setWeekAlertShown] = useState(false);
 
     const { notifications, markNotificationRead } = useNotifications();
 
@@ -362,8 +358,35 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
             setWeekChangeInfo({ week: gameState.week, total: gameState.totalWeeks });
             lastWeekRef.current = gameState.week;
             setTimeout(() => setWeekChangeInfo(null), 8000);
+            // Reset timer for new week
+            setWeekTimeLeft(WEEK_DURATION);
+            setWeekAlertShown(false);
         }
     }, [gameState?.week]);
+    
+    // Week countdown timer effect
+    useEffect(() => {
+        if (!isRunning || isPaused) return;
+        
+        const timer = setInterval(() => {
+            setWeekTimeLeft((prev) => {
+                if (prev <= 1) {
+                    // Week time has passed
+                    if (!weekAlertShown) {
+                        setWeekAlertShown(true);
+                        // Show alert
+                        alert(`Week ${gameState?.week || 1} has passed!`);
+                        // Auto advance to next week
+                        advanceTime();
+                    }
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        
+        return () => clearInterval(timer);
+    }, [isRunning, isPaused, gameState?.week, weekAlertShown]);
 
     const activeMeeting = gameState?.activeMeeting;
     const [showMeetingContent, setShowMeetingContent] = useState(false);
@@ -393,7 +416,6 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
         { name: 'Dashboard', icon: Home, id: 'dashboard' },
         { name: 'Backlog', icon: LayoutList, id: 'backlog', badge: backlogCount > 0 ? backlogCount : undefined },
         { name: 'Roadmap', icon: Map, id: 'roadmap' },
-        { name: 'Metrics', icon: Gauge, id: 'metrics' },
         { name: 'Company', icon: Building2, id: 'company' },
         { name: 'Documents', icon: FolderOpen, id: 'documents' },
         { name: 'Portfolio', icon: FolderHeart, id: 'portfolio' },
@@ -417,7 +439,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
             {/* New Week Overlay */}
             {weekChangeInfo && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-500">
-                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-3xl shadow-2xl text-center text-white max-w-md mx-4 animate-in zoom-in duration-300">
+                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[20px] shadow-2xl text-center text-white max-w-md mx-4 animate-in zoom-in duration-300">
                         <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Trophy className="w-10 h-10" />
                         </div>
@@ -436,7 +458,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
             {/* Meeting Call Overlay */}
             {activeMeeting && showMeetingContent && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-xl animate-in fade-in duration-500 p-4">
-                    <div className="glass-panel w-full max-w-lg rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 duration-500">
+                    <div className="glass-panel w-full max-w-lg rounded-[20px] border border-white/10 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 duration-500">
                         <div className="p-8 text-center">
                             <div className="relative w-32 h-32 mx-auto mb-6">
                                 <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping opacity-50" />
@@ -530,9 +552,16 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
             <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
 
                 {/* ── Sidebar ───────────────────────────────── */}
-                <aside className="w-64 border-r border-gray-200 dark:border-white/5 bg-white dark:bg-[#0a0a0a] flex flex-col shrink-0">
-                    <div className="p-6 flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl shadow-lg flex items-center justify-center text-white" style={{ backgroundColor: config.primaryColor }}>
+                {/* Mobile Sidebar Overlay */}
+                {mobileSidebarOpen && (
+                    <div 
+                        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                        onClick={() => setMobileSidebarOpen(false)}
+                    />
+                )}
+                <aside className={`${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 border-r border-gray-200 dark:border-white/5 bg-white dark:bg-[#0a0a0a] flex flex-col shrink-0 transition-transform duration-300 ease-in-out`}>
+                    <div className="p-4 lg:p-6 flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-[16px] shadow-lg flex items-center justify-center text-white" style={{ backgroundColor: config.primaryColor }}>
                             {config.industry.toLowerCase().includes('fintech') || config.industry.toLowerCase().includes('payment') ? (
                                 <CreditCard className="w-4 h-4" />
                             ) : config.industry.toLowerCase().includes('tech') ? (
@@ -541,15 +570,24 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                 <Building2 className="w-4 h-4" />
                             )}
                         </div>
-                        <span className="font-bold text-lg tracking-tight">{config.companyName}</span>
+                        <span className="font-bold text-base lg:text-lg tracking-tight truncate">{config.companyName}</span>
+                        <button 
+                            onClick={() => setMobileSidebarOpen(false)}
+                            className="lg:hidden ml-auto p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                        >
+                            <X className="w-5 h-5 text-gray-500" />
+                        </button>
                     </div>
 
-                    <nav className="flex-1 px-4 py-4 space-y-1">
+                    <nav className="flex-1 px-3 lg:px-4 py-4 space-y-1">
                         {NAV_ITEMS.map((item) => (
                             <button
                                 key={item.id}
-                                onClick={() => setActiveTab(item.id)}
-                                className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors relative ${activeTab === item.id
+                                onClick={() => {
+                                    setActiveTab(item.id);
+                                    setMobileSidebarOpen(false);
+                                }}
+                                className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-[12px] transition-colors relative ${activeTab === item.id
                                     ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                                     }`}
@@ -565,71 +603,104 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                         ))}
                     </nav>
 
-                    <div className="p-4 mx-4 mb-4 border-t border-gray-200 dark:border-gray-800">
+                    <div className="p-3 lg:p-4 mx-3 lg:mx-4 mb-4 border-t border-gray-200 dark:border-gray-800">
                         <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Phase Progress</div>
                         <div className="h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                             <div className="h-full rounded-full transition-all" style={{ width: `${gameState.phaseProgress}%`, backgroundColor: config.primaryColor }} />
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{Math.round(gameState.phaseProgress)}% complete</p>
                     </div>
+                    
+                    {/* Week Countdown Timer */}
+                    <div className="p-3 lg:p-4 mx-3 lg:mx-4 mb-4 border-t border-gray-200 dark:border-gray-800">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">Week Timer</span>
+                            <span className={`text-xs font-mono font-bold ${weekTimeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-blue-500'}`}>
+                                {Math.floor(weekTimeLeft / 60).toString().padStart(2, '0')}:{(weekTimeLeft % 60).toString().padStart(2, '0')}
+                            </span>
+                        </div>
+                        <div className="h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                            <div 
+                                className={`h-full rounded-full transition-all ${weekTimeLeft < 60 ? 'bg-red-500' : 'bg-blue-500'}`} 
+                                style={{ width: `${(weekTimeLeft / WEEK_DURATION) * 100}%` }} 
+                            />
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">Time remaining in week</p>
+                    </div>
+                    
+                    {/* Dark Mode Toggle */}
+                    <div className="p-3 lg:p-4 mx-3 lg:mx-4 mb-4 border-t border-gray-200 dark:border-gray-800">
+                        <button 
+                            onClick={toggleTheme}
+                            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-[12px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                            <span className="flex-1 text-left">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+                        </button>
+                    </div>
                 </aside>
 
                 {/* ── Main ─────────────────────────────────── */}
-                <main className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-[#121212]">
+                <main className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-[#121212] min-w-0">
                     {/* Header */}
-                    <header className="h-16 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 bg-white/50 dark:bg-gray-900/50 backdrop-blur-md z-10 flex-shrink-0">
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/dashboard')} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+                    <header className="h-14 lg:h-16 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-3 lg:px-6 bg-white/50 dark:bg-gray-900/50 backdrop-blur-md z-10 flex-shrink-0">
+                        <div className="flex items-center gap-2 lg:gap-3 min-w-0">
+                            <button 
+                                onClick={() => setMobileSidebarOpen(true)}
+                                className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
+                            >
+                                <Menu className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                            </button>
+                            <button onClick={() => navigate('/dashboard')} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition hidden sm:flex">
                                 <ChevronRight className="h-5 w-5 rotate-180 text-gray-500 dark:text-gray-400" />
                             </button>
-                            <h1 className="text-base font-semibold dark:text-white">PM Workspace</h1>
-                            <span className="text-xs font-bold px-2 py-1 rounded border" style={{ backgroundColor: `${config.primaryColor}20`, color: config.primaryColor, borderColor: `${config.primaryColor}30` }}>
+                            <h1 className="text-sm lg:text-base font-semibold dark:text-white truncate">PM Workspace</h1>
+                            <span className="hidden sm:inline-flex text-xs font-bold px-2 py-1 rounded border" style={{ backgroundColor: `${config.primaryColor}20`, color: config.primaryColor, borderColor: `${config.primaryColor}30` }}>
                                 WEEK {String(gameState.week).padStart(2, '0')}
                             </span>
-                            <div className="flex items-center gap-1.5 px-3 py-1 font-mono text-sm bg-gray-100 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-                                <Clock className={`w-4 h-4 ${gameState.timeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-blue-500'}`} />
+                            <div className="hidden md:flex items-center gap-1.5 px-2 lg:px-3 py-1 font-mono text-xs lg:text-sm bg-gray-100 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+                                <Clock className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${gameState.timeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-blue-500'}`} />
                                 <span className={gameState.timeLeft < 60 ? 'text-red-500 font-bold' : 'dark:text-white'}>
                                     {Math.floor(gameState.timeLeft / 60).toString().padStart(2, '0')}:{(gameState.timeLeft % 60).toString().padStart(2, '0')}
                                 </span>
                             </div>
                             {isPaused && (
-                                <span className="bg-yellow-500/10 text-yellow-500 text-xs font-bold px-2 py-1 rounded border border-yellow-500/20 flex items-center gap-1">
+                                <span className="hidden sm:inline-flex bg-yellow-500/10 text-yellow-500 text-xs font-bold px-2 py-1 rounded border border-yellow-500/20 flex items-center gap-1">
                                     <Pause className="w-3 h-3" /> PAUSED
                                 </span>
                             )}
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                            {/* Notifications - icon only */}
                             <button onClick={() => setShowNotifications(true)} className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
                                 <Bell className="w-5 h-5 text-gray-500" />
                                 {notifications.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />}
                             </button>
+                            
+                            {/* Play/Pause - icon only */}
                             {!isRunning ? (
-                                <button onClick={() => { enableSounds(); startSimulation(); }} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 animate-pulse">
-                                    <Play className="w-4 h-4" /> Start
+                                <button onClick={() => { enableSounds(); startSimulation(); }} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all" title="Start">
+                                    <Play className="w-5 h-5" />
                                 </button>
                             ) : isPaused ? (
-                                <button onClick={() => { enableSounds(); resumeSimulation(); }} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
-                                    <Play className="w-4 h-4" /> Resume
+                                <button onClick={() => { enableSounds(); resumeSimulation(); }} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all" title="Resume">
+                                    <Play className="w-5 h-5" />
                                 </button>
                             ) : (
-                                <button onClick={pauseSimulation} className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                    <Pause className="w-4 h-4" /> Running
+                                <button onClick={pauseSimulation} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all" title="Pause">
+                                    <Pause className="w-5 h-5" />
                                 </button>
                             )}
-                            <button onClick={toggleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">
-                                {isDark ? <Sun className="w-5 h-5 text-gray-400" /> : <Moon className="w-5 h-5 text-gray-500" />}
-                            </button>
-                            <button onClick={restartSimulation} className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">
-                                <RotateCcw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                            </button>
+                            
+                            {/* Next Week - arrow icon only */}
                             <button
                                 onClick={advanceTime}
                                 disabled={!isRunning || isPaused}
-                                className="bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 shadow-lg shadow-blue-500/20"
+                                className="p-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg shadow-lg shadow-emerald-500/20 transition-all"
+                                title="Next Week"
                             >
-                                Next Week <ArrowRight className="w-4 h-4" />
+                                <ArrowRight className="w-5 h-5" />
                             </button>
                         </div>
                     </header>
@@ -683,34 +754,32 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                     }
                                 }}
                             />
-                        ) : activeTab === 'metrics' ? (
-                            <MetricsPanel gameState={gameState as any} />
                         ) : (
                             /* ── Dashboard ── */
-                            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                            <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 custom-scrollbar">
                                 {/* KPI Row */}
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
                                     {metrics.map((m) => (
-                                        <div key={m.label} className="bg-white dark:bg-gray-800/80 rounded-xl p-4 border border-gray-200 dark:border-gray-700/60 shadow-sm">
-                                            <div className="flex items-center gap-2 mb-2">
+                                        <div key={m.label} className="bg-white dark:bg-gray-800/80 rounded-[20px] p-3 sm:p-4 border border-gray-200 dark:border-gray-700/60 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-1 sm:mb-2">
                                                 <div className={`w-2 h-2 rounded-full ${m.dot}`} />
-                                                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">{m.label}</div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium truncate">{m.label}</div>
                                             </div>
-                                            <div className="text-2xl font-bold mb-1 dark:text-white">{m.value}</div>
+                                            <div className="text-xl sm:text-2xl font-bold mb-1 dark:text-white">{m.value}</div>
                                             <div className={`text-xs flex items-center gap-1 ${m.trendColor === 'green' ? 'text-emerald-400' : m.trendColor === 'red' ? 'text-red-400' : 'text-yellow-400'}`}>
                                                 {m.trendDir === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                                                {m.trendVal}
+                                                <span className="truncate">{m.trendVal}</span>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                                     {/* LEFT: Signals & Events Preview */}
-                                    <div className="space-y-4">
+                                    <div className="space-y-3 sm:space-y-4">
                                         {/* Signals */}
-                                        <div className="glass-panel rounded-xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
-                                            <div className="p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
+                                        <div className="glass-panel rounded-[20px] border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+                                            <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
                                                 <h3 className="text-sm font-semibold dark:text-white flex items-center gap-2">
                                                     <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                                                     Signals — Week {gameState.week}
@@ -719,14 +788,14 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                                     View all <ArrowRight className="w-3 h-3" />
                                                 </button>
                                             </div>
-                                            <div className="p-4 space-y-3">
+                                            <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                                                 {currentSignals.length === 0 ? (
                                                     <div className="text-center py-6">
                                                         <AlertCircle className="w-6 h-6 text-gray-400 mx-auto mb-2" />
                                                         <p className="text-gray-500 text-sm">No signals this week yet.</p>
                                                     </div>
                                                 ) : currentSignals.map((s) => (
-                                                    <div key={s.id} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-800">
+                                                    <div key={s.id} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-[16px] border border-gray-100 dark:border-gray-800">
                                                         <div className={`w-7 h-7 rounded-full ${s.sourceColor} flex items-center justify-center text-[10px] font-bold flex-shrink-0`}>{s.sourceInitials}</div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2 mb-0.5">
@@ -741,8 +810,8 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                         </div>
 
                                         {/* Events */}
-                                        <div className="glass-panel rounded-xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
-                                            <div className="p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
+                                        <div className="glass-panel rounded-[20px] border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+                                            <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
                                                 <h3 className="text-sm font-semibold dark:text-white flex items-center gap-2">
                                                     <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
                                                     Events — Week {gameState.week}
@@ -751,7 +820,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                                     View all <ArrowRight className="w-3 h-3" />
                                                 </button>
                                             </div>
-                                            <div className="p-4 space-y-3">
+                                            <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                                                 {currentEvents.length === 0 ? (
                                                     <div className="text-center py-6">
                                                         <AlertCircle className="w-6 h-6 text-gray-400 mx-auto mb-2" />
@@ -784,7 +853,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                         </div>
 
                                         {/* Stakeholders */}
-                                        <div className="glass-panel rounded-xl border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
+                                        <div className="glass-panel rounded-[12px] border border-gray-200 dark:border-white/5 shadow-sm overflow-hidden">
                                             <div className="px-4 py-3 border-b border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/5">
                                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Key Stakeholders</h3>
                                             </div>
@@ -814,7 +883,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
 
                                     {/* RIGHT: Strategic Actions */}
                                     <div className="space-y-4">
-                                        <div className="bg-white dark:bg-gray-800/50 rounded-xl border-2 border-dashed overflow-hidden shadow-xl" style={{ borderColor: `${config.primaryColor}40` }}>
+                                        <div className="bg-white dark:bg-gray-800/50 rounded-[12px] border-2 border-dashed overflow-hidden shadow-xl" style={{ borderColor: `${config.primaryColor}40` }}>
                                             <div className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: config.primaryColor }}>
                                                 <div className="flex items-center gap-2">
                                                     <Zap className="w-5 h-5 text-white" />
@@ -842,7 +911,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                                             <button
                                                                 key={action.id}
                                                                 onClick={() => setOpenModal({ kind: 'weekly', item: action })}
-                                                                className="w-full group text-left p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1a1a] hover:border-blue-500 hover:bg-blue-500/5 transition-all"
+                                                                className="w-full group text-left p-4 rounded-[12px] border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1a1a] hover:border-blue-500 hover:bg-blue-500/5 transition-all"
                                                             >
                                                                 <div className="flex items-center gap-2 mb-1">
                                                                     <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${PRI[action.priority]}`}>{action.priority}</span>
@@ -862,7 +931,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                                             <button
                                                                 key={action.id}
                                                                 onClick={() => setOpenModal({ kind: 'legacy', item: action })}
-                                                                className="w-full group text-left p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1a1a] hover:border-amber-500 hover:bg-amber-500/5 transition-all"
+                                                                className="w-full group text-left p-4 rounded-[12px] border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1a1a] hover:border-amber-500 hover:bg-amber-500/5 transition-all"
                                                             >
                                                                 <div className="flex items-center gap-2 mb-1">
                                                                     <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Decision</span>
@@ -883,7 +952,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                         {backlogCount > 0 && (
                                             <button
                                                 onClick={() => setActiveTab('backlog')}
-                                                className="w-full p-4 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-colors text-left"
+                                                className="w-full p-4 rounded-[12px] border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 transition-colors text-left"
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -918,13 +987,13 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
             {/* Completion Modal */}
             {isCompleted && score && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-gray-800 max-w-md w-full p-10 text-center shadow-2xl">
+                    <div className="bg-white dark:bg-[#1a1a1a] rounded-[16px] border border-gray-200 dark:border-gray-800 max-w-md w-full p-10 text-center shadow-2xl">
                         <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Trophy className="w-10 h-10 text-emerald-500" />
                         </div>
                         <h2 className="text-3xl font-bold dark:text-white mb-2">Simulation Complete!</h2>
                         <p className="text-gray-500 mb-8">You reached the end of the {config.companyName} scenario.</p>
-                        <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl p-6 mb-8 border border-gray-100 dark:border-gray-800">
+                        <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-[16px] p-6 mb-8 border border-gray-100 dark:border-gray-800">
                             <div className="text-5xl font-black dark:text-white mb-2">{score.overall}%</div>
                             <div className="text-sm font-bold text-emerald-500 uppercase tracking-widest">{score.grade} Grade</div>
                             <div className="grid grid-cols-2 gap-2 mt-4 text-xs text-gray-500">

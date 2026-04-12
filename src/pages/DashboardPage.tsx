@@ -1,12 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  Home, Folder, Users, Award, BarChart3, Settings, Plus,
-  Briefcase, FileText, Menu, X, Bell, Search, Clock, Zap,
-  TrendingUp, User, Trophy, Play, CheckCircle
+import { 
+  LayoutDashboard, 
+  Play, 
+  Trophy, 
+  Folder, 
+  Settings, 
+  HelpCircle, 
+  LogOut,
+  Briefcase,
+  FileText,
+  Menu,
+  X,
+  Bell,
+  Clock,
+  Zap,
+  TrendingUp,
+  Plus,
+  CheckCircle,
+  Star,
+  Target,
+  Users,
+  Award
 } from 'lucide-react';
 import { usePageSetup } from '../hooks/usePageSetup';
-import { simulations, auth } from '../lib/supabase';
+import { simulations, supabase, profiles } from '../lib/supabase';
 
 const DashboardPage = () => {
   usePageSetup();
@@ -37,9 +55,9 @@ const DashboardPage = () => {
 
   useEffect(() => {
     async function loadData() {
-      const { user } = await auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { profile } = await auth.getProfile(user.id);
+        const { profile } = await profiles.getProfile(user.id);
         const name = profile?.full_name || user.email?.split('@')[0] || 'User';
         setUserName(name);
         setUserInitials(name.substring(0, 2).toUpperCase());
@@ -99,22 +117,22 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <div
-            className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-foreground/50 backdrop-blur-sm transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-2xl animate-slide-in-left">
-            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-card shadow-2xl animate-slide-in-left">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-border">
               <Link to="/" className="flex items-center space-x-2">
                 <img src="/logo.png" alt="TURNVE" className="h-8 w-auto" />
               </Link>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 tap-target"
+                className="p-2 rounded-lg text-muted-foreground hover:bg-secondary tap-target"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -124,16 +142,16 @@ const DashboardPage = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="flex items-center px-3 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors tap-target"
+                  className="flex items-center px-3 py-3 text-sm font-medium text-foreground rounded-xl hover:bg-secondary transition-colors tap-target"
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <IconComponent iconName={item.icon} className="mr-3 h-5 w-5 text-gray-400" />
+                  <IconComponent iconName={item.icon} className="mr-3 h-5 w-5 text-muted-foreground" />
                   {item.name}
                 </Link>
               ))}
             </nav>
             {/* Mobile sidebar footer */}
-            <div className="p-4 border-t border-gray-100">
+            <div className="p-4 border-t border-border">
               {isFirstTimeUser && (
                 <div className="bg-gradient-to-br from-sky-600 to-blue-700 rounded-xl p-4 text-white mb-4">
                   <div className="flex items-center space-x-2 mb-2">
@@ -160,8 +178,8 @@ const DashboardPage = () => {
 
       {/* Desktop Sidebar */}
       <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 lg:w-72 md:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-100 overflow-y-auto">
-          <div className="flex items-center h-16 px-6 border-b border-gray-100">
+        <div className="flex flex-col flex-grow bg-card border-r border-border overflow-y-auto">
+          <div className="flex items-center h-16 px-6 border-b border-border">
             <Link to="/" className="flex items-center space-x-2">
               <img src="/logo.png" alt="TURNVE" className="h-8 w-auto" />
             </Link>
@@ -171,14 +189,14 @@ const DashboardPage = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors tap-target ${location.pathname === item.href ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
+                className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors tap-target ${location.pathname === item.href ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-secondary'}`}
               >
-                <IconComponent iconName={item.icon} className={`mr-3 h-5 w-5 ${location.pathname === item.href ? 'text-blue-600' : 'text-gray-400'}`} />
+                <IconComponent iconName={item.icon} className={`mr-3 h-5 w-5 ${location.pathname === item.href ? 'text-primary' : 'text-muted-foreground'}`} />
                 {item.name}
               </Link>
             ))}
           </nav>
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border-t border-border">
             {isFirstTimeUser && (
               <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-xl p-4 text-white mb-4">
                 <div className="flex items-center space-x-2 mb-2">
@@ -212,37 +230,27 @@ const DashboardPage = () => {
       {/* Main Content */}
       <div className="md:pl-64 lg:pl-72">
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
           <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 lg:px-6">
-            <div className="flex items-center flex-1">
+            <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 mr-2 sm:mr-4 rounded-lg text-gray-500 hover:bg-gray-100 md:hidden tap-target"
+                className="p-2 mr-2 sm:mr-4 rounded-lg text-muted-foreground hover:bg-secondary md:hidden tap-target"
               >
                 <Menu className="h-6 w-6" />
               </button>
-              <div className="relative flex-1 max-w-md">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search projects, simulations..."
-                  className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <button className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors tap-target">
+              <button className="relative p-2 rounded-xl text-muted-foreground hover:bg-secondary transition-colors tap-target">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full"></span>
               </button>
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-semibold text-gray-900">{userName}</p>
-                  <p className="text-xs text-gray-500">Explorer</p>
+                  <p className="text-sm font-semibold text-foreground">{userName}</p>
+                  <p className="text-xs text-muted-foreground">Explorer</p>
                 </div>
-                <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
+                <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-primary-foreground font-semibold text-sm sm:text-base">
                   {userInitials}
                 </div>
               </div>
@@ -255,12 +263,12 @@ const DashboardPage = () => {
           {/* Welcome Section */}
           {isFirstTimeUser ? (
             <div className="mb-6 sm:mb-8 animate-fade-in">
-              <div className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full bg-violet-50 border border-violet-100 text-violet-700 text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4">
+              <div className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4">
                 <Trophy className="h-3 w-3 mr-1" />
                 Welcome to TURNVE
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Let's build your career together!</h1>
-              <p className="text-sm sm:text-base text-gray-600 max-w-2xl">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">Let's build your career together!</h1>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
                 You're about to step into a real-world management simulation.
                 Choose an industry, select your role, and start making impactful decisions.
               </p>
@@ -268,14 +276,14 @@ const DashboardPage = () => {
           ) : (
             <div className="mb-6 sm:mb-8 animate-fade-in">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Welcome back, {userName.split(' ')[0]}! 👋</h1>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Welcome back, {userName.split(' ')[0]}! 👋</h1>
                 {onboardingProgress < 100 && (
-                  <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs sm:text-sm font-semibold">
+                  <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#ffe6cd] dark:bg-[#746019]/30 border border-[#ffe6cd] dark:border-[#746019]/50 text-[#746019] dark:text-[#ffe6cd] text-xs sm:text-sm font-semibold">
                     {onboardingProgress}% complete
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-sm sm:text-base text-gray-600">Here's what's happening with your projects today.</p>
+              <p className="mt-1 text-sm sm:text-base text-muted-foreground">Here's what's happening with your projects today.</p>
             </div>
           )}
 
@@ -314,36 +322,36 @@ const DashboardPage = () => {
             </div>
           )}
 
-          {/* Quick Actions Grid */}
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
-            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
+          {/* Quick Actions Grid - No background card */}
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-base sm:text-lg font-bold text-foreground mb-3 sm:mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               <Link
                 to="/industries"
-                className={`flex flex-col items-center p-3 sm:p-4 rounded-xl transition-all duration-200 tap-target ${isFirstTimeUser ? 'bg-sky-50 hover:bg-sky-100' : 'bg-blue-50 hover:bg-blue-100'}`}
+                className={`flex flex-col items-center p-3 sm:p-4 rounded-[20px] transition-all duration-200 tap-target border ${isFirstTimeUser ? 'bg-white border-[#c3faf5] shadow-sm hover:shadow-md dark:bg-white/10 dark:border-[#187574]/50' : 'bg-white border-gray-100 shadow-sm hover:shadow-md dark:bg-white/10 dark:border-white/10'}`}
               >
-                <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center mb-2 ${isFirstTimeUser ? 'bg-sky-500' : 'bg-blue-500'}`}>
-                  <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] flex items-center justify-center mb-2 ${isFirstTimeUser ? 'bg-[#187574] dark:bg-[#c3faf5]' : 'bg-primary'}`}>
+                  <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-white dark:text-[#187574]" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-gray-900">New Simulation</span>
+                <span className="text-xs sm:text-sm font-medium text-foreground">New Simulation</span>
               </Link>
-              <Link to="/projects" className="flex flex-col items-center p-3 sm:p-4 rounded-xl bg-sky-50 hover:bg-sky-100 transition-all duration-200 tap-target">
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-sky-500 flex items-center justify-center mb-2">
-                  <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              <Link to="/projects" className="flex flex-col items-center p-3 sm:p-4 rounded-[20px] bg-white border border-[#ffc6c6]/50 shadow-sm hover:shadow-md transition-all duration-200 tap-target dark:bg-white/10 dark:border-[#ffc6c6]/30">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] bg-[#600000] dark:bg-[#ffc6c6] flex items-center justify-center mb-2">
+                  <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-[#ffc6c6] dark:text-[#600000]" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-gray-900">Projects</span>
+                <span className="text-xs sm:text-sm font-medium text-foreground">Projects</span>
               </Link>
-              <Link to="/simulations" className="flex flex-col items-center p-3 sm:p-4 rounded-xl bg-pink-50 hover:bg-pink-100 transition-all duration-200 tap-target">
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-pink-500 flex items-center justify-center mb-2">
+              <Link to="/simulations" className="flex flex-col items-center p-3 sm:p-4 rounded-[20px] bg-white border border-primary/20 shadow-sm hover:shadow-md transition-all duration-200 tap-target dark:bg-white/10 dark:border-primary/30">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] bg-primary flex items-center justify-center mb-2">
                   <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-gray-900">Simulations</span>
+                <span className="text-xs sm:text-sm font-medium text-foreground">Simulations</span>
               </Link>
-              <Link to="/settings" className="flex flex-col items-center p-3 sm:p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all duration-200 tap-target">
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-slate-500 flex items-center justify-center mb-2">
-                  <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              <Link to="/settings" className="flex flex-col items-center p-3 sm:p-4 rounded-[20px] bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 tap-target dark:bg-white/10 dark:border-white/10">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] bg-primary/10 flex items-center justify-center mb-2">
+                  <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-gray-900">Settings</span>
+                <span className="text-xs sm:text-sm font-medium text-foreground">Settings</span>
               </Link>
             </div>
           </div>

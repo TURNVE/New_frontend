@@ -116,9 +116,9 @@ const IndustriesPage = () => {
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center">
@@ -126,7 +126,7 @@ const IndustriesPage = () => {
             </Link>
             <Link
               to="/dashboard"
-              className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-1.5" />
               <span>Back to Dashboard</span>
@@ -143,10 +143,10 @@ const IndustriesPage = () => {
             <Building2 className="h-3.5 w-3.5 mr-1.5" />
             Step 1 of 3
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-920 tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight mb-4">
             Choose Your Industry
           </h1>
-          <p className="text-base sm:text-lg text-gray-500 leading-relaxed font-medium">
+          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed font-medium">
             Select the industry where you want to gain practical experience.
             Each industry offers unique simulations tailored to real-world scenarios.
           </p>
@@ -166,19 +166,19 @@ const IndustriesPage = () => {
                   if (!isTechnology) e.preventDefault();
                 }}
                 className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 block ${isTechnology
-                    ? 'bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:border-gray-200 transform hover:-translate-y-1'
-                    : 'bg-white/60 shadow-sm border border-gray-100/80 cursor-not-allowed opacity-75'
+                    ? 'bg-card shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgb(0,0,0,0.08)] border border-border hover:border-border transform hover:-translate-y-1'
+                    : 'bg-card/60 shadow-sm border border-border cursor-not-allowed opacity-75'
                   }`}
               >
                 {/* Active/Locked State styling */}
                 <div className="absolute top-5 right-5">
                   {isTechnology ? (
-                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowRight className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-950 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ArrowRight className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     </div>
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100">
-                      <Lock className="w-3.5 h-3.5 text-gray-400" />
+                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center border border-border">
+                      <Lock className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
                   )}
                 </div>
@@ -187,24 +187,24 @@ const IndustriesPage = () => {
                   <IconComponent className={`w-7 h-7 ${industry.iconColor}`} />
                 </div>
 
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-foreground mb-2">
                   {industry.name}
                 </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-6 min-h-[44px]">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6 min-h-[44px]">
                   {industry.description}
                 </p>
 
-                <div className="grid grid-cols-3 gap-2 py-4 border-t border-gray-100/80">
+                <div className="grid grid-cols-3 gap-2 py-4 border-t border-border">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-400 mb-1 flex items-center gap-1">Sims</p>
-                    <p className="text-sm font-bold text-gray-800">{industry.stats.simulations}</p>
+                    <p className="text-[11px] uppercase tracking-wide font-semibold text-muted-foreground mb-1 flex items-center gap-1">Sims</p>
+                    <p className="text-sm font-bold text-foreground">{industry.stats.simulations}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-400 mb-1 flex items-center gap-1">Time</p>
-                    <p className="text-sm font-bold text-gray-800">{industry.stats.avgDuration.split(' ')[0]}w</p>
+                    <p className="text-[11px] uppercase tracking-wide font-semibold text-muted-foreground mb-1 flex items-center gap-1">Time</p>
+                    <p className="text-sm font-bold text-foreground">{industry.stats.avgDuration.split(' ')[0]}w</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide font-semibold text-gray-400 mb-1 flex items-center gap-1">Level</p>
+                    <p className="text-[11px] uppercase tracking-wide font-semibold text-muted-foreground mb-1 flex items-center gap-1">Level</p>
                     <p className={`text-sm font-bold truncate ${industry.textColor}`}>{industry.stats.level.split(' ')[0]}</p>
                   </div>
                 </div>
@@ -214,21 +214,21 @@ const IndustriesPage = () => {
         </div>
 
         {/* Help Section */}
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col sm:flex-row items-center gap-6 sm:gap-8 justify-between">
+        <div className="max-w-4xl mx-auto bg-card rounded-3xl p-8 sm:p-10 border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col sm:flex-row items-center gap-6 sm:gap-8 justify-between">
           <div className="flex items-center gap-6">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-center border border-blue-100 shadow-sm flex-shrink-0">
-              <Sparkles className="h-6 w-6 text-blue-600" />
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-2xl flex items-center justify-center border border-blue-100 dark:border-blue-900 shadow-sm flex-shrink-0">
+              <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="text-center sm:text-left">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1.5">Not sure which industry to choose?</h3>
-              <p className="text-gray-500 text-sm font-medium">
+              <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1.5">Not sure which industry to choose?</h3>
+              <p className="text-muted-foreground text-sm font-medium">
                 Take our quick assessment to find the perfect simulation track.
               </p>
             </div>
           </div>
           <button
             onClick={() => setShowAssessmentModal(true)}
-            className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+            className="w-full sm:w-auto px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
           >
             Take Assessment
           </button>
@@ -237,16 +237,16 @@ const IndustriesPage = () => {
 
       {/* Assessment Modal */}
       {showAssessmentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm transition-opacity">
+          <div className="bg-card rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-secondary/50">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-bold text-gray-900">Career Assessment</h2>
+                <Sparkles className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Career Assessment</h2>
               </div>
               <button
                 onClick={() => setShowAssessmentModal(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -254,8 +254,8 @@ const IndustriesPage = () => {
 
             <div className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">What's your primary career goal?</label>
-                <select className="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-3 border outline-none text-sm text-gray-700 shadow-sm">
+                <label className="block text-sm font-semibold text-foreground mb-2">What's your primary career goal?</label>
+                <select className="w-full border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary py-3 border outline-none text-sm text-foreground bg-background shadow-sm">
                   <option>Product Management</option>
                   <option>Marketing Strategy</option>
                   <option>Data Analytics</option>
@@ -264,16 +264,16 @@ const IndustriesPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Years of experience</label>
-                <select className="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-3 border outline-none text-sm text-gray-700 shadow-sm">
+                <label className="block text-sm font-semibold text-foreground mb-2">Years of experience</label>
+                <select className="w-full border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary py-3 border outline-none text-sm text-foreground bg-background shadow-sm">
                   <option>0-2 years (Beginner)</option>
                   <option>3-5 years (Intermediate)</option>
                   <option>5+ years (Advanced)</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">How much time do you have weekly?</label>
-                <select className="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-3 border outline-none text-sm text-gray-700 shadow-sm">
+                <label className="block text-sm font-semibold text-foreground mb-2">How much time do you have weekly?</label>
+                <select className="w-full border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary py-3 border outline-none text-sm text-foreground bg-background shadow-sm">
                   <option>1-2 hours</option>
                   <option>3-5 hours</option>
                   <option>6+ hours</option>
@@ -281,16 +281,16 @@ const IndustriesPage = () => {
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50/80 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
+            <div className="p-6 bg-secondary/80 border-t border-border flex flex-col sm:flex-row justify-end gap-3">
               <button
                 onClick={() => setShowAssessmentModal(false)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white hover:bg-gray-100 border border-gray-200 rounded-xl transition-all w-full sm:w-auto"
+                className="px-5 py-2.5 text-sm font-semibold text-muted-foreground bg-card hover:bg-secondary border border-border rounded-xl transition-all w-full sm:w-auto"
               >
                 Cancel
               </button>
               <button
                 onClick={() => setShowAssessmentModal(false)}
-                className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg rounded-xl transition-all w-full sm:w-auto"
+                className="px-5 py-2.5 text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg rounded-xl transition-all w-full sm:w-auto"
               >
                 Find My Track
               </button>

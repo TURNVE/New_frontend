@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   FileText, Download, Eye, Clock, ChevronRight,
-  Trash2, Plus, Filter, Search, Award, FileCheck,
+  Trash2, Plus, Award, FileCheck,
   Calendar, Users, AlertTriangle, TrendingUp
 } from 'lucide-react';
 import type { ArtifactType } from '../../artifacts/types';
@@ -39,8 +39,6 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
   onDeleteArtifact,
   currentWeek,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<ArtifactType | 'all'>('all');
   const [showGenerateModal, setShowGenerateModal] = useState(false);
 
   const artifactTypes: ArtifactType[] = [
@@ -53,12 +51,6 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
     'project_charter',
   ];
 
-  const filteredArtifacts = artifacts.filter(artifact => {
-    const matchesSearch = artifact.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === 'all' || artifact.type === filterType;
-    return matchesSearch && matchesType;
-  });
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'draft': return 'bg-gray-500/20 text-gray-400';
@@ -69,75 +61,37 @@ export const DocumentsPanel: React.FC<DocumentsPanelProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-[#0a0a0a]">
-      {/* Header */}
+    <div className="h-full flex flex-col bg-white dark:bg-[#0a0a0a] relative">
+      {/* Header - Simplified */}
       <div className="p-6 border-b border-gray-200 dark:border-white/5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Documents & Artifacts</h2>
-            <p className="text-sm text-[#a1a1aa]">
-              Generate and download PM documents for your portfolio
-            </p>
-          </div>
-          <button
-            onClick={() => setShowGenerateModal(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Generate Document
-          </button>
-        </div>
-
-        {/* Search & Filter */}
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#a1a1aa]" />
-            <input
-              type="text"
-              placeholder="Search documents..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white placeholder-[#a1a1aa] focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#a1a1aa]" />
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value as ArtifactType | 'all')}
-              className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
-            >
-              <option value="all">All Types</option>
-              {artifactTypes.map(type => (
-                <option key={type} value={type}>
-                  {ARTIFACT_TYPE_ICONS[type]} {ARTIFACT_TYPE_LABELS[type]}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Documents & Artifacts</h2>
+        <p className="text-sm text-[#a1a1aa]">
+          {artifacts.length} documents • Week {currentWeek}
+        </p>
       </div>
+
+      {/* Floating Action Button */}
+      <button
+        onClick={() => setShowGenerateModal(true)}
+        className="absolute bottom-6 right-6 w-14 h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center transition-all hover:scale-105 z-10"
+        title="Generate Document"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
 
       {/* Document List */}
       <div className="flex-1 overflow-y-auto p-6">
-        {filteredArtifacts.length === 0 ? (
+        {artifacts.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-12 h-12 text-[#a1a1aa] mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Documents Yet</h3>
             <p className="text-sm text-[#a1a1aa] mb-4">
-              Generate your first PM document to start building your portfolio
+              Tap the + button to generate your first document
             </p>
-            <button
-              onClick={() => setShowGenerateModal(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Generate Document
-            </button>
           </div>
         ) : (
           <div className="grid gap-4">
-            {filteredArtifacts.map(artifact => (
+            {artifacts.map(artifact => (
               <div
                 key={artifact.id}
                 className="glass-panel p-4 rounded-xl border border-gray-200 dark:border-white/5 hover:border-gray-200 dark:border-white/10 transition-all"

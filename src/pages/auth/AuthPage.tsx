@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { AUTH_ROUTES, AUTH_ERRORS } from '../../contexts/AuthContext';
 import { SignInPage } from '../../components/ui/sign-in';
 
 function AuthPage() {
@@ -9,30 +10,27 @@ function AuthPage() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      navigate('/dashboard');
+      navigate(AUTH_ROUTES.DASHBOARD);
     }
   }, [user, isLoading, navigate]);
 
-  const handleEmailSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
+  const handleEmailSignIn = async (email: string, password: string) => {
     const { error } = await signIn(email, password);
-
     if (error) {
-      console.error('Sign in error:', error);
+      return { error: { message: error.message || AUTH_ERRORS.SIGN_IN_FAILED } };
     }
+    return { error: null };
   };
 
   const handleGoogleSignIn = async () => {
-    await signInWithOAuth('google');
+    const { error } = await signInWithOAuth('google');
+    if (error) {
+      console.error('Google sign-in error:', error);
+    }
   };
 
   const handleCreateAccount = () => {
-    navigate('/sign-up');
+    navigate(AUTH_ROUTES.SIGN_UP);
   };
 
   const testimonials = [
@@ -74,7 +72,8 @@ function AuthPage() {
         description="Access your account and continue your journey with us"
         heroImageSrc="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop"
         testimonials={testimonials}
-        onSignedIn={() => navigate('/dashboard')}
+        onEmailSignIn={handleEmailSignIn}
+        onSignedIn={() => navigate(AUTH_ROUTES.DASHBOARD)}
         onGoogleSignIn={handleGoogleSignIn}
         onCreateAccount={handleCreateAccount}
       />

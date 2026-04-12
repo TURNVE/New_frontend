@@ -1,8 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import type { AuthResponse } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { AUTH_ROUTES, AUTH_ERRORS } from '../../contexts/AuthContext';
+
+const GoogleIcon = () => (
+  <svg className="w-5 h-5" viewBox="0 0 24 24">
+    <path fill="#FFC107" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+    <path fill="#FF3D00" d="M5.26 10.59l2.88 2.11C8.87 10.62 10.72 9 13.5 9c1.45 0 2.77.52 3.8 1.38l2.84-2.84C18.24 5.72 16.03 4.5 13.5 4.5c-3.62 0-6.75 2.08-8.24 5.09z" />
+    <path fill="#4CAF50" d="M13.5 19.5c-2.17 0-4.14-.81-5.65-2.15l-2.92 2.26C6.55 21.47 9.79 23 13.5 23c2.85 0 5.56-1.04 7.66-2.92l-3.31-2.55c-1.17.79-2.68 1.97-4.35 1.97z" />
+    <path fill="#1976D2" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+  </svg>
+);
 
 export const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +22,7 @@ export const SignUpPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const navigate = useNavigate();
+  const { signUp, signInWithOAuth } = useAuth();
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,27 +30,21 @@ export const SignUpPage = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
+      const { data, error: signUpError } = await signUp(email, password, {
+        data: { full_name: fullName },
       });
 
-      if (error) {
-        setError(error.message || 'Failed to create account');
+      if (signUpError) {
+        setError(signUpError.message || AUTH_ERRORS.SIGN_UP_FAILED);
         return;
       }
 
       if (data.user) {
         setError('Please check your email to verify your account.');
-        setTimeout(() => navigate('/sign-in'), 3000);
+        setTimeout(() => navigate(AUTH_ROUTES.SIGN_IN), 3000);
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(AUTH_ERRORS.GENERIC);
     } finally {
       setIsLoading(false);
     }
@@ -51,24 +55,14 @@ export const SignUpPage = () => {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/auth/callback',
-        },
-      });
+      const { error: oauthError } = await signInWithOAuth('google');
 
-      if (error) {
-        setError(error.message || 'Failed to sign in with Google');
+      if (oauthError) {
+        setError(oauthError.message || AUTH_ERRORS.OAUTH_FAILED);
         setIsOAuthLoading(false);
-        return;
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(AUTH_ERRORS.GENERIC);
       setIsOAuthLoading(false);
     }
   };
@@ -126,7 +120,7 @@ export const SignUpPage = () => {
         </div>
 
         <div className="relative z-10">
-          <p className="text-sm text-gray-500">© 2024 Turnve Career Simulator. All rights reserved.</p>
+          <p className="text-sm text-gray-500">© 2025 Turnve Career Simulator. All rights reserved.</p>
         </div>
       </div>
 
@@ -143,12 +137,7 @@ export const SignUpPage = () => {
               disabled={isOAuthLoading}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#FFC107" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#FF3D00" d="M5.26 10.59l2.88 2.11C8.87 10.62 10.72 9 13.5 9c1.45 0 2.77.52 3.8 1.38l2.84-2.84C18.24 5.72 16.03 4.5 13.5 4.5c-3.62 0-6.75 2.08-8.24 5.09z" />
-                <path fill="#4CAF50" d="M13.5 19.5c-2.17 0-4.14-.81-5.65-2.15l-2.92 2.26C6.55 21.47 9.79 23 13.5 23c2.85 0 5.56-1.04 7.66-2.92l-3.31-2.55c-1.17.79-2.68 1.97-4.35 1.97z" />
-                <path fill="#1976D2" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-              </svg>
+              <GoogleIcon />
               <span className="text-sm font-medium text-gray-700">{isOAuthLoading ? 'Loading...' : 'Sign up with Google'}</span>
             </button>
           </div>

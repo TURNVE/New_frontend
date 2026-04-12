@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   FolderHeart, Check, X, ExternalLink, 
-  Copy, Share2, Award, FileText, Star
+  Copy, Share2, Award, FileText, Star, Plus
 } from 'lucide-react';
 import type { ArtifactType } from '../../artifacts/types';
 import { ARTIFACT_TYPE_LABELS, ARTIFACT_TYPE_ICONS } from '../../artifacts/types';
@@ -28,7 +28,6 @@ interface PortfolioBuilderProps {
 export const PortfolioBuilder: React.FC<PortfolioBuilderProps> = ({ artifacts }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showPreview, setShowPreview] = useState(false);
-  const [portfolioName, setPortfolioName] = useState('My PM Portfolio');
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
 
   const toggleArtifact = (id: string) => {
@@ -81,53 +80,33 @@ export const PortfolioBuilder: React.FC<PortfolioBuilderProps> = ({ artifacts })
   }, {} as Record<ArtifactType, Artifact[]>);
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-[#0a0a0a]">
-      {/* Header */}
+    <div className="h-full flex flex-col bg-white dark:bg-[#0a0a0a] relative">
+      {/* Header - Simplified */}
       <div className="p-6 border-b border-gray-200 dark:border-white/5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-              <FolderHeart className="w-5 h-5 text-amber-400" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Portfolio Builder</h2>
-              <p className="text-sm text-[#a1a1aa]">
-                Select your best artifacts to showcase to employers
-              </p>
-            </div>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+            <FolderHeart className="w-5 h-5 text-amber-400" />
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={selectAll}
-              className="px-3 py-1.5 text-xs text-[#a1a1aa] hover:text-gray-900 dark:text-white transition-colors"
-            >
-              Select All
-            </button>
-            <button
-              onClick={deselectAll}
-              className="px-3 py-1.5 text-xs text-[#a1a1aa] hover:text-gray-900 dark:text-white transition-colors"
-            >
-              Deselect All
-            </button>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Portfolio Builder</h2>
+            <p className="text-sm text-[#a1a1aa]">
+              {selectedIds.size} selected • {artifacts.length} total
+            </p>
           </div>
         </div>
-
-        {/* Portfolio Name Input */}
-        <div className="flex gap-4 items-center">
-          <input
-            type="text"
-            value={portfolioName}
-            onChange={(e) => setPortfolioName(e.target.value)}
-            className="flex-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white placeholder-[#a1a1aa] focus:outline-none focus:border-amber-500"
-            placeholder="Enter portfolio name..."
-          />
+        
+        <div className="flex items-center gap-2">
           <button
-            onClick={generatePortfolio}
-            disabled={selectedIds.size === 0}
-            className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
+            onClick={selectAll}
+            className="px-3 py-1.5 text-xs text-[#a1a1aa] hover:text-gray-900 dark:text-white transition-colors"
           >
-            <Award className="w-4 h-4" />
-            Generate Portfolio
+            Select All
+          </button>
+          <button
+            onClick={deselectAll}
+            className="px-3 py-1.5 text-xs text-[#a1a1aa] hover:text-gray-900 dark:text-white transition-colors"
+          >
+            Deselect All
           </button>
         </div>
 
@@ -157,6 +136,16 @@ export const PortfolioBuilder: React.FC<PortfolioBuilderProps> = ({ artifacts })
           </div>
         )}
       </div>
+
+      {/* Floating Action Button */}
+      <button
+        onClick={generatePortfolio}
+        disabled={selectedIds.size === 0}
+        className="absolute bottom-6 right-6 w-14 h-14 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full shadow-lg shadow-amber-500/30 flex items-center justify-center transition-all hover:scale-105 z-10"
+        title="Generate Portfolio"
+      >
+        <Award className="w-6 h-6" />
+      </button>
 
       {/* Selected Summary */}
       {selectedIds.size > 0 && (

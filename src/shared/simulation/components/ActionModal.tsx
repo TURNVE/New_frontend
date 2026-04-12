@@ -36,7 +36,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
         const item = action.item;
         return (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-gray-800 max-w-lg w-full p-8 shadow-2xl">
+                <div className="bg-white dark:bg-[#1a1a1a] rounded-[16px] border border-gray-200 dark:border-gray-800 max-w-lg w-full p-8 shadow-2xl">
                     <div className="flex items-start justify-between mb-4">
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white pr-4">{item.name}</h3>
                         <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
@@ -49,7 +49,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                             <button
                                 key={choice.id}
                                 onClick={() => { onLegacyDecision?.(choice); onClose(); }}
-                                className="w-full text-left p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-500/5 transition-all group"
+                                className="w-full text-left p-4 rounded-[12px] border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-500/5 transition-all group"
                             >
                                 <span className="block text-sm font-bold text-gray-900 dark:text-white group-hover:text-blue-500">{choice.label}</span>
                                 <span className="block text-xs text-gray-500 mt-1">{choice.description}</span>
@@ -116,11 +116,11 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-gray-200 dark:border-gray-800 max-w-xl w-full shadow-2xl max-h-[90vh] flex flex-col">
+            <div className="bg-white dark:bg-[#1a1a1a] rounded-[16px] border border-gray-200 dark:border-gray-800 max-w-xl w-full shadow-2xl max-h-[90vh] flex flex-col">
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between flex-shrink-0">
                     <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-[12px] bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
                             {icon}
                         </div>
                         <div>
@@ -155,7 +155,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                     {/* Immersive Strategic Briefing */}
                     <div className="relative group">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                        <div className="relative bg-white dark:bg-gray-900 border border-blue-500/10 rounded-2xl p-5 shadow-sm">
+                        <div className="relative bg-white dark:bg-gray-900 border border-blue-500/10 rounded-[16px] p-5 shadow-sm">
                             <div className="flex items-center gap-2 mb-3">
                                 <div className="p-1 px-2 bg-blue-500/10 rounded text-[10px] font-black text-blue-500 uppercase tracking-widest">
                                     Strategic Briefing
@@ -176,7 +176,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                                     <button
                                         key={ch.id}
                                         onClick={() => setSelectedApproval(ch.id)}
-                                        className={`w-full text-left p-4 rounded-xl border transition-all ${selectedApproval === ch.id ? 'border-blue-500 bg-blue-500/10' : 'border-gray-200 dark:border-gray-700 hover:border-blue-400'}`}
+                                        className={`w-full text-left p-4 rounded-[12px] border transition-all ${selectedApproval === ch.id ? 'border-blue-500 bg-blue-500/10' : 'border-gray-200 dark:border-gray-700 hover:border-blue-400'}`}
                                     >
                                         <span className={`block text-sm font-bold ${selectedApproval === ch.id ? 'text-blue-500' : 'text-gray-900 dark:text-white'}`}>{ch.label}</span>
                                         <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">{ch.description}</span>
@@ -188,23 +188,23 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                                 <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                                     <div>
                                         <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Rationale: Why this path? *</label>
-                                        <textarea
-                                            value={textValue}
-                                            onChange={e => setTextValue(e.target.value)}
-                                            placeholder="Explain your strategic reasoning..."
-                                            rows={3}
-                                            className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:border-blue-500 resize-none leading-relaxed"
-                                        />
+                                    <textarea
+                                        value={textValue}
+                                        onChange={e => setTextValue(e.target.value)}
+                                        placeholder="Explain your strategic reasoning..."
+                                        rows={3}
+                                        className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[12px] p-3 text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:border-blue-500 resize-none leading-relaxed"
+                                    />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Key Constraints / Risks Considered</label>
-                                        <textarea
-                                            value={approvalReason}
-                                            onChange={e => setApprovalReason(e.target.value)}
-                                            placeholder="e.g. Time limits, technical debt, compliance gaps..."
-                                            rows={2}
-                                            className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:border-blue-500 resize-none leading-relaxed"
-                                        />
+                                    <textarea
+                                        value={approvalReason}
+                                        onChange={e => setApprovalReason(e.target.value)}
+                                        placeholder="e.g. Time limits, technical debt, compliance gaps..."
+                                        rows={2}
+                                        className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[12px] p-3 text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:border-blue-500 resize-none leading-relaxed"
+                                    />
                                     </div>
                                 </div>
                             )}
@@ -220,7 +220,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                                 onChange={e => setTextValue(e.target.value)}
                                 placeholder={item.decisionPlaceholder}
                                 rows={10}
-                                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 resize-none font-mono leading-relaxed"
+                                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[12px] p-4 text-sm text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 resize-none font-mono leading-relaxed"
                             />
                             <p className="text-xs text-gray-400 mt-1">{textValue.length} characters (min 20)</p>
                         </div>
@@ -229,7 +229,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                     {/* SUBMIT PRD */}
                     {item.actionType === 'submit_prd' && item.prdFields && (
                         <div className="space-y-4">
-                            <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg px-4 py-3">
+                            <div className="bg-blue-500/5 border border-blue-500/20 rounded-[12px] px-4 py-3">
                                 <p className="text-xs font-bold text-blue-500 uppercase">{item.prdTitle}</p>
                             </div>
                             {item.prdFields.map((field) => (
@@ -297,7 +297,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                     {item.actionType === 'approval' && item.approvalOptions && (
                         <div className="space-y-3">
                             {item.approvalContext && (
-                                <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed font-mono">
+                                <div className="bg-gray-50 dark:bg-gray-900 rounded-[12px] p-4 border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed font-mono">
                                     {item.approvalContext}
                                 </div>
                             )}
@@ -305,7 +305,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                                 <div key={opt.id}>
                                     <button
                                         onClick={() => { setSelectedApproval(opt.id); setShowReasonFor(opt.requiresReason ? opt.id : ''); }}
-                                        className={`w-full text-left p-4 rounded-xl border transition-all ${selectedApproval === opt.id ? 'border-blue-500 bg-blue-500/10' : 'border-gray-200 dark:border-gray-700 hover:border-blue-400'}`}
+                                        className={`w-full text-left p-4 rounded-[12px] border transition-all ${selectedApproval === opt.id ? 'border-blue-500 bg-blue-500/10' : 'border-gray-200 dark:border-gray-700 hover:border-blue-400'}`}
                                     >
                                         <span className={`text-sm font-bold ${selectedApproval === opt.id ? 'text-blue-500' : 'text-gray-900 dark:text-white'}`}>{opt.label}</span>
                                     </button>
@@ -325,7 +325,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
 
                     {/* ACKNOWLEDGE */}
                     {item.actionType === 'acknowledge' && (
-                        <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4 text-sm text-blue-600 dark:text-blue-400">
+                            <div className="bg-blue-500/5 border border-blue-500/20 rounded-[12px] p-4 text-sm text-blue-600 dark:text-blue-400">
                             Click "Acknowledge" below to confirm you have read and understood this notification.
                         </div>
                     )}

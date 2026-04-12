@@ -4,28 +4,58 @@
 
 @theme inline {
   --color-background: #ffffff;
-  --color-foreground: #0a142f;
+  --color-foreground: #1c1c1e;
   --color-card: #ffffff;
-  --color-card-foreground: #0a142f;
+  --color-card-foreground: #1c1c1e;
   --color-popover: #ffffff;
-  --color-popover-foreground: #0a142f;
-  --color-primary: #0a142f;
-  --color-primary-foreground: #f8fafc;
+  --color-popover-foreground: #1c1c1e;
+  --color-primary: #5b76fe;
+  --color-primary-foreground: #ffffff;
   --color-secondary: #f1f5f9;
-  --color-secondary-foreground: #0a142f;
+  --color-secondary-foreground: #1c1c1e;
   --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-accent: #f1f5f9;
-  --color-accent-foreground: #0a142f;
+  --color-muted-foreground: #555a6a;
+  --color-accent: #5b76fe;
+  --color-accent-foreground: #ffffff;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #f8fafc;
-  --color-border: #e2e8f0;
-  --color-input: #e2e8f0;
-  --color-ring: #0a142f;
+  --color-border: #c7cad5;
+  --color-input: #e9eaef;
+  --color-ring: #5b76fe;
+  --color-success: #00b473;
+  --color-coral-light: #ffc6c6;
+  --color-coral-dark: #600000;
+  --color-teal-light: #c3faf5;
+  --color-teal-dark: #187574;
+  --color-orange-light: #ffe6cd;
+  --color-yellow-dark: #746019;
+  --color-rose-light: #ffd8f4;
+  --color-pink-light: #fde0f0;
   --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 3rem;
+}
+
+.dark {
+  --color-background: #1c1c1e;
+  --color-foreground: #ffffff;
+  --color-card: #2a2a2c;
+  --color-card-foreground: #ffffff;
+  --color-popover: #2a2a2c;
+  --color-popover-foreground: #ffffff;
+  --color-primary: #5b76fe;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #3a3a3c;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #3a3a3c;
+  --color-muted-foreground: #a5a8b5;
+  --color-accent: #5b76fe;
+  --color-accent-foreground: #ffffff;
+  --color-border: #4a4a4c;
+  --color-input: #3a3a3c;
+  --color-ring: #5b76fe;
 }
 
 @layer base {
