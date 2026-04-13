@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { ThemeToggle } from './theme-toggle';
 
 interface FooterLink {
   name: string;
@@ -91,7 +92,12 @@ export function Footer7({
         <div className="border-t border-white/20 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-white/50 text-sm">{copyright}</p>
-            <div className="flex gap-6">
+            <div className="flex items-center gap-6">
+              {/* Theme Toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-white/50 text-sm hidden sm:inline">Theme:</span>
+                <ThemeToggle />
+              </div>
               {legalLinks.map((link, index) => (
                 <a
                   key={index}

@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
-import { ThemeToggle } from '../ui/theme-toggle';
 
 const menuItems = [
   { name: 'Features', href: '/features' },
   { name: 'Programs', href: '/programs' },
-  { name: 'Pricing', href: '/pricing' },
   { name: 'Blog', href: '/blog' },
-  { name: 'Developers', href: '/developers' },
-  { name: 'FAQ', href: '/faq' },
   { name: 'About', href: '/about' },
 ];
 
@@ -50,9 +46,8 @@ export function Header() {
               </ul>
             </div>
 
-            {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center gap-3">
-              <ThemeToggle />
+            {/* Desktop Actions - Show on tablet (md) and up */}
+            <div className="hidden md:flex items-center gap-3">
               {/* Login */}
               <a
                 href="/login"
@@ -64,15 +59,14 @@ export function Header() {
               {/* CTA Button */}
               <a
                 href="/sign-up"
-                className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35"
+                className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 whitespace-nowrap"
               >
                 Get Started
               </a>
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden flex items-center gap-2">
-              <ThemeToggle />
+            {/* Mobile Menu Button - Only on small screens */}
+            <div className="md:hidden flex items-center gap-2">
               <button
                 onClick={() => setMenuState(!menuState)}
                 className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors"

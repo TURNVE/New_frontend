@@ -14,7 +14,7 @@ function ProgramPreview() {
           <div>
             <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
               <Calendar className="h-3 w-3 mr-1" />
-              Next Cohort: April 2025
+              Next Cohort: April 2026
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               5-Week Practical Bootcamp

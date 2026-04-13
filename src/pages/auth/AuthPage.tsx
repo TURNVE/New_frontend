@@ -6,7 +6,7 @@ import { SignInPage } from '../../components/ui/sign-in';
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { user, isLoading, signIn, signInWithOAuth } = useAuth();
+  const { user, isLoading, signIn, signInWithOAuth, resetPassword } = useAuth();
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -31,6 +31,14 @@ function AuthPage() {
 
   const handleCreateAccount = () => {
     navigate(AUTH_ROUTES.SIGN_UP);
+  };
+
+  const handleResetPassword = async (email: string) => {
+    const { error } = await resetPassword(email);
+    if (error) {
+      return { error: { message: error.message || 'Failed to send reset link' } };
+    }
+    return { error: null };
   };
 
   const testimonials = [
@@ -76,6 +84,7 @@ function AuthPage() {
         onSignedIn={() => navigate(AUTH_ROUTES.DASHBOARD)}
         onGoogleSignIn={handleGoogleSignIn}
         onCreateAccount={handleCreateAccount}
+        onResetPassword={handleResetPassword}
       />
     </div>
   );

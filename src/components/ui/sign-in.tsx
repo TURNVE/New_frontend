@@ -26,6 +26,7 @@ interface Props {
   onGoogleSignIn?: () => Promise<void> | void;
   onCreateAccount?: () => void;
   onSignedIn?: () => void;
+  onResetPassword?: (email: string) => Promise<{ error?: { message: string } | null }>;
 }
 
 const TestimonialCard = ({ testimonial, delay }: { testimonial: Testimonial, delay: string }) => (
@@ -48,6 +49,7 @@ export const SignInPage: React.FC<Props> = ({
   onGoogleSignIn,
   onCreateAccount,
   onSignedIn,
+  onResetPassword,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -55,6 +57,8 @@ export const SignInPage: React.FC<Props> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
 
   const handleEmailSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,6 +93,28 @@ export const SignInPage: React.FC<Props> = ({
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setResetMessage(null);
+    setIsLoading(true);
+
+    try {
+      if (onResetPassword) {
+        const result = await onResetPassword(email);
+        if (result?.error) {
+          setError(result.error.message || 'Failed to send reset link');
+        } else {
+          setResetMessage('Password reset link sent to your email.');
+        }
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="h-[100dvh] flex flex-col md:flex-row font-geist w-[100dvw] bg-gray-50">
       <section className="flex-1 flex items-center justify-center p-6 md:p-12 bg-white">
@@ -104,105 +130,164 @@ export const SignInPage: React.FC<Props> = ({
             </div>
           )}
 
-          <form className="space-y-5" onSubmit={handleEmailSignIn}>
-            <div className="animate-element animate-delay-300">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+          {isResettingPassword ? (
+            <form className="space-y-5" onSubmit={handleResetPassword}>
+              <div className="animate-element animate-delay-300">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                  </div>
+                  <input
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
+                    required
+                  />
                 </div>
-                <input
-                  name="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
-                  required
-                />
               </div>
-            </div>
 
-            <div className="animate-element animate-delay-400">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+              {resetMessage && (
+                <div className="animate-element p-4 bg-green-50 border border-green-200 rounded-xl">
+                  <p className="text-sm text-green-600">{resetMessage}</p>
                 </div>
-                <input
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
-                  required
-                />
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="animate-element animate-delay-400 w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isLoading ? 'Sending...' : 'Send Reset Link'}
+              </button>
+
+              <div className="text-center mt-4 animate-element animate-delay-500">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => {
+                    setIsResettingPassword(false);
+                    setError(null);
+                    setResetMessage(null);
+                  }}
+                  className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  Back to sign in
                 </button>
               </div>
-            </div>
+            </form>
+          ) : (
+            <>
+              <form className="space-y-5" onSubmit={handleEmailSignIn}>
+                <div className="animate-element animate-delay-300">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                    </div>
+                    <input
+                      name="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
+                      required
+                    />
+                  </div>
+                </div>
 
-            <div className="animate-element animate-delay-500 flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2.5 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
-                />
-                <span className="text-gray-600 group-hover:text-gray-800 transition-colors">Keep me signed in</span>
-              </label>
-              <a
-                href="#"
-                onClick={(e) => { e.preventDefault(); }}
-                className="font-medium text-primary hover:opacity-80 transition-colors"
+                <div className="animate-element animate-delay-400">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                    </div>
+                    <input
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="animate-element animate-delay-500 flex items-center justify-between text-sm">
+                  <label className="flex items-center gap-2.5 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      name="rememberMe"
+                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                    />
+                    <span className="text-gray-600 group-hover:text-gray-800 transition-colors">Keep me signed in</span>
+                  </label>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsResettingPassword(true);
+                      setError(null);
+                      setResetMessage(null);
+                    }}
+                    className="font-medium text-primary hover:opacity-80 transition-colors"
+                  >
+                    Reset password
+                  </a>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="animate-element animate-delay-600 w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {isLoading ? 'Signing in...' : 'Sign In'}
+                </button>
+              </form>
+
+              <div className="animate-element animate-delay-700 relative flex items-center justify-center my-6">
+                <span className="w-full border-t border-gray-200"></span>
+                <span className="px-4 text-xs font-medium text-gray-400 bg-white absolute">Or continue with</span>
+              </div>
+
+              <button
+                onClick={handleGoogleSignIn}
+                disabled={isOAuthLoading}
+                className="animate-element animate-delay-800 w-full flex items-center justify-center gap-3 border border-gray-200 bg-white rounded-xl py-3.5 font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Reset password
-              </a>
-            </div>
+                <GoogleIcon />
+                {isOAuthLoading ? 'Loading...' : 'Continue with Google'}
+              </button>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="animate-element animate-delay-600 w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
-
-          <div className="animate-element animate-delay-700 relative flex items-center justify-center my-6">
-            <span className="w-full border-t border-gray-200"></span>
-            <span className="px-4 text-xs font-medium text-gray-400 bg-white absolute">Or continue with</span>
-          </div>
-
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={isOAuthLoading}
-            className="animate-element animate-delay-800 w-full flex items-center justify-center gap-3 border border-gray-200 bg-white rounded-xl py-3.5 font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <GoogleIcon />
-            {isOAuthLoading ? 'Loading...' : 'Continue with Google'}
-          </button>
-
-          <p className="animate-element animate-delay-900 text-center text-sm text-gray-500 mt-8">
-            New to our platform?{' '}
-            <a
-              href="#"
-              onClick={(e) => { e.preventDefault(); onCreateAccount?.(); }}
-              className="font-semibold text-primary hover:opacity-80 hover:underline transition-colors"
-            >
-              Create Account
-            </a>
-          </p>
+              <p className="animate-element animate-delay-900 text-center text-sm text-gray-500 mt-8">
+                New to our platform?{' '}
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); onCreateAccount?.(); }}
+                  className="font-semibold text-primary hover:opacity-80 hover:underline transition-colors"
+                >
+                  Create Account
+                </a>
+              </p>
+            </>
+          )}
         </div>
       </section>
 

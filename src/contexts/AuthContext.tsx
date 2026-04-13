@@ -39,6 +39,7 @@ export interface AuthContextValue {
     signOut: () => Promise<void>
     resetPassword: (email: string) => Promise<{ error: Error | null }>
     refreshSession: () => Promise<void>
+    checkEmailExists: (email: string) => Promise<boolean>
 }
 
 // ── Context ────────────────────────────────────────────────────
@@ -132,6 +133,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(refreshed?.user ?? null)
     }, [])
 
+    const checkEmailExists = useCallback(async (email: string) => {
+        const { data, error } = await supabase.rpc('is_email_registered', { email_address: email })
+        if (error) {
+            console.error('Error checking email:', error)
+            return false
+        }
+        return !!data
+    }, [])
+
     const isAuthenticated = useMemo(() => !!user && !!session, [user, session])
 
     const value = useMemo<AuthContextValue>(
@@ -146,8 +156,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             signOut,
             resetPassword,
             refreshSession,
+            checkEmailExists,
         }),
-        [user, session, isAuthenticated, isLoading, signUp, signIn, signInWithOAuth, signOut, resetPassword, refreshSession]
+        [user, session, isAuthenticated, isLoading, signUp, signIn, signInWithOAuth, signOut, resetPassword, refreshSession, checkEmailExists]
     )
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

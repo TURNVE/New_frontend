@@ -22,7 +22,7 @@ export const SignUpPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const navigate = useNavigate();
-  const { signUp, signInWithOAuth } = useAuth();
+  const { signUp, signInWithOAuth, checkEmailExists } = useAuth();
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,6 +30,13 @@ export const SignUpPage = () => {
     setIsLoading(true);
 
     try {
+      const emailExists = await checkEmailExists(email);
+      if (emailExists) {
+        setError('User already exists. Please log in with your details.');
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error: signUpError } = await signUp(email, password, {
         data: { full_name: fullName },
       });
@@ -120,7 +127,7 @@ export const SignUpPage = () => {
         </div>
 
         <div className="relative z-10">
-          <p className="text-sm text-gray-500">© 2025 Turnve Career Simulator. All rights reserved.</p>
+          <p className="text-sm text-gray-500">© 2026 Turnve Career Simulator. All rights reserved.</p>
         </div>
       </div>
 
