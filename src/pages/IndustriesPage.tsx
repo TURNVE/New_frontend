@@ -139,11 +139,11 @@ const IndustriesPage = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
         {/* Header Section */}
         <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-16">
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold tracking-wide uppercase shadow-sm mb-4">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold tracking-wide uppercase shadow-sm mb-4">
             <Building2 className="h-3.5 w-3.5 mr-1.5" />
             Step 1 of 3
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight mb-4">
             Choose Your Industry
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed font-medium">
@@ -166,8 +166,8 @@ const IndustriesPage = () => {
                   if (!isTechnology) e.preventDefault();
                 }}
                 className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 block ${isTechnology
-                    ? 'bg-card shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgb(0,0,0,0.08)] border border-border hover:border-border transform hover:-translate-y-1'
-                    : 'bg-card/60 shadow-sm border border-border cursor-not-allowed opacity-75'
+                  ? 'bg-card shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgb(0,0,0,0.08)] border border-border hover:border-border transform hover:-translate-y-1'
+                  : 'bg-card/60 shadow-sm border border-border cursor-not-allowed opacity-75'
                   }`}
               >
                 {/* Active/Locked State styling */}
@@ -187,27 +187,12 @@ const IndustriesPage = () => {
                   <IconComponent className={`w-7 h-7 ${industry.iconColor}`} />
                 </div>
 
-                <h3 className="text-lg font-bold text-foreground mb-2">
+                <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
                   {industry.name}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6 min-h-[44px]">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {industry.description}
                 </p>
-
-                <div className="grid grid-cols-3 gap-2 py-4 border-t border-border">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wide font-semibold text-muted-foreground mb-1 flex items-center gap-1">Sims</p>
-                    <p className="text-sm font-bold text-foreground">{industry.stats.simulations}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wide font-semibold text-muted-foreground mb-1 flex items-center gap-1">Time</p>
-                    <p className="text-sm font-bold text-foreground">{industry.stats.avgDuration.split(' ')[0]}w</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wide font-semibold text-muted-foreground mb-1 flex items-center gap-1">Level</p>
-                    <p className={`text-sm font-bold truncate ${industry.textColor}`}>{industry.stats.level.split(' ')[0]}</p>
-                  </div>
-                </div>
               </Link>
             );
           })}
@@ -220,7 +205,7 @@ const IndustriesPage = () => {
               <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="text-center sm:text-left">
-              <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1.5">Not sure which industry to choose?</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1.5">Not sure which industry to choose?</h3>
               <p className="text-muted-foreground text-sm font-medium">
                 Take our quick assessment to find the perfect simulation track.
               </p>
@@ -242,7 +227,7 @@ const IndustriesPage = () => {
             <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-secondary/50">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-foreground">Career Assessment</h2>
+                <h2 className="text-lg font-semibold text-foreground">Career Assessment</h2>
               </div>
               <button
                 onClick={() => setShowAssessmentModal(false)}

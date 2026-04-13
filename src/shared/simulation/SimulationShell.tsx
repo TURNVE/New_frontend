@@ -9,7 +9,7 @@ import {
     FolderHeart, Bell, Play, Pause, RotateCcw, ArrowRight, Moon, Sun,
     Zap, Clock, CheckCircle, AlertCircle, TrendingUp, TrendingDown,
     Trophy, X, AlertTriangle, FileText, Filter, Search, Tag, CreditCard,
-    Phone, PhoneCall, Video, User, Menu,
+    Phone, PhoneCall, Video, User, Menu, HelpCircle, BookOpen,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import useSimulationCore from './useSimulationCore';
@@ -28,7 +28,7 @@ import { enableSounds } from '../../utils/sounds';
 import ActionModal, { type ModalAction } from './components/ActionModal';
 import SimRoadmapMindmap from './components/SimRoadmapMindmap';
 
-type ActiveTab = 'dashboard' | 'backlog' | 'roadmap' | 'documents' | 'portfolio' | 'company';
+type ActiveTab = 'dashboard' | 'backlog' | 'roadmap' | 'documents' | 'portfolio' | 'company' | 'guide';
 
 // ─── Priority badge ───────────────────────────────────────────
 const PRI: Record<string, string> = {
@@ -419,6 +419,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
         { name: 'Company', icon: Building2, id: 'company' },
         { name: 'Documents', icon: FolderOpen, id: 'documents' },
         { name: 'Portfolio', icon: FolderHeart, id: 'portfolio' },
+        { name: 'User Guide', icon: BookOpen, id: 'guide' },
     ];
 
     if (!gameState) {
@@ -754,6 +755,89 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                     }
                                 }}
                             />
+                        ) : activeTab === 'guide' ? (
+                            /* ── User Guide ── */
+                            <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 custom-scrollbar">
+                                <div className="max-w-3xl mx-auto">
+                                    <div className="mb-6">
+                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">User Guide</h2>
+                                        <p className="text-gray-500 dark:text-gray-400">Everything you need to know about this simulation</p>
+                                    </div>
+
+                                    {/* Simulation Overview */}
+                                    <div className="bg-white dark:bg-gray-800/50 rounded-[16px] border border-gray-200 dark:border-gray-700 p-5 mb-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                                <BookOpen className="w-5 h-5 text-blue-500" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Simulation Overview</h3>
+                                                <p className="text-sm text-gray-500">{config.name}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
+                                            <p><strong className="text-gray-900 dark:text-white">Company:</strong> {config.companyName}</p>
+                                            <p><strong className="text-gray-900 dark:text-white">Industry:</strong> {config.industry}</p>
+                                            <p><strong className="text-gray-900 dark:text-white">Challenge:</strong> {config.challenge}</p>
+                                            <p>{config.challengeDetails}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* How to Play */}
+                                    <div className="bg-white dark:bg-gray-800/50 rounded-[16px] border border-gray-200 dark:border-gray-700 p-5 mb-6">
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                            <HelpCircle className="w-5 h-5 text-blue-500" />
+                                            How to Navigate
+                                        </h3>
+                                        
+                                        <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <span className="text-xs font-bold text-blue-500">1</span>
+                                                </div>
+                                                <p><strong>Dashboard</strong> — Monitor your KPIs (Budget, Progress, Risk, Morale) and see weekly signals/events</p>
+                                            </div>
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <span className="text-xs font-bold text-blue-500">2</span>
+                                                </div>
+                                                <p><strong>Backlog</strong> — Your main workspace. Complete actions, respond to signals, and make decisions</p>
+                                            </div>
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <span className="text-xs font-bold text-blue-500">3</span>
+                                                </div>
+                                                <p><strong>Roadmap</strong> — Visual timeline showing project phases and your progress</p>
+                                            </div>
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <span className="text-xs font-bold text-blue-500">4</span>
+                                                </div>
+                                                <p><strong>Company</strong> — Learn about stakeholders, company news, and industry context</p>
+                                            </div>
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <span className="text-xs font-bold text-blue-500">5</span>
+                                                </div>
+                                                <p><strong>Documents</strong> — Generate artifacts like PRDs, roadmaps, and decision memos</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Tips */}
+                                    <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-[16px] p-5">
+                                        <h3 className="text-lg font-bold text-amber-700 dark:text-amber-400 mb-3">Pro Tips</h3>
+                                        <ul className="space-y-2 text-sm text-amber-600 dark:text-amber-300 list-disc list-inside">
+                                            <li>Keep an eye on the week timer — it auto-advances when time runs out</li>
+                                            <li>Balance all four KPIs: Budget, Progress, Risk, and Morale</li>
+                                            <li>Check the Backlog regularly for urgent actions</li>
+                                            <li>Read stakeholder messages before making big decisions</li>
+                                            <li>Generate documents to build your portfolio</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         ) : (
                             /* ── Dashboard ── */
                             <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 custom-scrollbar">

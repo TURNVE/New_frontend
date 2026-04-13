@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Play, 
-  Trophy, 
-  Folder, 
-  Settings, 
-  HelpCircle, 
+import {
+  LayoutDashboard,
+  Play,
+  Trophy,
+  Folder,
+  Settings,
+  HelpCircle,
   LogOut,
   Briefcase,
   FileText,
@@ -21,7 +21,11 @@ import {
   Star,
   Target,
   Users,
-  Award
+  Award,
+  Home,
+  BarChart3,
+  User,
+  Sparkles
 } from 'lucide-react';
 import { usePageSetup } from '../hooks/usePageSetup';
 import { simulations, supabase, profiles } from '../lib/supabase';
@@ -262,174 +266,201 @@ const DashboardPage = () => {
         <main className="p-3 sm:p-4 lg:p-6 xl:p-8">
           {/* Welcome Section */}
           {isFirstTimeUser ? (
-            <div className="mb-6 sm:mb-8 animate-fade-in">
-              <div className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4">
-                <Trophy className="h-3 w-3 mr-1" />
+            <div className="mb-8 sm:mb-10 animate-fade-in">
+              <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/5 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-widest mb-4 shadow-sm">
+                <Trophy className="h-3.5 w-3.5 mr-1.5" />
                 Welcome to TURNVE
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">Let's build your career together!</h1>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground mb-3">
+                Let's build your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">career together!</span>
+              </h1>
+              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
                 You're about to step into a real-world management simulation.
                 Choose an industry, select your role, and start making impactful decisions.
               </p>
             </div>
           ) : (
-            <div className="mb-6 sm:mb-8 animate-fade-in">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Welcome back, {userName.split(' ')[0]}! 👋</h1>
+            <div className="mb-8 sm:mb-10 animate-fade-in">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground">Welcome back, {userName.split(' ')[0]}! 👋</h1>
                 {onboardingProgress < 100 && (
-                  <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#ffe6cd] dark:bg-[#746019]/30 border border-[#ffe6cd] dark:border-[#746019]/50 text-[#746019] dark:text-[#ffe6cd] text-xs sm:text-sm font-semibold">
+                  <span className="px-3.5 py-1 rounded-full bg-[#ffe6cd] dark:bg-[#746019]/30 border border-[#ffe6cd] dark:border-[#746019]/50 text-[#746019] dark:text-[#ffe6cd] text-sm font-semibold shadow-sm">
                     {onboardingProgress}% complete
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-sm sm:text-base text-muted-foreground">Here's what's happening with your projects today.</p>
+              <p className="mt-2 text-base sm:text-lg text-muted-foreground">Here's what's happening with your projects today.</p>
             </div>
           )}
 
           {/* First Time User CTA */}
           {isFirstTimeUser && (
-            <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 text-white shadow-lg shadow-violet-500/20 animate-scale-in">
-              <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-6">
+            <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-primary to-violet-900 rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 lg:p-12 mb-8 sm:mb-12 text-white shadow-2xl shadow-primary/20 animate-scale-in border border-white/10 group">
+              {/* Decorative Background Elements */}
+              <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
+              <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl group-hover:bg-blue-400/30 transition-all duration-700"></div>
+
+              <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 lg:gap-12">
                 <div className="flex-1 text-center md:text-left">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2">Your First Step Awaits</h2>
-                  <p className="text-violet-100 mb-4 sm:mb-6 text-sm sm:text-base">
-                    Start your first simulation journey. Choose your industry and role to begin making real-world management decisions.
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-[11px] font-semibold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Simulation Engine
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold mb-4 tracking-tight text-white drop-shadow-sm">
+                    Your First Step Awaits
+                  </h2>
+                  <p className="text-indigo-100/90 mb-8 text-base sm:text-lg max-w-xl leading-relaxed mx-auto md:mx-0">
+                    Start your first simulation journey. Choose your industry and role to begin making real-world management decisions in a risk-free environment.
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center md:justify-start">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                     <Link
                       to="/industries"
-                      className="inline-flex items-center justify-center gap-2 bg-white text-violet-700 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-violet-50 transition-all shadow-lg hover:shadow-xl tap-target"
+                      className="inline-flex items-center justify-center gap-2 bg-white text-primary px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.3)] tap-target"
                     >
-                      <Play className="h-4 w-4 sm:h-5 sm:w-5" />
+                      <Play className="h-5 w-5 fill-primary" />
                       Start Simulation
                     </Link>
                     <Link
                       to="/tracks"
-                      className="inline-flex items-center justify-center gap-2 bg-violet-500/30 hover:bg-violet-500/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition-all tap-target"
+                      className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 active:scale-95 tap-target"
                     >
-                      <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
+                      <TrendingUp className="h-5 w-5" />
                       Explore Tracks
                     </Link>
                   </div>
                 </div>
-                <div className="flex-shrink-0">
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl flex items-center justify-center border border-white/20">
-                    <Play className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
+                <div className="flex-shrink-0 hidden sm:block relative">
+                  <div className="absolute inset-0 bg-white/20 rounded-[32px] blur-2xl animate-pulse"></div>
+                  <div className="relative w-40 h-40 lg:w-48 lg:h-48 bg-white/10 backdrop-blur-md rounded-[32px] flex items-center justify-center border border-white/20 shadow-2xl group-hover:-translate-y-2 transition-transform duration-500 ease-out">
+                    <div className="absolute right-0 top-0 -mr-6 -mt-6 bg-white/20 backdrop-blur-lg rounded-2xl p-4 border border-white/20 shadow-lg animate-float">
+                      <Star className="h-6 w-6 text-[#fcd34d] fill-[#fcd34d]" />
+                    </div>
+                    <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-inner">
+                      <Play className="h-10 w-10 text-primary ml-1.5 fill-primary" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Quick Actions Grid - No background card */}
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-base sm:text-lg font-bold text-foreground mb-3 sm:mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {/* Quick Actions Grid */}
+          <div className="mb-8 sm:mb-12">
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-5">Quick Actions</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
               <Link
                 to="/industries"
-                className={`flex flex-col items-center p-3 sm:p-4 rounded-[20px] transition-all duration-200 tap-target border ${isFirstTimeUser ? 'bg-white border-[#c3faf5] shadow-sm hover:shadow-md dark:bg-white/10 dark:border-[#187574]/50' : 'bg-white border-gray-100 shadow-sm hover:shadow-md dark:bg-white/10 dark:border-white/10'}`}
+                className={`flex flex-col items-center p-5 sm:p-6 rounded-[24px] transition-all duration-300 tap-target border group ${isFirstTimeUser ? 'bg-primary/5 border-primary/20 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary/40' : 'bg-card border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30'}`}
               >
-                <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] flex items-center justify-center mb-2 ${isFirstTimeUser ? 'bg-[#187574] dark:bg-[#c3faf5]' : 'bg-primary'}`}>
-                  <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-white dark:text-[#187574]" />
+                <div className={`h-14 w-14 rounded-[16px] flex items-center justify-center mb-4 transition-colors duration-300 ${isFirstTimeUser ? 'bg-primary text-primary-foreground group-hover:bg-primary/90 shadow-md' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'}`}>
+                  <Plus className="h-7 w-7" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-foreground">New Simulation</span>
+                <span className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">New Simulation</span>
               </Link>
-              <Link to="/projects" className="flex flex-col items-center p-3 sm:p-4 rounded-[20px] bg-white border border-[#ffc6c6]/50 shadow-sm hover:shadow-md transition-all duration-200 tap-target dark:bg-white/10 dark:border-[#ffc6c6]/30">
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] bg-[#600000] dark:bg-[#ffc6c6] flex items-center justify-center mb-2">
-                  <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-[#ffc6c6] dark:text-[#600000]" />
+              <Link to="/projects" className="flex flex-col items-center p-5 sm:p-6 rounded-[24px] bg-card border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 tap-target group">
+                <div className="h-14 w-14 rounded-[16px] bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center mb-4 transition-colors duration-300">
+                  <Briefcase className="h-7 w-7" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-foreground">Projects</span>
+                <span className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">Projects</span>
               </Link>
-              <Link to="/simulations" className="flex flex-col items-center p-3 sm:p-4 rounded-[20px] bg-white border border-primary/20 shadow-sm hover:shadow-md transition-all duration-200 tap-target dark:bg-white/10 dark:border-primary/30">
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] bg-primary flex items-center justify-center mb-2">
-                  <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              <Link to="/simulations" className="flex flex-col items-center p-5 sm:p-6 rounded-[24px] bg-card border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 tap-target group">
+                <div className="h-14 w-14 rounded-[16px] bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center mb-4 transition-colors duration-300">
+                  <TrendingUp className="h-7 w-7" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-foreground">Simulations</span>
+                <span className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">Simulations</span>
               </Link>
-              <Link to="/settings" className="flex flex-col items-center p-3 sm:p-4 rounded-[20px] bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 tap-target dark:bg-white/10 dark:border-white/10">
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-[16px] bg-primary/10 flex items-center justify-center mb-2">
-                  <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <Link to="/settings" className="flex flex-col items-center p-5 sm:p-6 rounded-[24px] bg-card border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 tap-target group">
+                <div className="h-14 w-14 rounded-[16px] bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white flex items-center justify-center mb-4 transition-colors duration-300">
+                  <Settings className="h-7 w-7" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-foreground">Settings</span>
+                <span className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">Settings</span>
               </Link>
             </div>
           </div>
 
           {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
             {/* Left Column - Ongoing Simulations */}
             <div>
               {isFirstTimeUser ? (
-                <div className="bg-white rounded-xl sm:rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
-                  <div className="bg-sky-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-sky-100 flex items-center justify-between">
-                    <h2 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <Play className="h-4 w-4 sm:h-5 sm:w-5 text-sky-600" />
+                <div className="bg-card rounded-[24px] border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden">
+                  <div className="bg-secondary/50 px-6 py-5 border-b border-border flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                      <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
                       Recommended for You
                     </h2>
                   </div>
-                  <div className="p-4 sm:p-6">
-                    <Link to="/industries" className="block group p-4 sm:p-5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-700 text-white hover:shadow-lg transition-all duration-300 tap-target">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-base sm:text-lg">Start Your First Simulation</h3>
-                        <Play className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
-                      </div>
-                      <p className="text-sky-100 text-sm mb-4">Choose an industry and begin your journey toward real-world management experience.</p>
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-sky-200">
-                        <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>Beginner-friendly</span>
-                        <span>•</span>
-                        <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>Step 1 of 4</span>
+                  <div className="p-6">
+                    <Link to="/industries" className="block group p-6 rounded-[20px] bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-100 dark:border-blue-900/50 hover:shadow-md transition-all duration-300 tap-target relative overflow-hidden">
+                      <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors"></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">Start Your First Simulation</h3>
+                          <div className="w-8 h-8 rounded-full bg-white dark:bg-background shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Play className="h-4 w-4 text-primary ml-0.5 fill-primary" />
+                          </div>
+                        </div>
+                        <p className="text-muted-foreground text-sm mb-5 leading-relaxed">Choose an industry and begin your journey toward real-world management experience.</p>
+                        <div className="flex items-center gap-3 text-xs font-semibold text-primary">
+                          <div className="flex items-center gap-1">
+                            <CheckCircle className="h-3.5 w-3.5" />
+                            <span>Beginner-friendly</span>
+                          </div>
+                          <span className="text-muted-foreground">•</span>
+                          <div className="flex items-center gap-1">
+                            <CheckCircle className="h-3.5 w-3.5" />
+                            <span>Step 1 of 4</span>
+                          </div>
+                        </div>
                       </div>
                     </Link>
                   </div>
                 </div>
               ) : ongoingSimulations.length > 0 ? (
-                <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
-                  <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 flex items-center justify-between">
-                    <h2 className="text-base sm:text-lg font-bold text-gray-900">Ongoing Simulations</h2>
-                    <Link to="/simulations" className="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                <div className="bg-card rounded-[24px] border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
+                  <div className="px-6 py-5 border-b border-border flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-foreground">Ongoing Simulations</h2>
+                    <Link to="/simulations" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
                       View all
                     </Link>
                   </div>
-                  <div className="p-4 sm:p-6">
+                  <div className="p-6 space-y-4">
                     {ongoingSimulations.slice(0, 2).map((sim) => (
                       <Link
                         key={sim.id}
                         to={`/simulation/${sim.id}`}
-                        className="block group p-3 sm:p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors mb-3 last:mb-0 tap-target"
+                        className="block group p-5 rounded-[20px] bg-secondary/30 hover:bg-secondary/80 border border-transparent hover:border-border transition-all duration-300 tap-target"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sim.status === 'active' ? 'bg-blue-100 text-blue-700' : sim.status === 'in-progress' ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className={`text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-md ${sim.status === 'active' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' : sim.status === 'in-progress' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400'}`}>
                             {sim.status}
                           </span>
-                          <span className="text-xs text-gray-500">{sim.industry}</span>
+                          <span className="text-xs font-medium text-muted-foreground">{sim.industry}</span>
                         </div>
-                        <h3 className="font-semibold text-sm sm:text-base text-gray-900 group-hover:text-blue-600 transition-colors mb-2 line-clamp-1">{sim.title}</h3>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2 mb-2">
-                          <div className={`${sim.color} h-1.5 sm:h-2 rounded-full transition-all`} style={{ width: `${sim.progress}%` }} />
+                        <h3 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors mb-3 line-clamp-1">{sim.title}</h3>
+                        <div className="w-full bg-secondary rounded-full h-2 mb-3 overflow-hidden">
+                          <div className={`${sim.color} h-2 rounded-full transition-all duration-500`} style={{ width: `${sim.progress}%` }} />
                         </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
                           <span>{sim.progress}% complete</span>
-                          <span className="flex items-center"><Clock className="h-3 w-3 mr-1" />{sim.dueDate}</span>
+                          <span className="flex items-center"><Clock className="h-3.5 w-3.5 mr-1.5" />{sim.dueDate}</span>
                         </div>
                       </Link>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm p-8 sm:p-12 text-center">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-100 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Briefcase className="h-7 w-7 sm:h-8 sm:w-8 text-gray-400" />
+                <div className="bg-card rounded-[24px] border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-10 sm:p-12 text-center">
+                  <div className="w-20 h-20 bg-secondary rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-sm border border-border">
+                    <Briefcase className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2">No active simulations</h3>
-                  <p className="text-sm text-gray-500 mb-6">Start your first simulation journey today!</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">No active simulations</h3>
+                  <p className="text-base text-muted-foreground mb-8 max-w-sm mx-auto">Start your first simulation journey today and build real-world experience!</p>
                   <Link
                     to="/industries"
-                    className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors tap-target"
+                    className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 tap-target"
                   >
-                    <Play className="h-4 w-4" />
+                    <Play className="h-5 w-5 fill-primary-foreground" />
                     Start Simulation
                   </Link>
                 </div>
@@ -439,25 +470,25 @@ const DashboardPage = () => {
             {/* Right Column - Recent Activity */}
             <div>
               {!isFirstTimeUser && (
-                <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
-                  <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 flex items-center justify-between">
-                    <h2 className="text-base sm:text-lg font-bold text-gray-900">Recent Activity</h2>
-                    <Link to="/activity" className="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-700">View all</Link>
+                <div className="bg-card rounded-[24px] border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
+                  <div className="px-6 py-5 border-b border-border flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-foreground">Recent Activity</h2>
+                    <Link to="/activity" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">View all</Link>
                   </div>
-                  <div className="divide-y divide-gray-100">
+                  <div className="divide-y divide-border">
                     {recentActivity.slice(0, 4).map((activity) => (
-                      <div key={activity.id} className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-gray-50 transition-colors">
-                        <div className="flex items-start space-x-3 sm:space-x-4">
+                      <div key={activity.id} className="px-6 py-5 hover:bg-secondary/30 transition-colors group cursor-pointer">
+                        <div className="flex items-start gap-4">
                           <div className="flex-shrink-0">
-                            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl bg-blue-50 flex items-center justify-center">
-                              <IconComponent iconName={activity.icon} className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                            <div className="h-12 w-12 rounded-[16px] bg-primary/10 group-hover:bg-primary transition-colors duration-300 flex items-center justify-center">
+                              <IconComponent iconName={activity.icon} className="h-5 w-5 text-primary group-hover:text-white transition-colors duration-300" />
                             </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 line-clamp-1">{activity.title}</p>
-                            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 line-clamp-1">{activity.desc}</p>
+                          <div className="flex-1 min-w-0 pt-1">
+                            <p className="text-sm font-semibold text-foreground line-clamp-1">{activity.title}</p>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-1 leading-relaxed">{activity.desc}</p>
                           </div>
-                          <span className="text-xs text-gray-400 whitespace-nowrap">{activity.time}</span>
+                          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap pt-1 bg-secondary px-2.5 py-1 rounded-md">{activity.time}</span>
                         </div>
                       </div>
                     ))}
