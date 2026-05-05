@@ -92,6 +92,50 @@ export type SimulationScore = {
   completed_at: string
 }
 
+export type PortfolioItem = {
+  id: string
+  portfolio_id: string
+  user_id: string
+  title: string
+  description?: string
+  category?: string
+  tags?: string[]
+  role?: string
+  industry?: string
+  duration_weeks?: number
+  budget?: number
+  team_size?: number
+  image_url?: string
+  external_url?: string
+  metrics?: Record<string, unknown>
+  display_order?: number
+  is_featured?: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type ThemePreset = 'professional' | 'creative' | 'minimalist' | 'vibrant' | 'dark'
+export type LayoutStyle = 'grid' | 'masonry' | 'list'
+
+export type Portfolio = {
+  id: string
+  user_id: string
+  title: string
+  description?: string
+  is_published: boolean
+  share_token?: string
+  published_at?: string
+  theme_preset: ThemePreset
+  show_achievements: boolean
+  show_ratings: boolean
+  show_budget: boolean
+  show_team_size: boolean
+  layout_style: LayoutStyle
+  custom_css?: string
+  created_at: string
+  updated_at: string
+}
+
 export type { User, Session }
 
 // ── Profile helpers (kept here since they're data-layer, not auth-state) ──
@@ -184,6 +228,19 @@ export const simulations = {
 
     return { sessions: data as SimulationSession[], error }
   },
+  
+  getAllUserSessions: async (userId?: string) => {
+    const id = userId || (await supabase.auth.getUser()).data.user?.id
+    if (!id) return { sessions: [], error: new Error('No user ID') }
+
+    const { data, error } = await supabase
+      .from('simulation_sessions')
+      .select('*')
+      .eq('user_id', id)
+      .order('updated_at', { ascending: false })
+
+    return { sessions: data as SimulationSession[], error }
+  },
 
   updateSession: async (sessionId: string, updates: Partial<SimulationSession>) => {
     const { data, error } = await supabase
@@ -245,6 +302,174 @@ export const simulations = {
     const { data, error } = await query.order('completed_at', { ascending: false })
 
     return { scores: data as SimulationScore[], error }
+  }
+}
+
+export const portfolios = {
+  getPortfolio: async (userId?: string) => {
+    const id = userId || (await supabase.auth.getUser()).data.user?.id
+    if (!id) return { portfolio: null, error: new Error('No user ID') }
+
+    const { data: portfolio, error } = await supabase
+      .from('portfolios')
+      .select('*, items:portfolio_items(*)')
+      .eq('user_id', id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    return { portfolio: portfolio as (Portfolio & { items: PortfolioItem[] }) | null, error }
+  },
+
+  createPortfolio: async (title: string, description?: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { portfolio: null, error: new Error('Not authenticated') }
+
+    const { data: portfolio, error } = await supabase
+      .from('portfolios')
+      .upsert({ user_id: user.id, title, description })
+      .select()
+      .single()
+
+    return { portfolio: portfolio as Portfolio | null, error }
+  },
+
+  updatePortfolio: async (portfolioId: string, updates: Partial<Portfolio>) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { portfolio: null, error: new Error('Not authenticated') }
+
+    const { data: portfolio, error } = await supabase
+      .from('portfolios')
+      .update(updates)
+      .eq('id', portfolioId)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    return { portfolio: portfolio as Portfolio | null, error }
+  },
+
+  publishPortfolio: async (portfolioId: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { portfolio: null, error: new Error('Not authenticated') }
+
+    const randomPart = crypto.getRandomValues(new Uint32Array(2))
+    const shareToken = `portfolio-${user.id}-${randomPart[0].toString(16)}${randomPart[1].toString(16)}`
+
+    const { data: portfolio, error } = await supabase
+      .from('portfolios')
+      .update({ is_published: true, share_token: shareToken, published_at: new Date().toISOString() })
+      .eq('id', portfolioId)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    return { portfolio: portfolio as Portfolio | null, error }
+  },
+
+  unpublishPortfolio: async (portfolioId: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { portfolio: null, error: new Error('Not authenticated') }
+
+    const { data: portfolio, error } = await supabase
+      .from('portfolios')
+      .update({ is_published: false, share_token: null, published_at: null })
+      .eq('id', portfolioId)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    return { portfolio: portfolio as Portfolio | null, error }
+  },
+
+  getPublicPortfolio: async (shareToken: string) => {
+    const { data: portfolio, error } = await supabase
+      .from('portfolios')
+      .select('*, items:portfolio_items(*)')
+      .eq('share_token', shareToken)
+      .eq('is_published', true)
+      .single()
+
+    return { portfolio: portfolio as (Portfolio & { items: PortfolioItem[] }) | null, error }
+  },
+
+  getPublicPortfolioWithScores: async (shareToken: string) => {
+    const { data: portfolio, error: portfolioError } = await supabase
+      .from('portfolios')
+      .select('*, items:portfolio_items(*)')
+      .eq('share_token', shareToken)
+      .eq('is_published', true)
+      .single()
+
+    if (portfolioError || !portfolio) {
+      return { portfolio: null, scores: [], error: portfolioError }
+    }
+
+    const { data: scores, error: scoresError } = await supabase
+      .from('simulation_scores')
+      .select('*, session:session_id(*, scenario:scenario_key(*))')
+      .eq('user_id', portfolio.user_id)
+
+    if (scoresError) {
+      return { portfolio, scores: [], error: scoresError }
+    }
+
+    return { portfolio: portfolio as (Portfolio & { items: PortfolioItem[] }), scores: scores || [], error: null }
+  },
+
+  createPortfolioItem: async (item: Omit<PortfolioItem, 'id' | 'created_at' | 'updated_at'>) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { item: null, error: new Error('Not authenticated') }
+
+    const { data: portfolioItem, error } = await supabase
+      .from('portfolio_items')
+      .insert({ ...item, user_id: user.id })
+      .select()
+      .single()
+
+    return { item: portfolioItem as PortfolioItem | null, error }
+  },
+
+  updatePortfolioItem: async (itemId: string, updates: Partial<PortfolioItem>) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { item: null, error: new Error('Not authenticated') }
+
+    const { data: portfolioItem, error } = await supabase
+      .from('portfolio_items')
+      .update(updates)
+      .eq('id', itemId)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    return { item: portfolioItem as PortfolioItem | null, error }
+  },
+
+  deletePortfolioItem: async (itemId: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: new Error('Not authenticated') }
+
+    const { error } = await supabase
+      .from('portfolio_items')
+      .delete()
+      .eq('id', itemId)
+      .eq('user_id', user.id)
+
+    return { error }
+  },
+
+  getPortfolioItems: async (portfolioId: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { items: [], error: new Error('Not authenticated') }
+
+    const { data, error } = await supabase
+      .from('portfolio_items')
+      .select('*')
+      .eq('portfolio_id', portfolioId)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    return { items: data as PortfolioItem[], error }
   }
 }
 

@@ -28,13 +28,14 @@ const sampleTestimonials: Testimonial[] = [
 const LoginPage = () => {
   usePageSetup();
   const navigate = useNavigate();
-  const { user, isLoading, signInWithOAuth } = useAuth();
+  const { user, isLoading, signInWithOAuth, role } = useAuth();
 
   useEffect(() => {
     if (!isLoading && user) {
-      navigate('/dashboard');
+      const redirectPath = role === 'COMPANY' ? '/company' : '/dashboard';
+      navigate(redirectPath);
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, role]);
 
   const handleGoogleSignIn = async () => {
     await signInWithOAuth('google');
@@ -45,19 +46,24 @@ const LoginPage = () => {
   };
 
   return (
-    <SignInPage
-      title={
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="TURNVE" className="h-10 w-auto" />
-        </div>
-      }
-      description="Sign in to continue your journey with TURNVE"
-      heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
-      testimonials={sampleTestimonials}
-      onSignedIn={() => navigate('/dashboard')}
-      onGoogleSignIn={handleGoogleSignIn}
-      onCreateAccount={handleCreateAccount}
-    />
+    <div className="min-h-screen bg-background">
+      <SignInPage
+        title={
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="TURNVE" className="h-10 w-auto" />
+          </div>
+        }
+        description="Sign in to continue your journey with TURNVE"
+        heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
+        testimonials={sampleTestimonials}
+        onSignedIn={() => {
+          const redirectPath = role === 'COMPANY' ? '/company' : '/dashboard';
+          navigate(redirectPath);
+        }}
+        onGoogleSignIn={handleGoogleSignIn}
+        onCreateAccount={handleCreateAccount}
+      />
+    </div>
   );
 };
 

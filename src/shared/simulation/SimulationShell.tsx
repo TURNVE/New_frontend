@@ -3,6 +3,7 @@
  * Uses SimulationConfig. Backlog tab is the main activity hub.
  */
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { toast } from 'sonner';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
     ChevronRight, Home, LayoutList, Map, Gauge, Building2, FolderOpen,
@@ -31,23 +32,23 @@ import SimRoadmapMindmap from './components/SimRoadmapMindmap';
 type ActiveTab = 'dashboard' | 'backlog' | 'roadmap' | 'documents' | 'portfolio' | 'company' | 'guide';
 
 // ─── Priority badge ───────────────────────────────────────────
-const PRI: Record<string, string> = {
-    urgent: 'bg-red-500/20 text-red-400',
-    high: 'bg-amber-500/20 text-amber-400',
-    normal: 'bg-blue-500/20 text-blue-400',
-    low: 'bg-gray-500/20 text-gray-400',
-};
+    const PRI: Record<string, string> = {
+        urgent: 'bg-red-500/20 text-red-400',
+        high: 'bg-amber-500/20 text-amber-400',
+        normal: 'bg-primary/20 text-primary',
+        low: 'bg-[rgba(255,255,255,0.1)] text-text-tertiary',
+    };
 
 // ─── Severity dot ─────────────────────────────────────────────
-const SEV_DOT: Record<string, string> = {
-    critical: 'bg-red-500',
-    warning: 'bg-amber-500',
-    info: 'bg-emerald-500',
-    high: 'bg-red-500',
-    urgent: 'bg-red-500',
-    normal: 'bg-blue-500',
-    low: 'bg-gray-500',
-};
+    const SEV_DOT: Record<string, string> = {
+        critical: 'bg-red-500',
+        warning: 'bg-amber-500',
+        info: 'bg-[#10b981]',
+        high: 'bg-red-500',
+        urgent: 'bg-red-500',
+        normal: 'bg-primary',
+        low: 'bg-[rgba(255,255,255,0.3)]',
+    };
 
 // ─── Metrics derivation ───────────────────────────────────────
 function deriveMetrics(gs: ReturnType<typeof useSimulationCore>['gameState'], _c: SimulationConfig) {
@@ -56,10 +57,10 @@ function deriveMetrics(gs: ReturnType<typeof useSimulationCore>['gameState'], _c
     const pp = Math.round(gs.progress);
     const rp = Math.round(gs.riskLevel * 100);
     return [
-        { label: 'Budget', value: `$${(gs.budget / 1000).toFixed(0)}K`, dot: bp > 30 ? 'bg-blue-500' : 'bg-red-500', trendDir: bp > 30 ? 'up' as const : 'down' as const, trendVal: `${bp}% left`, trendColor: bp > 30 ? 'green' : 'red' as 'green' | 'red' },
-        { label: 'Progress', value: `${pp}%`, dot: pp > 70 ? 'bg-green-500' : 'bg-blue-500', trendDir: 'up' as const, trendVal: `Wk ${gs.week}/${gs.totalWeeks}`, trendColor: 'green' as const },
-        { label: 'Risk', value: `${rp}%`, dot: rp > 60 ? 'bg-red-500' : rp > 40 ? 'bg-amber-500' : 'bg-green-500', trendDir: rp > 50 ? 'up' as const : 'down' as const, trendVal: rp > 60 ? 'Critical' : 'Managed', trendColor: rp > 60 ? 'red' : 'green' as 'red' | 'green' },
-        { label: 'Morale', value: `${Math.round(gs.teamMorale)}%`, dot: gs.teamMorale > 75 ? 'bg-green-500' : 'bg-amber-500', trendDir: gs.teamMorale > 60 ? 'up' as const : 'down' as const, trendVal: gs.teamMorale > 75 ? 'High' : 'Low', trendColor: gs.teamMorale > 75 ? 'green' : 'yellow' as 'green' | 'yellow' },
+        { label: 'Budget', value: `$${(gs.budget / 1000).toFixed(0)}K`, dot: bp > 30 ? 'bg-[#7170ff]' : 'bg-red-500', trendDir: bp > 30 ? 'up' as const : 'down' as const, trendVal: `${bp}% left`, trendColor: bp > 30 ? 'green' : 'red' as 'green' | 'red' },
+        { label: 'Progress', value: `${pp}%`, dot: pp > 70 ? 'bg-[#10b981]' : 'bg-[#7170ff]', trendDir: 'up' as const, trendVal: `Wk ${gs.week}/${gs.totalWeeks}`, trendColor: 'green' as const },
+        { label: 'Risk', value: `${rp}%`, dot: rp > 60 ? 'bg-red-500' : rp > 40 ? 'bg-amber-500' : 'bg-[#10b981]', trendDir: rp > 50 ? 'up' as const : 'down' as const, trendVal: rp > 60 ? 'Critical' : 'Managed', trendColor: rp > 60 ? 'red' : 'green' as 'red' | 'green' },
+        { label: 'Morale', value: `${Math.round(gs.teamMorale)}%`, dot: gs.teamMorale > 75 ? 'bg-[#10b981]' : 'bg-amber-500', trendDir: gs.teamMorale > 60 ? 'up' as const : 'down' as const, trendVal: gs.teamMorale > 75 ? 'High' : 'Low', trendColor: gs.teamMorale > 75 ? 'green' : 'yellow' as 'green' | 'yellow' },
     ];
 }
 
@@ -124,11 +125,11 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
     return (
         <div className="flex-1 overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+            <div className="p-6 border-b border-border flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h2 className="text-lg font-bold dark:text-white">Activity Backlog</h2>
-                        <p className="text-xs text-gray-500 mt-0.5">{totalItems} items • Week {gameState.week}</p>
+                        <h2 className="text-lg font-bold text-foreground">Activity Backlog</h2>
+                        <p className="text-xs text-text-tertiary mt-0.5">{totalItems} items • Week {gameState.week}</p>
                     </div>
                 </div>
                 <div className="flex gap-1 flex-wrap">
@@ -136,7 +137,7 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                         <button
                             key={t.id}
                             onClick={() => setFilter(t.id)}
-                            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${filter === t.id ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${filter === t.id ? 'bg-[#5e6ad2] text-white' : 'bg-surface text-text-tertiary hover:bg-surface-secondary'}`}
                         >
                             {t.label}
                         </button>
@@ -150,28 +151,28 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                 {/* Signals Section */}
                 {(filter === 'all' || filter === 'signals') && filtSignals.length > 0 && (
                     <section>
-                        <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                        <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-[#7170ff] rounded-full animate-pulse" />
                             Signals ({filtSignals.length})
                         </h3>
                         <div className="space-y-2">
                             {filtSignals.map(sig => (
-                                <div key={sig.id} className="bg-white dark:bg-gray-800/60 rounded-[12px] p-4 border border-gray-100 dark:border-gray-700 flex items-start gap-3">
+                                <div key={sig.id} className="bg-card rounded-[12px] p-4 border border-border flex items-start gap-3">
                                     <div className={`w-8 h-8 rounded-full ${sig.sourceColor} flex items-center justify-center text-[10px] font-bold flex-shrink-0`}>
                                         {sig.sourceInitials}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-xs font-semibold dark:text-gray-300">{sig.source}</span>
-                                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${SEV_DOT[sig.severity] ?? 'bg-gray-400'}`} />
-                                            <span className="text-[10px] text-gray-400 uppercase">{sig.severity}</span>
-                                            <span className="text-[10px] text-gray-400 ml-auto">Week {sig.week}</span>
+                                            <span className="text-xs font-semibold text-text-secondary">{sig.source}</span>
+                                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${SEV_DOT[sig.severity] ?? 'bg-text-tertiary'}`} />
+                                            <span className="text-[10px] text-text-quaternary uppercase">{sig.severity}</span>
+                                            <span className="text-[10px] text-text-quaternary ml-auto">Week {sig.week}</span>
                                         </div>
-                                        <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{sig.message}</p>
+                                        <p className="text-xs text-text-secondary leading-relaxed">{sig.message}</p>
                                         {sig.tags && sig.tags.length > 0 && (
                                             <div className="flex gap-1 mt-2">
                                                 {sig.tags.map(tag => (
-                                                    <span key={tag} className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-500 text-[10px] rounded">
+                                                    <span key={tag} className="px-1.5 py-0.5 bg-surface text-text-tertiary text-[10px] rounded">
                                                         {tag}
                                                     </span>
                                                 ))}
@@ -187,13 +188,13 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                 {/* Events Section */}
                 {(filter === 'all' || filter === 'events') && filtEvents.length > 0 && (
                     <section>
-                        <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3 flex items-center gap-2">
                             <Tag className="w-3 h-3" />
                             Events ({filtEvents.length})
                         </h3>
                         <div className="space-y-2">
                             {filtEvents.map(evt => (
-                                <div key={evt.id} className={`bg-white dark:bg-gray-800/60 rounded-[12px] p-4 border transition-colors ${evt.requiresAction ? 'border-amber-500/30 bg-amber-500/5' : 'border-gray-100 dark:border-gray-700'}`}>
+                                <div key={evt.id} className={`bg-card rounded-[12px] p-4 border transition-colors ${evt.requiresAction ? 'border-amber-500/30 bg-amber-500/5' : 'border-border'}`}>
                                     <div className="flex items-start gap-3">
                                         <div className={`w-8 h-8 rounded-full ${evt.fromColor} flex items-center justify-center text-[10px] font-bold flex-shrink-0`}>
                                             {evt.fromInitials}
@@ -318,6 +319,19 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
     const [openModal, setOpenModal] = useState<ModalAction | null>(null);
     const [feedback, setFeedback] = useState('');
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+    const [pagePrimary, setPagePrimary] = useState(config.primaryColor);
+
+    useEffect(() => {
+        setPagePrimary(config.primaryColor);
+    }, [config.primaryColor]);
+
+    const primaryStyle = {
+        background: `linear-gradient(135deg, ${pagePrimary}, ${pagePrimary}cc)`,
+        backgroundColor: pagePrimary,
+        color: pagePrimary,
+        borderColor: `${pagePrimary}40`,
+        boxShadow: `0 4px 14px ${pagePrimary}40`,
+    };
     
     // Week countdown timer (7 days in seconds = 604800, but we'll use a shorter duration for gameplay)
     const WEEK_DURATION = 300; // 5 minutes per week for gameplay
@@ -372,21 +386,25 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
             setWeekTimeLeft((prev) => {
                 if (prev <= 1) {
                     // Week time has passed
-                    if (!weekAlertShown) {
+                    if (!weekAlertShown && !!gameState) {
                         setWeekAlertShown(true);
-                        // Show alert
-                        alert(`Week ${gameState?.week || 1} has passed!`);
+                        // Show alert (replacing blocking alert with toast notification)
+                        toast.info(`Week ${gameState?.week || 1} has passed!`, {
+                            position: "top-center",
+                            duration: 3000
+                        });
                         // Auto advance to next week
                         advanceTime();
+                        // Optionally, show notification in the UI component
                     }
-                    return 0;
+                    return WEEK_DURATION; // Reset the timer instead of returning 0
                 }
                 return prev - 1;
             });
         }, 1000);
         
         return () => clearInterval(timer);
-    }, [isRunning, isPaused, gameState?.week, weekAlertShown]);
+    }, [isRunning, isPaused, advanceTime, gameState, weekAlertShown, WEEK_DURATION]);
 
     const activeMeeting = gameState?.activeMeeting;
     const [showMeetingContent, setShowMeetingContent] = useState(false);
@@ -426,7 +444,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
         return (
             <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-[#0a0a0a]">
                 <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                    <div className="w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: `${pagePrimary}40`, borderTopColor: pagePrimary, borderLeftColor: pagePrimary }} />
                     <p className="text-gray-500 dark:text-gray-400">Initialising {config.companyName}...</p>
                 </div>
             </div>
@@ -440,7 +458,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
             {/* New Week Overlay */}
             {weekChangeInfo && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-500">
-                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[20px] shadow-2xl text-center text-white max-w-md mx-4 animate-in zoom-in duration-300">
+                    <div className="p-8 rounded-[20px] shadow-2xl text-center text-white max-w-md mx-4 animate-in zoom-in duration-300" style={{ background: `linear-gradient(135deg, ${pagePrimary}, ${pagePrimary}cc)` }}>
                         <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Trophy className="w-10 h-10" />
                         </div>
@@ -463,7 +481,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                         <div className="p-8 text-center">
                             <div className="relative w-32 h-32 mx-auto mb-6">
                                 <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping opacity-50" />
-                                <div className={`absolute inset-0 rounded-full border-4 border-dashed animate-spin-slow opacity-30 ${activeMeeting.fromColor.includes('red') ? 'border-red-500' : 'border-blue-500'}`} />
+                                <div className="absolute inset-0 rounded-full border-4 border-dashed animate-spin-slow opacity-30" style={{ borderColor: `${pagePrimary}60` }} />
                                 <div className={`w-32 h-32 rounded-full flex items-center justify-center text-4xl font-black text-white shadow-2xl z-10 relative ${activeMeeting.fromColor}`}>
                                     {activeMeeting.fromInitials}
                                 </div>
@@ -616,14 +634,14 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                     <div className="p-3 lg:p-4 mx-3 lg:mx-4 mb-4 border-t border-gray-200 dark:border-gray-800">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-xs text-gray-500 dark:text-gray-400">Week Timer</span>
-                            <span className={`text-xs font-mono font-bold ${weekTimeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-blue-500'}`}>
+                            <span className={`text-xs font-mono font-bold ${weekTimeLeft < 60 ? 'text-red-500 animate-pulse' : ''}`} style={weekTimeLeft >= 60 ? { color: pagePrimary } : {}}>
                                 {Math.floor(weekTimeLeft / 60).toString().padStart(2, '0')}:{(weekTimeLeft % 60).toString().padStart(2, '0')}
                             </span>
                         </div>
                         <div className="h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                             <div 
-                                className={`h-full rounded-full transition-all ${weekTimeLeft < 60 ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                style={{ width: `${(weekTimeLeft / WEEK_DURATION) * 100}%` }} 
+                                className={`h-full rounded-full transition-all ${weekTimeLeft < 60 ? 'bg-red-500' : ''}`} 
+                                style={weekTimeLeft >= 60 ? { width: `${(weekTimeLeft / WEEK_DURATION) * 100}%`, backgroundColor: pagePrimary } : { width: `${(weekTimeLeft / WEEK_DURATION) * 100}%` }} 
                             />
                         </div>
                         <p className="text-xs text-gray-400 mt-1">Time remaining in week</p>
@@ -660,7 +678,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                 WEEK {String(gameState.week).padStart(2, '0')}
                             </span>
                             <div className="hidden md:flex items-center gap-1.5 px-2 lg:px-3 py-1 font-mono text-xs lg:text-sm bg-gray-100 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-                                <Clock className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${gameState.timeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-blue-500'}`} />
+                                <Clock className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${gameState.timeLeft < 60 ? 'text-red-500 animate-pulse' : ''}`} style={gameState.timeLeft >= 60 ? { color: pagePrimary } : {}} />
                                 <span className={gameState.timeLeft < 60 ? 'text-red-500 font-bold' : 'dark:text-white'}>
                                     {Math.floor(gameState.timeLeft / 60).toString().padStart(2, '0')}:{(gameState.timeLeft % 60).toString().padStart(2, '0')}
                                 </span>
@@ -676,20 +694,20 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                             {/* Notifications - icon only */}
                             <button onClick={() => setShowNotifications(true)} className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
                                 <Bell className="w-5 h-5 text-gray-500" />
-                                {notifications.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />}
+                                {notifications.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{ backgroundColor: pagePrimary }} />}
                             </button>
                             
                             {/* Play/Pause - icon only */}
                             {!isRunning ? (
-                                <button onClick={() => { enableSounds(); startSimulation(); }} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all" title="Start">
+                                <button onClick={() => { enableSounds(); startSimulation(); }} className="p-2 text-white rounded-lg shadow-lg transition-all" style={{ backgroundColor: pagePrimary, boxShadow: `0 4px 14px ${pagePrimary}40` }} title="Start">
                                     <Play className="w-5 h-5" />
                                 </button>
                             ) : isPaused ? (
-                                <button onClick={() => { enableSounds(); resumeSimulation(); }} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all" title="Resume">
+                                <button onClick={() => { enableSounds(); resumeSimulation(); }} className="p-2 text-white rounded-lg shadow-lg transition-all" style={{ backgroundColor: pagePrimary, boxShadow: `0 4px 14px ${pagePrimary}40` }} title="Resume">
                                     <Play className="w-5 h-5" />
                                 </button>
                             ) : (
-                                <button onClick={pauseSimulation} className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-lg shadow-blue-500/20 transition-all" title="Pause">
+                                <button onClick={pauseSimulation} className="p-2 text-white rounded-lg shadow-lg transition-all" style={{ backgroundColor: pagePrimary, boxShadow: `0 4px 14px ${pagePrimary}40` }} title="Pause">
                                     <Pause className="w-5 h-5" />
                                 </button>
                             )}
@@ -865,10 +883,10 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                         <div className="glass-panel rounded-[20px] border border-gray-200 dark:border-white/5 overflow-hidden">
                                             <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
                                                 <h3 className="text-sm font-semibold dark:text-white flex items-center gap-2">
-                                                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                                                    <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: pagePrimary }} />
                                                     Signals — Week {gameState.week}
                                                 </h3>
-                                                <button onClick={() => setActiveTab('backlog')} className="text-xs text-blue-500 hover:text-blue-400 flex items-center gap-1">
+                                                <button onClick={() => setActiveTab('backlog')} className="text-xs flex items-center gap-1 hover:opacity-80" style={{ color: pagePrimary }}>
                                                     View all <ArrowRight className="w-3 h-3" />
                                                 </button>
                                             </div>
@@ -900,7 +918,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                                     <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
                                                     Events — Week {gameState.week}
                                                 </h3>
-                                                <button onClick={() => setActiveTab('backlog')} className="text-xs text-blue-500 hover:text-blue-400 flex items-center gap-1">
+                                                <button onClick={() => setActiveTab('backlog')} className="text-xs flex items-center gap-1 hover:opacity-80" style={{ color: pagePrimary }}>
                                                     View all <ArrowRight className="w-3 h-3" />
                                                 </button>
                                             </div>
@@ -984,7 +1002,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                                     <div className="text-center py-6">
                                                         <CheckCircle className="w-10 h-10 text-emerald-500/40 mx-auto mb-3" />
                                                         <p className="text-sm text-gray-500 dark:text-gray-400">All actions done for Week {gameState.week}.</p>
-                                                        <button onClick={advanceTime} className="mt-4 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-bold transition-all">
+                                                        <button onClick={advanceTime} className="mt-4 px-6 py-2 text-white rounded-lg text-sm font-bold transition-all" style={{ backgroundColor: pagePrimary, boxShadow: `0 4px 14px ${pagePrimary}40` }}>
                                                             Advance to Next Week
                                                         </button>
                                                     </div>
@@ -1088,7 +1106,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <button onClick={restartSimulation} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all">Try Again</button>
+                            <button onClick={restartSimulation} className="text-white font-bold py-4 rounded-xl shadow-lg transition-all" style={{ backgroundColor: pagePrimary, boxShadow: `0 4px 14px ${pagePrimary}40` }}>Try Again</button>
                             <button onClick={() => navigate('/simulations')} className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold py-4 rounded-xl transition-all">Exit</button>
                         </div>
                     </div>

@@ -6,13 +6,14 @@ import { SignInPage } from '../../components/ui/sign-in';
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { user, isLoading, signIn, signInWithOAuth, resetPassword } = useAuth();
+  const { user, isLoading, signIn, signInWithOAuth, resetPassword, role } = useAuth();
 
   useEffect(() => {
     if (!isLoading && user) {
-      navigate(AUTH_ROUTES.DASHBOARD);
+      const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
+      navigate(redirectPath);
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, role]);
 
   const handleEmailSignIn = async (email: string, password: string) => {
     const { error } = await signIn(email, password);
@@ -63,25 +64,28 @@ function AuthPage() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen bg-background">
       <div className="absolute top-8 left-8 z-10">
         <a href="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] rounded-xl flex items-center justify-center">
             <span className="text-white font-bold text-xl">T</span>
           </div>
-          <span className="text-2xl font-bold text-gray-900">Turnve</span>
+          <span className="text-2xl font-bold text-foreground">Turnve</span>
         </a>
       </div>
 
       <SignInPage
         title={
-          <span className="font-light text-gray-900 tracking-tighter">Welcome back</span>
+          <span className="font-light text-foreground tracking-tighter">Welcome back</span>
         }
         description="Access your account and continue your journey with us"
         heroImageSrc="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop"
         testimonials={testimonials}
         onEmailSignIn={handleEmailSignIn}
-        onSignedIn={() => navigate(AUTH_ROUTES.DASHBOARD)}
+        onSignedIn={() => {
+          const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
+          navigate(redirectPath);
+        }}
         onGoogleSignIn={handleGoogleSignIn}
         onCreateAccount={handleCreateAccount}
         onResetPassword={handleResetPassword}

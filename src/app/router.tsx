@@ -10,8 +10,18 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Outlet, ScrollRestoration } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
+
+// ── Scroll to top wrapper ───────────────────────────────────
+function RootLayout() {
+  return (
+    <>
+      <ScrollRestoration />
+      <Outlet />
+    </>
+  );
+}
 
 // ── Non-simulation pages (eager-loaded) ───────────────────────
 import LandingPage from '../pages/LandingPage';
@@ -21,6 +31,7 @@ import IndustriesPage from '../pages/IndustriesPage';
 import TracksPage from '../pages/TracksPage';
 import ConfirmationPage from '../pages/ConfirmationPage';
 import PortfolioPage from '../pages/PortfolioPage';
+import PublicPortfolioPage from '../pages/PublicPortfolioPage';
 import ProfilePage from '../pages/ProfilePage';
 import SettingsPage from '../pages/SettingsPage';
 import TeamPage from '../pages/TeamPage';
@@ -32,6 +43,23 @@ import SignUpPage from '../pages/auth/SignUpPage';
 import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage';
 import { NotFound } from '../pages/NotFoundPage';
 import Program1Page from '../pages/program1/Program1Page';
+import FAQPage from '../pages/FAQPage';
+import ContactPage from '../pages/ContactPage';
+// Organization marketing page
+import OrganizationPage from '../pages/organization/OrganizationPage';
+
+// ── Admin pages ────────────────────────────────────────────────
+import { ProtectedAdminRoute } from '../components/admin/ProtectedAdminRoute';
+import { ProtectedRoleRoute } from '../components/ProtectedRoleRoute';
+import { AdminLayout, AdminDashboardPage, AdminUsersPage, AdminAnalyticsPage } from '../pages/admin';
+import { AdminSimulationsPage, CreateSimulationPage, EditSimulationPage } from '../pages/admin/simulations';
+import { AdminBlogListPage, CreateBlogPage, EditBlogPage } from '../pages/admin/blogs';
+
+// ── Company pages ──────────────────────────────────────────────
+import { CompanyLayout } from '../pages/company/CompanyLayout';
+import { CompanyDashboardPage } from '../pages/company/CompanyDashboardPage';
+import { CompanySimulationsPage } from '../pages/company/CompanySimulationsPage';
+import { CompanySimulationCreator } from '../pages/company/CompanySimulationCreator';
 
 // ── Simulation pages (code-split, isolated) ───────────────────
 const PayLinkSimulation = lazy(() => import('../features/sim-pm-001-paylink/PayLinkSimulation'));
@@ -57,40 +85,87 @@ const withSuspense = (Component: React.ComponentType) => (
 
 // ── Router ─────────────────────────────────────────────────────
 const router = createBrowserRouter([
-  // ── Public / Marketing ──────────────────────────────────────
-  { path: '/', element: <LandingPage /> },
-  { path: '/bootcamp', element: <Program1Page /> },
+  {
+    element: <RootLayout />,
+    children: [
+      // ── Public / Marketing ──────────────────────────────────────
+      { path: '/', element: <LandingPage /> },
+      { path: '/bootcamp', element: <Program1Page /> },
+      { path: '/organization', element: <OrganizationPage /> },
+      { path: '/faq', element: <FAQPage /> },
+      { path: '/contact', element: <ContactPage /> },
 
-  // ── Auth ────────────────────────────────────────────────────
-  { path: '/login', element: <LoginPage /> },
-  { path: '/register', element: <LoginPage /> },
-  { path: '/sign-in', element: <AuthPage /> },
-  { path: '/sign-up', element: <SignUpPage /> },
-  { path: '/auth/callback', element: <OAuthCallbackPage /> },
+      // ── Auth ────────────────────────────────────────────────────
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <LoginPage /> },
+      { path: '/sign-in', element: <AuthPage /> },
+      { path: '/sign-up', element: <SignUpPage /> },
+      { path: '/auth/callback', element: <OAuthCallbackPage /> },
 
-  // ── App ─────────────────────────────────────────────────────
-  { path: '/dashboard', element: <DashboardPage /> },
-  { path: '/simulations', element: <SimulationsPage /> },
-  { path: '/portfolio', element: <PortfolioPage /> },
-  { path: '/profile', element: <ProfilePage /> },
-  { path: '/settings', element: <SettingsPage /> },
-  { path: '/team', element: <TeamPage /> },
-  { path: '/achievements', element: <AchievementsPage /> },
-  { path: '/projects', element: <ProjectsPage /> },
-  { path: '/industries', element: <IndustriesPage /> },
-  { path: '/tracks', element: <TracksPage /> },
-  { path: '/confirmation', element: <ConfirmationPage /> },
+      // ── App ─────────────────────────────────────────────────────
+      { path: '/dashboard', element: <DashboardPage /> },
+      { path: '/simulations', element: <SimulationsPage /> },
+      { path: '/portfolio', element: <PortfolioPage /> },
+      { path: '/portfolio/public/:shareToken', element: <PublicPortfolioPage /> },
+      { path: '/profile', element: <ProfilePage /> },
+      { path: '/settings', element: <SettingsPage /> },
+      { path: '/team', element: <TeamPage /> },
+      { path: '/achievements', element: <AchievementsPage /> },
+      { path: '/projects', element: <ProjectsPage /> },
+      { path: '/industries', element: <IndustriesPage /> },
+      { path: '/tracks', element: <TracksPage /> },
+      { path: '/confirmation', element: <ConfirmationPage /> },
 
-  // ── Simulations (Isolated, Code-Split) ───────────────────────
-  // Each simulation path maps to its own standalone page.
-  // Editing one simulation cannot affect another.
-  { path: '/simulation/sim-pm-001', element: withSuspense(PayLinkSimulation) },
-  { path: '/simulation/sim-pm-002', element: withSuspense(ShopEaseSimulation) },
-  { path: '/simulation/sim-pm-003', element: withSuspense(TechCoreSimulation) },
-  { path: '/simulation/sim-pm-004', element: withSuspense(NewWaveSimulation) },
+      // ── Simulations (Isolated, Code-Split) ───────────────────────
+      // Each simulation path maps to its own standalone page.
+      // Editing one simulation cannot affect another.
+      { path: '/simulation/sim-pm-001', element: withSuspense(PayLinkSimulation) },
+      { path: '/simulation/sim-pm-002', element: withSuspense(ShopEaseSimulation) },
+      { path: '/simulation/sim-pm-003', element: withSuspense(TechCoreSimulation) },
+      { path: '/simulation/sim-pm-004', element: withSuspense(NewWaveSimulation) },
 
-  // ── 404 ─────────────────────────────────────────────────────
-  { path: '*', element: <NotFound /> },
+      // ── Admin Routes ────────────────────────────────────────────────
+      {
+        path: '/admin',
+        element: (
+          <ProtectedAdminRoute>
+            <AdminLayout />
+          </ProtectedAdminRoute>
+        ),
+        children: [
+          { index: true, element: <AdminDashboardPage /> },
+          { path: 'simulations', element: <AdminSimulationsPage /> },
+          { path: 'simulations/new', element: <CreateSimulationPage /> },
+          { path: 'simulations/:id/edit', element: <EditSimulationPage /> },
+          { path: 'blogs', element: <AdminBlogListPage /> },
+          { path: 'blogs/new', element: <CreateBlogPage /> },
+          { path: 'blogs/:id/edit', element: <EditBlogPage /> },
+          { path: 'users', element: <AdminUsersPage /> },
+          { path: 'analytics', element: <AdminAnalyticsPage /> },
+        ],
+      },
+
+      // ── Company/Organization Routes ─────────────────────────────────
+      {
+        path: '/company',
+        element: (
+          <ProtectedRoleRoute allowedRoles={['COMPANY']}>
+            <CompanyLayout />
+          </ProtectedRoleRoute>
+        ),
+        children: [
+          { index: true, element: <CompanyDashboardPage /> },
+          { path: 'simulations', element: <CompanySimulationsPage /> },
+          { path: 'simulations/new', element: <CompanySimulationCreator /> },
+          { path: 'analytics', element: <div className="p-8 text-white">Analytics (Coming Soon)</div> },
+          { path: 'settings', element: <div className="p-8 text-white">Settings (Coming Soon)</div> },
+        ],
+      },
+
+      // ── 404 ─────────────────────────────────────────────────────
+      { path: '*', element: <NotFound /> },
+    ],
+  },
 ]);
 
 export default router;

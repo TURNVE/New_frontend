@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Session, User, AuthResponse, OAuthResponse } from '@supabase/supabase-js'
+import type { Profile } from '../lib/supabase'
 
-// ── Named Constants ────────────────────────────────────────────
+export type UserRole = 'USER' | 'RECRUITER' | 'COMPANY' | 'MENTOR' | 'ADMIN'
+
 export const AUTH_PROVIDERS = {
     GOOGLE: 'google',
     GITHUB: 'github',
@@ -23,14 +25,16 @@ export const AUTH_ROUTES = {
     SIGN_UP: '/sign-up',
     CALLBACK: '/auth/callback',
     DASHBOARD: '/dashboard',
+    COMPANY: '/company',
 } as const
 
 type OAuthProvider = typeof AUTH_PROVIDERS[keyof typeof AUTH_PROVIDERS]
 
-// ── Interface ──────────────────────────────────────────────────
 export interface AuthContextValue {
     user: User | null
     session: Session | null
+    profile: Profile | null
+    role: UserRole
     isAuthenticated: boolean
     isLoading: boolean
     signUp: (email: string, password: string, options?: { data?: Record<string, unknown> }) => Promise<AuthResponse>
@@ -42,23 +46,28 @@ export interface AuthContextValue {
     checkEmailExists: (email: string) => Promise<boolean>
 }
 
-// ── Context ────────────────────────────────────────────────────
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-// ── Provider ───────────────────────────────────────────────────
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [session, setSession] = useState<Session | null>(null)
+    const [profile, setProfile] = useState<Profile | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
+    const fetchProfile = useCallback(async (userId: string) => {
+        const { profile: data } = await (await import('../lib/supabase')).profiles.getProfile(userId)
+        setProfile(data)
+        return data
+    }, [])
+
     useEffect(() => {
-        // Get initial session
         const initializeAuth = async () => {
             try {
                 const { data: { session: currentSession } } = await supabase.auth.getSession()
                 if (currentSession) {
                     setSession(currentSession)
                     setUser(currentSession.user)
+                    await fetchProfile(currentSession.user.id)
                 }
             } catch (err) {
                 console.error('Failed to initialize auth:', err)
@@ -69,11 +78,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         initializeAuth()
 
-        // Listen for auth state changes (single listener for entire app)
         const { data: authListener } = supabase.auth.onAuthStateChange(
-            (_event, newSession) => {
+            async (_event, newSession) => {
                 setSession(newSession)
                 setUser(newSession?.user ?? null)
+                if (newSession?.user) {
+                    await fetchProfile(newSession.user.id)
+                } else {
+                    setProfile(null)
+                }
                 setIsLoading(false)
             }
         )
@@ -81,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return () => {
             authListener.subscription.unsubscribe()
         }
-    }, [])
+    }, [fetchProfile])
 
     const signUp = useCallback(
         async (email: string, password: string, options?: { data?: Record<string, unknown> }): Promise<AuthResponse> => {
@@ -118,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signOut = useCallback(async () => {
         await supabase.auth.signOut()
+        setProfile(null)
     }, [])
 
     const resetPassword = useCallback(async (email: string) => {
@@ -131,7 +145,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: { session: refreshed } } = await supabase.auth.getSession()
         setSession(refreshed)
         setUser(refreshed?.user ?? null)
-    }, [])
+        if (refreshed?.user) {
+            await fetchProfile(refreshed.user.id)
+        }
+    }, [fetchProfile])
 
     const checkEmailExists = useCallback(async (email: string) => {
         const { data, error } = await supabase.rpc('is_email_registered', { email_address: email })
@@ -143,11 +160,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     const isAuthenticated = useMemo(() => !!user && !!session, [user, session])
+    const role = useMemo<UserRole>(() => (profile?.role as UserRole) || 'USER', [profile?.role])
 
     const value = useMemo<AuthContextValue>(
         () => ({
             user,
             session,
+            profile,
+            role,
             isAuthenticated,
             isLoading,
             signUp,
@@ -158,13 +178,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             refreshSession,
             checkEmailExists,
         }),
-        [user, session, isAuthenticated, isLoading, signUp, signIn, signInWithOAuth, signOut, resetPassword, refreshSession, checkEmailExists]
+        [user, session, profile, role, isAuthenticated, isLoading, signUp, signIn, signInWithOAuth, signOut, resetPassword, refreshSession, checkEmailExists]
     )
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-// ── Hook ───────────────────────────────────────────────────────
 export function useAuth(): AuthContextValue {
     const context = useContext(AuthContext)
     if (!context) {

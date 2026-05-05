@@ -12,15 +12,21 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem('theme');
-    return (stored as Theme) || 'light';
+    // Default to dark for Linear design system
+    return (stored as Theme) || 'dark';
   });
 
+  // Apply theme immediately on mount and whenever theme changes
   useEffect(() => {
     localStorage.setItem('theme', theme);
+    const root = document.documentElement;
+    
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
+      root.classList.remove('light');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
+      root.classList.add('light');
     }
   }, [theme]);
 

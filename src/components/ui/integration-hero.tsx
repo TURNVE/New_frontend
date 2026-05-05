@@ -74,7 +74,7 @@ export default function IntegrationHero() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style jsx>{`
         @keyframes scroll-left {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -89,7 +89,7 @@ export default function IntegrationHero() {
         .animate-scroll-right {
           animation: scroll-right 40s linear infinite;
         }
-      `}} />
+      `}</style>
     </section>
   );
 }

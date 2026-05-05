@@ -4,17 +4,10 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { AUTH_ROUTES } from '@/contexts/AuthContext';
 
-/**
- * OAuthCallbackPage — handles the redirect from Google/GitHub OAuth.
- *
- * Supabase uses PKCE flow: after the user authenticates with Google,
- * they're redirected here with a `code` query param. We exchange it
- * for a session, and the AuthContext listener picks up the new session.
- */
 function OAuthCallbackPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, role } = useAuth();
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
@@ -29,20 +22,17 @@ function OAuthCallbackPage() {
         }
 
         if (code) {
-          // PKCE flow: exchange authorization code for session
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
             setError(exchangeError.message);
             return;
           }
         } else if (hash) {
-          // Implicit flow fallback: Supabase auto-detects hash tokens
-          // The onAuthStateChange listener in AuthContext handles this
         }
 
-        // Give the AuthContext listener a moment to update, then navigate
         setTimeout(() => {
-          navigate(AUTH_ROUTES.DASHBOARD, { replace: true });
+          const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
+          navigate(redirectPath, { replace: true });
         }, 500);
       } catch (err) {
         setError('Failed to complete authentication. Please try again.');
@@ -50,14 +40,14 @@ function OAuthCallbackPage() {
     };
 
     handleOAuthCallback();
-  }, [navigate]);
+  }, [navigate, role]);
 
-  // If already authenticated (AuthContext picked up the session), redirect immediately
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate(AUTH_ROUTES.DASHBOARD, { replace: true });
+      const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
+      navigate(redirectPath, { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, navigate, role]);
 
   if (error) {
     return (

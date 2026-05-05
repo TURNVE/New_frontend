@@ -4,19 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const avatarVariants = cva(
-  "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+  "relative flex shrink-0 overflow-hidden rounded-full border border-[rgba(255,255,255,0.08)]",
   {
     variants: {
       variant: {
-        default: "bg-gray-100",
-        rounded: "rounded-lg",
-        square: "rounded-none",
+        default: "bg-[rgba(255,255,255,0.04)]",
+        rounded: "rounded-[8px]",
+        square: "rounded-[4px]",
       },
       size: {
         default: "h-10 w-10",
         sm: "h-8 w-8",
-        lg: "h-16 w-16",
-        xl: "h-24 w-24",
+        lg: "h-12 w-12",
+        xl: "h-16 w-16",
       },
     },
     defaultVariants: {

@@ -30,18 +30,18 @@ interface Props {
 }
 
 const TestimonialCard = ({ testimonial, delay }: { testimonial: Testimonial, delay: string }) => (
-  <div className={`animate-testimonial ${delay} flex items-start gap-3 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/20 p-5 w-64 shadow-lg`}>
-    <img src={testimonial.avatarSrc} className="h-10 w-10 object-cover rounded-2xl" alt="avatar" />
+  <div className={`animate-testimonial ${delay} flex items-start gap-3 rounded-[12px] bg-card/80 backdrop-blur-xl border border-border p-5 w-64 shadow-lg`}>
+    <img src={testimonial.avatarSrc} className="h-10 w-10 object-cover rounded-[8px]" alt="avatar" />
     <div className="text-sm leading-snug">
-      <p className="flex items-center gap-1 font-medium text-gray-900">{testimonial.name}</p>
-      <p className="text-gray-500">{testimonial.handle}</p>
-      <p className="mt-1 text-gray-600">{testimonial.text}</p>
+      <p className="flex items-center gap-1 font-medium text-foreground">{testimonial.name}</p>
+      <p className="text-text-tertiary">{testimonial.handle}</p>
+      <p className="mt-1 text-text-secondary">{testimonial.text}</p>
     </div>
   </div>
 );
 
 export const SignInPage: React.FC<Props> = ({
-  title = <span className="font-light text-gray-900 tracking-tighter">Welcome</span>,
+  title = <span className="font-light text-foreground tracking-tighter">Welcome</span>,
   description = "Access your account and continue your journey with us",
   heroImageSrc,
   testimonials = [],
@@ -116,29 +116,29 @@ export const SignInPage: React.FC<Props> = ({
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col md:flex-row font-geist w-[100dvw] bg-gray-50">
-      <section className="flex-1 flex items-center justify-center p-6 md:p-12 bg-white">
+    <div className="h-[100dvh] flex flex-col md:flex-row font-geist w-[100dvw] bg-background">
+      <section className="flex-1 flex items-center justify-center p-6 md:p-12 bg-background">
         <div className="w-full max-w-md">
           <div className="mb-10">
             <div className="animate-element animate-delay-100 mb-2">{title}</div>
-            <p className="animate-element animate-delay-200 text-gray-500 text-base">{description}</p>
+            <p className="animate-element animate-delay-200 text-text-secondary text-base">{description}</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl animate-element">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-[6px] animate-element">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
 
           {isResettingPassword ? (
             <form className="space-y-5" onSubmit={handleResetPassword}>
               <div className="animate-element animate-delay-300">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-text-secondary mb-2">
                   Email Address
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                    <Mail className="h-5 w-5 text-text-quaternary group-focus-within:text-primary transition-colors" />
                   </div>
                   <input
                     name="email"
@@ -146,22 +146,22 @@ export const SignInPage: React.FC<Props> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email address"
-                    className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
+                    className="w-full bg-input text-foreground text-sm pl-11 pr-4 py-3.5 rounded-[6px] border border-border focus:outline-none focus:ring-2 focus:ring-[#7170ff]/20 focus:border-[#7170ff] transition-all placeholder:text-text-quaternary"
                     required
                   />
                 </div>
               </div>
 
               {resetMessage && (
-                <div className="animate-element p-4 bg-green-50 border border-green-200 rounded-xl">
-                  <p className="text-sm text-green-600">{resetMessage}</p>
+                <div className="animate-element p-4 bg-[#10b981]/10 border border-[#10b981]/20 rounded-[6px]">
+                  <p className="text-sm text-[#10b981]">{resetMessage}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="animate-element animate-delay-400 w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="animate-element animate-delay-400 w-full rounded-[6px] bg-[#5e6ad2] py-3.5 font-semibold text-white shadow-lg shadow-[rgba(94,106,210,0.25)] hover:shadow-xl hover:shadow-[rgba(94,106,210,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isLoading ? 'Sending...' : 'Send Reset Link'}
               </button>
@@ -174,7 +174,7 @@ export const SignInPage: React.FC<Props> = ({
                     setError(null);
                     setResetMessage(null);
                   }}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                  className="text-sm font-medium text-text-tertiary hover:text-foreground transition-colors"
                 >
                   Back to sign in
                 </button>
@@ -184,12 +184,12 @@ export const SignInPage: React.FC<Props> = ({
             <>
               <form className="space-y-5" onSubmit={handleEmailSignIn}>
                 <div className="animate-element animate-delay-300">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-text-secondary mb-2">
                     Email Address
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                      <Mail className="h-5 w-5 text-text-quaternary group-focus-within:text-primary transition-colors" />
                     </div>
                     <input
                       name="email"
@@ -197,19 +197,19 @@ export const SignInPage: React.FC<Props> = ({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email address"
-                      className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
+                      className="w-full bg-input text-foreground text-sm pl-11 pr-4 py-3.5 rounded-[6px] border border-border focus:outline-none focus:ring-2 focus:ring-[#7170ff]/20 focus:border-[#7170ff] transition-all placeholder:text-text-quaternary"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="animate-element animate-delay-400">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-text-secondary mb-2">
                     Password
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                      <Lock className="h-5 w-5 text-text-quaternary group-focus-within:text-primary transition-colors" />
                     </div>
                     <input
                       name="password"
@@ -217,13 +217,13 @@ export const SignInPage: React.FC<Props> = ({
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full bg-gray-50 text-gray-900 text-sm pl-11 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-gray-400"
+                      className="w-full bg-input text-foreground text-sm pl-11 pr-12 py-3.5 rounded-[6px] border border-border focus:outline-none focus:ring-2 focus:ring-[#7170ff]/20 focus:border-[#7170ff] transition-all placeholder:text-text-quaternary"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-text-quaternary hover:text-text-secondary transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -235,9 +235,9 @@ export const SignInPage: React.FC<Props> = ({
                     <input
                       type="checkbox"
                       name="rememberMe"
-                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer bg-input"
                     />
-                    <span className="text-gray-600 group-hover:text-gray-800 transition-colors">Keep me signed in</span>
+                    <span className="text-text-secondary group-hover:text-foreground transition-colors">Keep me signed in</span>
                   </label>
                   <a
                     href="#"
@@ -247,7 +247,7 @@ export const SignInPage: React.FC<Props> = ({
                       setError(null);
                       setResetMessage(null);
                     }}
-                    className="font-medium text-primary hover:opacity-80 transition-colors"
+                    className="font-medium text-[#7170ff] hover:text-[#828fff] transition-colors"
                   >
                     Reset password
                   </a>
@@ -256,32 +256,32 @@ export const SignInPage: React.FC<Props> = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="animate-element animate-delay-600 w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="animate-element animate-delay-600 w-full rounded-[6px] bg-[#5e6ad2] py-3.5 font-semibold text-white shadow-lg shadow-[rgba(94,106,210,0.25)] hover:shadow-xl hover:shadow-[rgba(94,106,210,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isLoading ? 'Signing in...' : 'Sign In'}
                 </button>
               </form>
 
               <div className="animate-element animate-delay-700 relative flex items-center justify-center my-6">
-                <span className="w-full border-t border-gray-200"></span>
-                <span className="px-4 text-xs font-medium text-gray-400 bg-white absolute">Or continue with</span>
+                <span className="w-full border-t border-border"></span>
+                <span className="px-4 text-xs font-medium text-text-tertiary bg-background absolute">Or continue with</span>
               </div>
 
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isOAuthLoading}
-                className="animate-element animate-delay-800 w-full flex items-center justify-center gap-3 border border-gray-200 bg-white rounded-xl py-3.5 font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="animate-element animate-delay-800 w-full flex items-center justify-center gap-3 border border-border bg-card rounded-[6px] py-3.5 font-medium text-text-secondary hover:bg-surface hover:border-[rgba(255,255,255,0.1)] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <GoogleIcon />
                 {isOAuthLoading ? 'Loading...' : 'Continue with Google'}
               </button>
 
-              <p className="animate-element animate-delay-900 text-center text-sm text-gray-500 mt-8">
+              <p className="animate-element animate-delay-900 text-center text-sm text-text-secondary mt-8">
                 New to our platform?{' '}
                 <a
                   href="#"
                   onClick={(e) => { e.preventDefault(); onCreateAccount?.(); }}
-                  className="font-semibold text-primary hover:opacity-80 hover:underline transition-colors"
+                  className="font-semibold text-[#7170ff] hover:text-[#828fff] hover:underline transition-colors"
                 >
                   Create Account
                 </a>
@@ -292,8 +292,8 @@ export const SignInPage: React.FC<Props> = ({
       </section>
 
       {heroImageSrc && (
-        <section className="hidden md:block flex-1 relative p-4 bg-gray-100">
-          <div className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center shadow-2xl" style={{ backgroundImage: `url(${heroImageSrc})` }}></div>
+        <section className="hidden md:block flex-1 relative p-4 bg-panel">
+          <div className="animate-slide-right animate-delay-300 absolute inset-4 rounded-[22px] bg-cover bg-center shadow-2xl" style={{ backgroundImage: `url(${heroImageSrc})` }}></div>
           {testimonials.length > 0 && (
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 px-8 w-full justify-center">
               <TestimonialCard testimonial={testimonials[0]} delay="animate-delay-1000" />

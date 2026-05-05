@@ -20,36 +20,25 @@ const AchievementsPage = () => {
   const totalCount = achievements.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Achievements</h1>
-              <p className="text-gray-600 mt-1">Track your milestones and accomplishments</p>
-            </div>
-            <div className="flex gap-3">
-              <Link 
-                to="/dashboard" 
-                className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-              >
-                <ChevronRight className="h-4 w-4 rotate-180" />
-                Dashboard
-              </Link>
-              <Link 
-                to="/profile" 
-                className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                View Profile
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
+    <div className="animate-fade-in">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Achievements</h1>
+          <p className="text-muted-foreground mt-1">Track your milestones and accomplishments</p>
         </div>
-      </header>
+        <div className="flex gap-3">
+          <Link 
+            to="/profile" 
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
+          >
+            View Profile
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="py-4">
         {/* Progress Overview */}
         <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 rounded-2xl p-6 sm:p-8 mb-8 text-white">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -92,10 +81,10 @@ const AchievementsPage = () => {
           {achievements.map(achievement => (
             <div 
               key={achievement.id} 
-              className={`bg-white rounded-2xl border shadow-sm p-6 transition-all ${
+              className={`bg-card rounded-2xl border border-border shadow-sm p-6 transition-all ${
                 achievement.earned 
-                  ? 'border-gray-100 hover:shadow-md' 
-                  : 'border-gray-100 opacity-75'
+                  ? 'hover:shadow-md' 
+                  : 'opacity-75'
               }`}
             >
               <div className="flex items-start justify-between mb-4">
@@ -103,27 +92,27 @@ const AchievementsPage = () => {
                   <achievement.icon className="h-8 w-8 text-white" />
                 </div>
                 {achievement.earned && (
-                  <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                  <div className="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-semibold">
                     Earned
                   </div>
                 )}
               </div>
 
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{achievement.title}</h3>
-              <p className="text-sm text-gray-600 mb-4">{achievement.description}</p>
+              <h3 className="text-lg font-bold text-foreground mb-2">{achievement.title}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{achievement.description}</p>
 
               {achievement.earned ? (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4" />
                   Earned on {achievement.date}
                 </div>
               ) : (
                 <div>
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-gray-500">Progress</span>
-                    <span className="font-medium text-gray-900">{achievement.progress}/{achievement.total}</span>
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="font-medium text-foreground">{achievement.progress}/{achievement.total}</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className="w-full bg-secondary rounded-full h-2">
                     <div 
                       className={`bg-gradient-to-r ${achievement.color} h-2 rounded-full`}
                       style={{ width: `${((achievement.progress ?? 0) / (achievement.total ?? 1)) * 100}%` }}
@@ -136,27 +125,27 @@ const AchievementsPage = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Achievements</h2>
+        <div className="mt-8 bg-card rounded-2xl border border-border shadow-sm p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">Recent Achievements</h2>
           <div className="space-y-4">
             {achievements.filter(a => a.earned).slice(0, 3).map((achievement, index) => (
-              <div key={achievement.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+              <div key={achievement.id} className="flex items-center gap-4 p-4 bg-secondary rounded-xl">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${achievement.color} flex items-center justify-center`}>
                   <achievement.icon className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{achievement.title}</h3>
-                  <p className="text-sm text-gray-500">{achievement.description}</p>
+                  <h3 className="font-semibold text-foreground">{achievement.title}</h3>
+                  <p className="text-sm text-muted-foreground">{achievement.description}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">+{100 * (index + 1)} pts</p>
-                  <p className="text-xs text-gray-500">{achievement.date}</p>
+                  <p className="text-sm font-medium text-foreground">+{100 * (index + 1)} pts</p>
+                  <p className="text-xs text-muted-foreground">{achievement.date}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

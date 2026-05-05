@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
-  MapPin, Calendar, Briefcase, Award, Globe,
+  MapPin, Calendar, Briefcase, Globe,
   Camera, Edit3, Save, X, Plus, Settings, LogOut, ChevronRight,
-  Building, FileText, Users, Link as LinkIcon, Star
+  Building, FileText, Link as LinkIcon, Star
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageSetup } from '../hooks/usePageSetup';
@@ -18,11 +18,11 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // User data state
-  const [userData, setUserData] = useState<any>({
-    name: '', title: '', email: '', phone: '', location: '', bio: '', website: '', linkedin: '', twitter: '', industry: 'Technology', experience: 'N/A', education: 'University', institution: '', skills: [], avatar_url: null
+  const [userData, setUserData] = useState({
+    name: '', title: '', email: '', phone: '', location: '', bio: '', website: '', linkedin: '', twitter: '', industry: 'Technology', experience: 'N/A', education: 'University', institution: '', skills: [], avatar_url: null as string | null
   });
 
-  const [stats, setStats] = useState<any[]>([
+  const [stats, setStats] = useState([
     { name: 'Simulations', value: '0', icon: Briefcase, color: 'text-blue-600', bgColor: 'bg-blue-50' },
     { name: 'Projects', value: '0', icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
     { name: 'Avg Score', value: '0.0', icon: Star, color: 'text-amber-600', bgColor: 'bg-amber-50' }
@@ -56,7 +56,7 @@ const ProfilePage = () => {
       const { scores } = await simulations.getScores(undefined);
 
       // We can also fetch the sessions just to figure out how many projects
-      const { data: allSessions } = await supabase.from('simulation_sessions').select('*').eq('user_id', user.id);
+      const { sessions: allSessions } = await simulations.getAllUserSessions(user?.id);
 
       const sessionCount = allSessions?.length || 0;
       const completedCount = scores?.length || 0;
@@ -93,32 +93,8 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <Link to="/dashboard" className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground">
-              <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
-              Back to Dashboard
-            </Link>
-            <div className="flex items-center gap-3">
-              <Link
-                to="/settings"
-                className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
-              >
-                <Settings className="h-5 w-5" />
-              </Link>
-              <button className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors">
-                <LogOut className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Profile Header */}
+    <div className="animate-fade-in">
+      {/* Profile Header */}
         <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden mb-8">
           {/* Cover */}
           <div className="h-32 sm:h-40 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
@@ -488,8 +464,7 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
   );
 };
 

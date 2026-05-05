@@ -25,6 +25,15 @@
   }
 }
 
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 /* Animation utilities */
 .animate-element {
   opacity: 0;

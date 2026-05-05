@@ -1,6 +1,6 @@
 import { Footer7 } from './components/ui/footer-7';
-import { Facebook, Instagram, Linkedin, Twitter, ArrowRight, Users, Award, Zap, Sparkles, CheckCircle2, PlayCircle, Briefcase, Target, Calendar, Globe, Rocket, LineChart } from 'lucide-react';
-import React from 'react';
+import { Facebook, Instagram, Linkedin, Twitter, ArrowRight, Users, Award, Zap, Sparkles, CheckCircle2, PlayCircle, Briefcase, Target, Calendar, Globe, Rocket, LineChart, Clock, TrendingUp, Star, HelpCircle, Mail, Building2, Layers, BarChart3, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedGroup } from './components/ui/animated-group';
 import { Header } from './components/layout/Header';
@@ -10,63 +10,319 @@ function ProgramPreview() {
   return (
     <section id="program" className="py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-              <Calendar className="h-3 w-3 mr-1" />
-              Next Cohort: April 2026
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              5-Week Practical Bootcamp
-            </h2>
-            <p className="text-lg text-muted-foreground mb-6">
-              Experience the job before you land it. Operate inside a structured startup lifecycle 
-              with real deadlines, stakeholder feedback, and senior mentorship.
-            </p>
-            <ul className="space-y-3 mb-8">
-              {[
-                'Live online sessions with industry practitioners',
-                'Hands-on projects with real deliverables',
-                'AI-powered feedback and coaching',
-                'Portfolio pieces you can defend in interviews'
-              ].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-muted-foreground">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              to="/bootcamp"
-              className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
-            >
-              Learn More
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+            <Calendar className="h-3 w-3 mr-1" />
+            Next Cohort: April 2026
           </div>
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-indigo-500/20 rounded-3xl blur-3xl" />
-            <div className="relative bg-card border border-border rounded-3xl p-8 shadow-xl">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-secondary/50 rounded-2xl p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">5</div>
-                  <div className="text-sm text-muted-foreground">Weeks</div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            5-Week Practical Bootcamp
+          </h2>
+          <p className="text-base sm:text-lg text-muted-foreground">
+            Experience the job before you land it. Operate inside a structured startup lifecycle with real deadlines, stakeholder feedback, and senior mentorship.
+          </p>
+        </div>
+
+        {/* Bento Grid - Fully Responsive */}
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 auto-rows-fr">
+          
+          {/* Row 1: Large Community Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="col-span-2 lg:col-span-2 lg:row-span-2 relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-2.5 sm:p-4 lg:p-8 group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50" />
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="flex items-center gap-1.5 sm:gap-3 mb-2 sm:mb-4">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
+                  <Users className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <div className="bg-secondary/50 rounded-2xl p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">4</div>
-                  <div className="text-sm text-muted-foreground">Tracks</div>
-                </div>
-                <div className="bg-secondary/50 rounded-2xl p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">1:1</div>
-                  <div className="text-sm text-muted-foreground">Mentorship</div>
-                </div>
-                <div className="bg-secondary/50 rounded-2xl p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">100%</div>
-                  <div className="text-sm text-muted-foreground">Remote</div>
+                <span className="text-[10px] sm:text-sm font-medium text-primary uppercase tracking-wider">Community</span>
+              </div>
+              <h3 className="text-xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-0.5 sm:mb-2">50K+</h3>
+              <p className="text-xs sm:text-base text-muted-foreground mb-1.5 sm:mb-6">Active Learners</p>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md flex-grow hidden sm:block">
+                Join a thriving community of professionals. Get support through live sessions, peer collaboration, and dedicated mentorship from industry experts.
+              </p>
+              <div className="mt-1.5 sm:mt-6 flex flex-wrap gap-1 sm:gap-2">
+                {['Live Sessions', 'Peer Groups', 'Mentorship'].map((tag) => (
+                  <span key={tag} className="px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary/10 text-primary text-[9px] sm:text-xs font-medium">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Row 1: Duration Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-[#ffc6c6]/30 to-[#ffc6c6]/10 border border-[#ffc6c6]/30 p-2.5 sm:p-4 lg:p-6 group hover:shadow-lg hover:shadow-[#ffc6c6]/20 transition-all"
+          >
+            <div className="flex flex-col h-full min-h-[80px] sm:min-h-[120px] lg:min-h-[140px]">
+              <div className="flex items-center justify-between mb-1 sm:mb-4">
+                <Clock className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-[#600000] dark:text-[#ffc6c6]" />
+                <span className="text-[9px] sm:text-xs font-medium text-[#600000]/60 dark:text-[#ffc6c6]/60 uppercase">Duration</span>
+              </div>
+              <h3 className="text-xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-0 sm:mb-1">5</h3>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Weeks Intensive</p>
+              <div className="mt-auto pt-1 sm:pt-4">
+                <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs text-muted-foreground">
+                  <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 text-emerald-500" />
+                  <span>Live & On-demand</span>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Row 1: Tracks Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-[#c3faf5]/30 to-[#c3faf5]/10 border border-[#c3faf5]/30 p-2.5 sm:p-4 lg:p-6 group hover:shadow-lg hover:shadow-[#c3faf5]/20 transition-all"
+          >
+            <div className="flex flex-col h-full min-h-[80px] sm:min-h-[120px] lg:min-h-[140px]">
+              <div className="flex items-center justify-between mb-1 sm:mb-4">
+                <Briefcase className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-[#187574]" />
+                <span className="text-[9px] sm:text-xs font-medium text-[#187574]/60 uppercase">Paths</span>
+              </div>
+              <h3 className="text-xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-0 sm:mb-1">4</h3>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Career Tracks</p>
+              <div className="mt-auto pt-1 sm:pt-4">
+                <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs text-muted-foreground">
+                  <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 text-emerald-500" />
+                  <span>PM, Marketing, Ops, Data</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Row 2: Mentorship Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="col-span-2 lg:col-span-2 relative overflow-hidden rounded-xl sm:rounded-3xl bg-card border border-border p-2.5 sm:p-4 lg:p-6 group hover:border-primary/30 hover:shadow-lg transition-all"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 lg:gap-6">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <div className="w-9 h-9 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
+                  <Award className="h-4 w-4 sm:h-7 sm:w-7 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-lg lg:text-xl font-bold text-foreground mb-0 sm:mb-1">1:1 Mentorship</h3>
+                  <p className="text-[10px] sm:text-sm text-muted-foreground">Personal guidance from industry leaders</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-4 sm:ml-auto">
+                <div className="text-center px-2.5 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-2xl bg-secondary/50">
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">100%</p>
+                  <p className="text-[9px] sm:text-xs text-muted-foreground">Remote</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Row 3: Simulations Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-[#ffe6cd]/30 to-[#ffe6cd]/10 border border-[#ffe6cd]/30 p-2.5 sm:p-4 lg:p-6 group hover:shadow-lg hover:shadow-[#ffe6cd]/20 transition-all"
+          >
+            <div className="flex flex-col h-full min-h-[80px] sm:min-h-[120px] lg:min-h-[140px]">
+              <div className="flex items-center justify-between mb-1 sm:mb-4">
+                <PlayCircle className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-[#746019]" />
+                <span className="text-[9px] sm:text-xs font-medium text-[#746019]/60 uppercase">Scenarios</span>
+              </div>
+              <h3 className="text-xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-0 sm:mb-1">200+</h3>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">AI Simulations</p>
+              <div className="mt-auto pt-1 sm:pt-4">
+                <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs text-muted-foreground">
+                  <Zap className="h-2 w-2 sm:h-3 sm:w-3 text-amber-500" />
+                  <span>Real-world scenarios</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Row 3: Success Rate Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/30 p-2.5 sm:p-4 lg:p-6 group hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+          >
+            <div className="flex flex-col h-full min-h-[80px] sm:min-h-[120px] lg:min-h-[140px]">
+              <div className="flex items-center justify-between mb-1 sm:mb-4">
+                <TrendingUp className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-emerald-600" />
+                <span className="text-[9px] sm:text-xs font-medium text-emerald-600/60 uppercase">Outcome</span>
+              </div>
+              <h3 className="text-xl sm:text-3xl lg:text-4xl font-bold text-emerald-600 mb-0 sm:mb-1">92%</h3>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Job Success Rate</p>
+              <div className="mt-auto pt-1 sm:pt-4">
+                <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs text-emerald-600">
+                  <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3" />
+                  <span>Within 6 months</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Row 3: Rating & CTA Combined */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            viewport={{ once: true }}
+            className="col-span-2 relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-amber-500/30 p-2.5 sm:p-4 lg:p-6 group hover:shadow-lg hover:shadow-amber-500/20 transition-all"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+              {/* Rating Side */}
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-3">
+                  <Star className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-amber-500 fill-amber-500" />
+                  <span className="text-[9px] sm:text-xs font-medium text-amber-600/60 uppercase">Rating</span>
+                </div>
+                <h3 className="text-xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-0 sm:mb-1">4.9</h3>
+                <p className="text-[10px] sm:text-sm text-muted-foreground mb-1.5 sm:mb-3">User Rating</p>
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="h-3 w-3 sm:h-4 sm:w-4 text-amber-500 fill-amber-500" />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Divider */}
+              <div className="hidden sm:block w-px h-16 bg-amber-500/20" />
+              <div className="sm:hidden w-full h-px bg-amber-500/20" />
+              
+              {/* CTA Side */}
+              <div className="flex-1 flex flex-col justify-center">
+                <h4 className="text-sm sm:text-lg font-bold text-foreground mb-0.5 sm:mb-2">
+                  Ready to start?
+                </h4>
+                <p className="text-[10px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                  Join the next cohort starting April 2026
+                </p>
+                <Link
+                  to="/bootcamp"
+                  className="inline-flex items-center justify-center px-3.5 py-2 sm:px-6 sm:py-3 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
+                >
+                  Learn More
+                  <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CompanySection() {
+  return (
+    <section className="py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+              <Building2 className="h-3 w-3 mr-1" />
+              For Organizations
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              Empower Your Team with Practical Skills
+            </h2>
+            <p className="text-base sm:text-lg text-muted-foreground mb-6 leading-relaxed">
+              Upskill your workforce with AI-powered simulations designed for teams. 
+              Create custom scenarios, track progress, and accelerate your employees' 
+              career growth with real-world experience.
+            </p>
+            
+            <div className="space-y-3 mb-8">
+              {[
+                'Custom simulations for your industry',
+                'Team dashboards and analytics',
+                'Dedicated success manager',
+                'Volume pricing discounts'
+              ].map((item, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                  <span className="text-sm sm:text-base text-muted-foreground">{item}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link 
+                to="/organization" 
+                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
+              >
+                Learn More
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+              <Link 
+                to="/contact" 
+                className="inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground text-sm font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
+              >
+                Contact Sales
+              </Link>
+            </div>
+          </motion.div>
+          
+          {/* Visual */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            <div className="relative rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-6 sm:p-8">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-card border border-border">
+                  <Users className="h-6 w-6 text-primary mb-2" />
+                  <p className="text-2xl font-bold text-foreground">500+</p>
+                  <p className="text-xs text-muted-foreground">Team Members</p>
+                </div>
+                <div className="p-4 rounded-2xl bg-card border border-border">
+                  <Award className="h-6 w-6 text-emerald-500 mb-2" />
+                  <p className="text-2xl font-bold text-foreground">95%</p>
+                  <p className="text-xs text-muted-foreground">Skill Improvement</p>
+                </div>
+                <div className="p-4 rounded-2xl bg-card border border-border">
+                  <Zap className="h-6 w-6 text-amber-500 mb-2" />
+                  <p className="text-2xl font-bold text-foreground">3x</p>
+                  <p className="text-xs text-muted-foreground">Faster Onboarding</p>
+                </div>
+                <div className="p-4 rounded-2xl bg-card border border-border">
+                  <Star className="h-6 w-6 text-rose-500 mb-2" />
+                  <p className="text-2xl font-bold text-foreground">4.9</p>
+                  <p className="text-xs text-muted-foreground">Rating</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -74,6 +330,17 @@ function ProgramPreview() {
 }
 
 function App() {
+  useEffect(() => {
+    import('aos').then((AOS) => {
+      AOS.init({
+        duration: 600,
+        easing: 'ease-out',
+        once: true,
+        offset: 50,
+      });
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -116,48 +383,127 @@ function App() {
                 x: {
                   repeat: Infinity,
                   repeatType: "loop",
-                  duration: 20,
+                  duration: 30,
                   ease: "linear",
                 },
               }}
             >
-              {/* Double the cards for seamless loop */}
-              {[...Array(2)].map((_, setIndex) => (
-                <React.Fragment key={setIndex}>
-                  <CompactFeatureCard
-                    icon={<Users className="w-5 h-5" />}
-                    title="Team Collaboration"
-                    description="Work with your team on projects"
-                    accent="coral"
-                  />
-                  <CompactFeatureCard
-                    icon={<Award className="w-5 h-5" />}
-                    title="Skill Development"
-                    description="Build management experience"
-                    accent="teal"
-                  />
-                  <CompactFeatureCard
-                    icon={<Zap className="w-5 h-5" />}
-                    title="AI-Powered Insights"
-                    description="Get personalized feedback"
-                    accent="orange"
-                  />
-                </React.Fragment>
-              ))}
+              {/* Set 1 - Original cards */}
+              <CompactFeatureCard
+                icon={<Users className="w-5 h-5" />}
+                title="Team Collaboration"
+                description="Work with your team on projects"
+                accent="coral"
+              />
+              <CompactFeatureCard
+                icon={<Award className="w-5 h-5" />}
+                title="Skill Development"
+                description="Build management experience"
+                accent="teal"
+              />
+              <CompactFeatureCard
+                icon={<Zap className="w-5 h-5" />}
+                title="AI-Powered Insights"
+                description="Get personalized feedback"
+                accent="orange"
+              />
+              <CompactFeatureCard
+                icon={<Target className="w-5 h-5" />}
+                title="Goal Tracking"
+                description="Monitor your progress daily"
+                accent="coral"
+              />
+              <CompactFeatureCard
+                icon={<Briefcase className="w-5 h-5" />}
+                title="Portfolio Builder"
+                description="Showcase your achievements"
+                accent="teal"
+              />
+              <CompactFeatureCard
+                icon={<Globe className="w-5 h-5" />}
+                title="Global Network"
+                description="Connect with professionals"
+                accent="orange"
+              />
+              <CompactFeatureCard
+                icon={<Rocket className="w-5 h-5" />}
+                title="Career Launch"
+                description="Fast-track your promotion"
+                accent="coral"
+              />
+              <CompactFeatureCard
+                icon={<PlayCircle className="w-5 h-5" />}
+                title="Live Simulations"
+                description="Practice real scenarios"
+                accent="teal"
+              />
+              
+              {/* Set 2 - Duplicate for seamless loop */}
+              <CompactFeatureCard
+                icon={<Users className="w-5 h-5" />}
+                title="Team Collaboration"
+                description="Work with your team on projects"
+                accent="coral"
+              />
+              <CompactFeatureCard
+                icon={<Award className="w-5 h-5" />}
+                title="Skill Development"
+                description="Build management experience"
+                accent="teal"
+              />
+              <CompactFeatureCard
+                icon={<Zap className="w-5 h-5" />}
+                title="AI-Powered Insights"
+                description="Get personalized feedback"
+                accent="orange"
+              />
+              <CompactFeatureCard
+                icon={<Target className="w-5 h-5" />}
+                title="Goal Tracking"
+                description="Monitor your progress daily"
+                accent="coral"
+              />
+              <CompactFeatureCard
+                icon={<Briefcase className="w-5 h-5" />}
+                title="Portfolio Builder"
+                description="Showcase your achievements"
+                accent="teal"
+              />
+              <CompactFeatureCard
+                icon={<Globe className="w-5 h-5" />}
+                title="Global Network"
+                description="Connect with professionals"
+                accent="orange"
+              />
+              <CompactFeatureCard
+                icon={<Rocket className="w-5 h-5" />}
+                title="Career Launch"
+                description="Fast-track your promotion"
+                accent="coral"
+              />
+              <CompactFeatureCard
+                icon={<PlayCircle className="w-5 h-5" />}
+                title="Live Simulations"
+                description="Practice real scenarios"
+                accent="teal"
+              />
             </motion.div>
           </div>
         </section>
 
+        {/* Company/Organization Section */}
+        <CompanySection />
+
         {/* Program 1 Section */}
         <ProgramPreview />
-
-        {/* Stats Section */}
-        <StatsSection />
 
         {/* Testimonials Section */}
         <section id="testimonials">
           <Testimonials />
         </section>
+
+        {/* FAQ Section */}
+        <FAQSection />
 
         {/* CTA Section */}
         <section id="pricing" className="py-20 lg:py-32">
@@ -300,16 +646,7 @@ function Hero() {
           </AnimatedGroup>
         </div>
         <AnimatedGroup preset="slide">
-          <div className="relative mx-auto mt-8 px-2 sm:mt-12 md:mt-20 z-20">
-            <div aria-hidden className="bg-gradient-to-b from-transparent via-background/50 to-background absolute inset-0 z-10 pointer-events-none" />
-            <div className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-border bg-card shadow-xl transition-all duration-700">
-              <img
-                className="w-full h-auto relative object-contain"
-                src="/images/hero-briefing.png"
-                alt="TURNVE Simulation Briefing Preview"
-              />
-            </div>
-          </div>
+          {/* Hero image removed */}
         </AnimatedGroup>
         
         <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-secondary/30 to-transparent -z-10 pointer-events-none" />
@@ -325,114 +662,137 @@ function HowItWorks() {
       title: "Choose Your Path",
       description: "Select your industry and role across Tech, Marketing, Finance, and more.",
       icon: Target,
-      color: "text-primary"
+      lightBg: "bg-blue-50 dark:bg-blue-500/5",
+      borderColor: "border-blue-200 dark:border-blue-500/20",
+      iconBg: "bg-blue-100 dark:bg-blue-500/15",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      aos: "fade-up"
     },
     {
       number: "02",
       title: "Run Simulations",
       description: "Experience realistic scenarios and solve real business problems.",
       icon: PlayCircle,
-      color: "text-[#187574]"
+      lightBg: "bg-teal-50 dark:bg-teal-500/5",
+      borderColor: "border-teal-200 dark:border-teal-500/20",
+      iconBg: "bg-teal-100 dark:bg-teal-500/15",
+      iconColor: "text-teal-600 dark:text-teal-400",
+      aos: "fade-up"
     },
     {
       number: "03",
       title: "Get AI Feedback",
       description: "Receive instant feedback to improve your management skills.",
       icon: Zap,
-      color: "text-[#746019]"
+      lightBg: "bg-amber-50 dark:bg-amber-500/5",
+      borderColor: "border-amber-200 dark:border-amber-500/20",
+      iconBg: "bg-amber-100 dark:bg-amber-500/15",
+      iconColor: "text-amber-600 dark:text-amber-400",
+      aos: "fade-up"
     },
     {
       number: "04",
       title: "Build Portfolio",
       description: "Showcase proven experience to employers with real outcomes.",
       icon: Briefcase,
-      color: "text-[#600000]"
+      lightBg: "bg-rose-50 dark:bg-rose-500/5",
+      borderColor: "border-rose-200 dark:border-rose-500/20",
+      iconBg: "bg-rose-100 dark:bg-rose-500/15",
+      iconColor: "text-rose-600 dark:text-rose-400",
+      aos: "fade-up"
     },
     {
       number: "05",
       title: "Land Your Role",
       description: "Walk into interviews with confidence and demonstrable experience.",
       icon: Rocket,
-      color: "text-primary"
+      lightBg: "bg-violet-50 dark:bg-violet-500/5",
+      borderColor: "border-violet-200 dark:border-violet-500/20",
+      iconBg: "bg-violet-100 dark:bg-violet-500/15",
+      iconColor: "text-violet-600 dark:text-violet-400",
+      aos: "fade-up"
     }
   ];
 
   return (
-    <section id="how-it-works" className="py-12 sm:py-16 lg:py-20">
+    <section id="how-it-works" className="py-16 sm:py-20 lg:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-3">
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
             How It Works
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
             From zero to hired in 5 steps
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground">
             Transform knowledge into skills employers value
           </p>
         </div>
 
-        <div className="relative">
-          {/* Connection line - desktop only */}
-          <div className="hidden xl:block absolute top-[2.5rem] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.number}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.08 }}
-                viewport={{ once: true }}
-                className="relative group"
-              >
-                <div className="bg-card rounded-[20px] border border-border p-3 sm:p-4 hover:border-primary/50 hover:shadow-lg transition-all duration-300 h-full">
-                  {/* Top row: Number + Icon - Icon hidden on mobile */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`text-lg sm:text-xl font-bold ${step.color}`}>{step.number}</span>
-                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-secondary flex items-center justify-center group-hover:scale-105 transition-transform hidden sm:flex`}>
-                      <step.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${step.color}`} />
-                    </div>
-                  </div>
-                  
-                  {/* Content */}
-                  <h3 className="text-sm sm:text-base font-bold text-foreground mb-1 leading-tight">{step.title}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-snug line-clamp-3">{step.description}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+          {steps.map((step, index) => (
+            <motion.div
+              key={step.number}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+              viewport={{ once: true, margin: "-50px" }}
+              whileHover={{ y: -8, transition: { duration: 0.3, type: "spring", stiffness: 300 } }}
+              data-aos={step.aos}
+              data-aos-delay={index * 100}
+              data-aos-duration="600"
+              className="relative group"
+            >
+              {/* Card with light background */}
+              <div className={`relative ${step.lightBg} rounded-2xl sm:rounded-3xl border-2 ${step.borderColor} p-5 sm:p-6 lg:p-7 hover:shadow-xl transition-all duration-300 h-full min-h-[200px] sm:min-h-[220px] lg:min-h-[260px] flex flex-col overflow-hidden`}>
+                {/* Animated shimmer effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
                 </div>
                 
-                {/* Arrow connector - mobile/tablet only */}
-                {index < steps.length - 1 && (
-                  <>
-                    {/* Mobile: horizontal arrow between columns */}
-                    <div className="hidden sm:flex lg:hidden absolute -right-2 top-1/2 -translate-y-1/2 z-10">
-                      <ArrowRight className="h-4 w-4 text-primary/30" />
-                    </div>
-                    {/* Mobile 2-col: arrow after odd items */}
-                    {(index === 1) && (
-                      <div className="flex sm:hidden absolute -bottom-3 left-1/2 -translate-x-1/2 z-10">
-                        <ArrowRight className="h-4 w-4 text-primary/30 rotate-90" />
-                      </div>
-                    )}
-                    {(index === 0 || index === 2) && (
-                      <div className="flex sm:hidden absolute -right-2 top-1/2 -translate-y-1/2 z-10">
-                        <ArrowRight className="h-4 w-4 text-primary/30" />
-                      </div>
-                    )}
-                  </>
-                )}
-              </motion.div>
-            ))}
-          </div>
+                {/* Step Number Badge */}
+                <div className={`absolute -top-3 left-5 sm:left-6 px-3 py-1 rounded-full ${step.iconBg} border ${step.borderColor} ${step.iconColor} text-sm font-bold z-10`}>
+                  Step {step.number}
+                </div>
+                
+                {/* Icon */}
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${step.iconBg} flex items-center justify-center mb-4 sm:mb-5 mt-2 group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 z-10`}>
+                  <step.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${step.iconColor}`} />
+                </div>
+                
+                {/* Content */}
+                <h3 className="text-lg sm:text-xl lg:text-xl font-bold text-foreground mb-2 sm:mb-3 leading-tight z-10">
+                  {step.title}
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed flex-grow z-10">
+                  {step.description}
+                </p>
+              </div>
+              
+              {/* Connector arrows (desktop only) */}
+              {index < steps.length - 1 && (
+                <div className="hidden lg:flex absolute top-1/2 -right-3 z-10">
+                  <motion.div
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    className={`w-6 h-6 rounded-full ${step.iconBg} border ${step.borderColor} flex items-center justify-center`}
+                  >
+                    <ArrowRight className={`h-3 w-3 ${step.iconColor}`} />
+                  </motion.div>
+                </div>
+              )}
+            </motion.div>
+          ))}
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-8 sm:mt-10 text-center">
+        <div className="mt-12 sm:mt-16 text-center">
           <Link
             to="/industries"
-            className="inline-flex items-center justify-center px-6 py-2.5 sm:px-8 sm:py-3 bg-primary text-primary-foreground text-sm sm:text-base font-semibold rounded-lg hover:opacity-90 transition-all shadow-md shadow-primary/20 whitespace-nowrap"
+            className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
           >
             Start Your Journey
-            <ArrowRight className="ml-1.5 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
       </div>
@@ -440,35 +800,115 @@ function HowItWorks() {
   );
 }
 
-function StatsSection() {
-  const stats = [
-    { value: "50K+", label: "Active Users", icon: Users },
-    { value: "200+", label: "Simulations", icon: PlayCircle },
-    { value: "92%", label: "Job Success Rate", icon: LineChart },
-    { value: "4.9★", label: "User Rating", icon: Award },
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  
+  const faqs = [
+    {
+      question: "How does TURNVE's AI-powered simulation work?",
+      answer: "Our AI creates realistic workplace scenarios based on real industry challenges. You'll make decisions, manage projects, and interact with virtual stakeholders. The AI provides instant feedback on your choices and tracks your progress over time."
+    },
+    {
+      question: "Do I need prior management experience to join?",
+      answer: "Not at all! TURNVE is designed for entry-level professionals and career transitioners. Our simulations adapt to your skill level, starting with foundational scenarios and progressively increasing complexity as you grow."
+    },
+    {
+      question: "How long do I have access to the simulations?",
+      answer: "You get unlimited access to all simulations during your active subscription. Even after completing the 5-week bootcamp, you can revisit scenarios to practice and refine your skills. Plus, new simulations are added monthly."
+    },
+    {
+      question: "Will this help me get a job?",
+      answer: "Yes! 92% of our graduates land jobs within 6 months. You'll build a portfolio of completed projects, earn certificates, and gain demonstrable experience you can discuss in interviews. Many hiring managers specifically value practical simulation experience."
+    }
   ];
 
+  const toggleFAQ = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
-    <section className="py-16 bg-secondary/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
+    <section className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-background to-secondary/20">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10 sm:mb-14">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+            Got Questions?
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-base sm:text-lg text-muted-foreground">
+            Everything you need to know about transforming your career with TURNVE
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="text-center"
+              className="bg-card rounded-2xl border border-border overflow-hidden"
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-4">
-                <stat.icon className="h-8 w-8" />
-              </div>
-              <div className="text-3xl sm:text-4xl font-bold text-foreground mb-1">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
+              <button
+                onClick={() => toggleFAQ(index)}
+                className="w-full flex items-center justify-between p-5 sm:p-6 text-left hover:bg-secondary/50 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <HelpCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground pr-4">
+                    {faq.question}
+                  </h3>
+                </div>
+                <ChevronDown 
+                  className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`} 
+                />
+              </button>
+              <motion.div
+                initial={false}
+                animate={{ 
+                  height: openIndex === index ? 'auto' : 0,
+                  opacity: openIndex === index ? 1 : 0
+                }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <div className="px-5 sm:px-6 pb-5 sm:pb-6 pl-[68px] sm:pl-[80px]">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </div>
+              </motion.div>
             </motion.div>
           ))}
         </div>
+
+        {/* CTA Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="mt-10 sm:mt-14 flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
+          <Link
+            to="/faq"
+            className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
+          >
+            View All FAQs
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
+          >
+            <Mail className="mr-2 h-5 w-5" />
+            Contact Us
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

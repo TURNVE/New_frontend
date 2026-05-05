@@ -1,8 +1,11 @@
-import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Eye, EyeOff, Mail, Lock, User, Building2, Briefcase, Globe, Users, ListChecks } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { supabase } from '../../lib/supabase';
 import { AUTH_ROUTES, AUTH_ERRORS } from '../../contexts/AuthContext';
+
+type AccountType = 'individual' | 'organization';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -14,6 +17,14 @@ const GoogleIcon = () => (
 );
 
 export const SignUpPage = () => {
+  const [searchParams] = useSearchParams();
+  const [accountType, setAccountType] = useState<AccountType>(() => {
+    return searchParams.get('type') === 'organization' ? 'organization' : 'individual';
+  });
+  const [orgName, setOrgName] = useState('');
+  const [orgWebsite, setOrgWebsite] = useState('');
+  const [orgIndustry, setOrgIndustry] = useState('');
+  const [orgSize, setOrgSize] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,8 +48,15 @@ export const SignUpPage = () => {
         return;
       }
 
+      const role = accountType === 'organization' ? 'COMPANY' : 'USER';
       const { data, error: signUpError } = await signUp(email, password, {
-        data: { full_name: fullName },
+        data: { 
+          full_name: accountType === 'organization' ? orgName : fullName, 
+          role,
+          org_website: orgWebsite || undefined,
+          org_industry: orgIndustry || undefined,
+          org_size: orgSize || undefined
+        },
       });
 
       if (signUpError) {
@@ -47,6 +65,15 @@ export const SignUpPage = () => {
       }
 
       if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ role })
+          .eq('id', data.user.id);
+
+        if (profileError) {
+          console.error('Error updating profile role:', profileError);
+        }
+
         setError('Please check your email to verify your account.');
         setTimeout(() => navigate(AUTH_ROUTES.SIGN_IN), 3000);
       }
@@ -75,49 +102,49 @@ export const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-50 via-blue-100/50 to-indigo-100/30 p-12 flex-col justify-between relative overflow-hidden">
+    <div className="min-h-screen flex bg-background">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0f1011] via-[#191a1b] to-[#08090a] p-12 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 right-20 w-64 h-64 bg-blue-200 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-80 h-80 bg-indigo-200 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-20 w-64 h-64 bg-[#5e6ad2]/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-80 h-80 bg-[#7170ff]/20 rounded-full blur-3xl" />
         </div>
 
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-12">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">T</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">Turnve</span>
+            <span className="text-xl font-bold text-foreground">Turnve</span>
           </div>
 
           <div className="max-w-md">
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
               Simulate your career growth.
             </h1>
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+            <p className="text-lg text-text-secondary mb-8 leading-relaxed">
               Step into real-world professional scenarios, make high-stakes decisions, and accelerate your path to leadership with Turnve.
             </p>
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-white/80 border border-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                <div className="w-6 h-6 rounded-full bg-[rgba(94,106,210,0.2)] border border-[rgba(94,106,210,0.3)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3.5 h-3.5 text-[#7170ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Real-world Project Scenarios</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <h3 className="font-semibold text-foreground mb-1">Real-world Project Scenarios</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed">
                     Experience 12-week simulations modeled after top-tier enterprise environments.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-white/80 border border-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                <div className="w-6 h-6 rounded-full bg-[rgba(94,106,210,0.2)] border border-[rgba(94,106,210,0.3)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3.5 h-3.5 text-[#7170ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Behavioral Data Insights</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <h3 className="font-semibold text-foreground mb-1">Behavioral Data Insights</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed">
                     Gain deep visibility into your decision-making patterns and resilience.
                   </p>
                 </div>
@@ -127,71 +154,133 @@ export const SignUpPage = () => {
         </div>
 
         <div className="relative z-10">
-          <p className="text-sm text-gray-500">© 2026 Turnve Career Simulator. All rights reserved.</p>
+          <p className="text-sm text-text-tertiary">© 2026 Turnve Career Simulator. All rights reserved.</p>
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-white">
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-background">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Create your profile</h2>
-            <p className="text-gray-500">Start your professional journey today.</p>
+            <h2 className="text-3xl font-bold text-foreground mb-2">
+              {accountType === 'organization' ? 'Create your organization' : 'Create your profile'}
+            </h2>
+            <p className="text-text-secondary">
+              {accountType === 'organization'
+                ? 'Create simulations, manage team training, and track progress.'
+                : 'Start your professional journey today.'}
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <p className="text-sm font-medium text-text-secondary mb-2">I am signing up as:</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setAccountType('individual')}
+                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                  accountType === 'individual'
+                    ? 'border-[#5e6ad2] bg-[#5e6ad2]/5 shadow-sm'
+                    : 'border-border hover:border-[#5e6ad2]/50'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  accountType === 'individual'
+                    ? 'bg-[#5e6ad2] text-white'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  <User className="h-5 w-5" />
+                </div>
+                <div className="text-left">
+                  <p className={`text-sm font-semibold ${
+                    accountType === 'individual' ? 'text-[#5e6ad2]' : 'text-foreground'
+                  }`}>Individual</p>
+                  <p className="text-xs text-text-tertiary">Career growth</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAccountType('organization')}
+                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                  accountType === 'organization'
+                    ? 'border-[#5e6ad2] bg-[#5e6ad2]/5 shadow-sm'
+                    : 'border-border hover:border-[#5e6ad2]/50'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  accountType === 'organization'
+                    ? 'bg-[#5e6ad2] text-white'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  <Building2 className="h-5 w-5" />
+                </div>
+                <div className="text-left">
+                  <p className={`text-sm font-semibold ${
+                    accountType === 'organization' ? 'text-[#5e6ad2]' : 'text-foreground'
+                  }`}>Organization</p>
+                  <p className="text-xs text-text-tertiary">Create & manage simulations</p>
+                </div>
+              </button>
+            </div>
           </div>
 
           <div className="space-y-3 mb-6">
             <button
               onClick={handleGoogleSignIn}
               disabled={isOAuthLoading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-[6px] hover:bg-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <GoogleIcon />
-              <span className="text-sm font-medium text-gray-700">{isOAuthLoading ? 'Loading...' : 'Sign up with Google'}</span>
+              <span className="text-sm font-medium text-text-secondary">{isOAuthLoading ? 'Loading...' : 'Sign up with Google'}</span>
             </button>
           </div>
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-400">or continue with</span>
+              <span className="bg-background px-2 text-text-tertiary">or continue with</span>
             </div>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-[6px]">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSignUp} className="space-y-5">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Full Name
+              <label htmlFor={accountType === 'organization' ? 'orgName' : 'fullName'} className="block text-sm font-medium text-text-secondary mb-1.5">
+                {accountType === 'organization' ? 'Organization Name' : 'Full Name'}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  {accountType === 'organization' ? (
+                    <Building2 className="h-5 w-5 text-text-quaternary" />
+                  ) : (
+                    <User className="h-5 w-5 text-text-quaternary" />
+                  )}
                 </div>
                 <input
                   type="text"
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Alex Rivera"
-                  className="w-full pl-11 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+                  id={accountType === 'organization' ? 'orgName' : 'fullName'}
+                  value={accountType === 'organization' ? orgName : fullName}
+                  onChange={(e) => accountType === 'organization' ? setOrgName(e.target.value) : setFullName(e.target.value)}
+                  placeholder={accountType === 'organization' ? 'Acme Corp' : 'Alex Rivera'}
+                  className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground placeholder:text-text-quaternary focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Professional Email
+              <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-1.5">
+                {accountType === 'organization' ? 'Work Email' : 'Professional Email'}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-text-quaternary" />
                 </div>
                 <input
                   type="email"
@@ -199,19 +288,19 @@ export const SignUpPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex.r@company.com"
-                  className="w-full pl-11 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+                  className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground placeholder:text-text-quaternary focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-text-secondary mb-1.5">
                 Create Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-text-quaternary" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -219,59 +308,147 @@ export const SignUpPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow pr-12"
+                  className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground placeholder:text-text-quaternary focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow pr-12"
                   required
                   minLength={6}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-quaternary hover:text-text-secondary"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            <div>
-              <label htmlFor="roleInterest" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Role Interest
-              </label>
-              <select
-                id="roleInterest"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow appearance-none bg-white"
-                required
-              >
-                <option value="" disabled>Select your target track</option>
-                <option value="product-manager">Product Manager</option>
-                <option value="engineering-manager">Engineering Manager</option>
-                <option value="data-analytics">Data & Analytics</option>
-                <option value="operations">Operations Manager</option>
-                <option value="consulting">Consulting</option>
-              </select>
-            </div>
+            {accountType === 'individual' && (
+              <div>
+                <label htmlFor="roleInterest" className="block text-sm font-medium text-text-secondary mb-1.5">
+                  Role Interest
+                </label>
+                <select
+                  id="roleInterest"
+                  className="w-full px-4 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
+                  required
+                >
+                  <option value="" disabled>Select your target track</option>
+                  <option value="product-manager">Product Manager</option>
+                  <option value="engineering-manager">Engineering Manager</option>
+                  <option value="data-analytics">Data & Analytics</option>
+                  <option value="operations">Operations Manager</option>
+                  <option value="consulting">Consulting</option>
+                </select>
+              </div>
+            )}
+
+            {accountType === 'organization' && (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="orgWebsite" className="block text-sm font-medium text-text-secondary mb-1.5">
+                    Company Website
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Globe className="h-5 w-5 text-text-quaternary" />
+                    </div>
+                    <input
+                      type="url"
+                      id="orgWebsite"
+                      value={orgWebsite}
+                      onChange={(e) => setOrgWebsite(e.target.value)}
+                      placeholder="https://company.com"
+                      className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground placeholder:text-text-quaternary focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="orgIndustry" className="block text-sm font-medium text-text-secondary mb-1.5">
+                    Industry
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Briefcase className="h-5 w-5 text-text-quaternary" />
+                    </div>
+                    <select
+                      id="orgIndustry"
+                      value={orgIndustry}
+                      onChange={(e) => setOrgIndustry(e.target.value)}
+                      className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
+                    >
+                      <option value="" disabled>Select industry</option>
+                      <option value="technology">Technology</option>
+                      <option value="finance">Finance & Banking</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="education">Education</option>
+                      <option value="manufacturing">Manufacturing</option>
+                      <option value="retail">Retail & E-commerce</option>
+                      <option value="consulting">Consulting</option>
+                      <option value="media">Media & Entertainment</option>
+                      <option value="government">Government & Public Sector</option>
+                      <option value="nonprofit">Nonprofit</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="orgSize" className="block text-sm font-medium text-text-secondary mb-1.5">
+                    Company Size
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Users className="h-5 w-5 text-text-quaternary" />
+                    </div>
+                    <select
+                      id="orgSize"
+                      value={orgSize}
+                      onChange={(e) => setOrgSize(e.target.value)}
+                      className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
+                    >
+                      <option value="" disabled>Select team size</option>
+                      <option value="1-10">1-10 employees</option>
+                      <option value="11-50">11-50 employees</option>
+                      <option value="51-200">51-200 employees</option>
+                      <option value="201-500">201-500 employees</option>
+                      <option value="501-1000">501-1000 employees</option>
+                      <option value="1000+">1000+ employees</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-[6px]">
+                  <p className="text-xs text-blue-300 flex items-start gap-2">
+                    <ListChecks className="h-4 w-4 shrink-0 mt-0.5" />
+                    Organization accounts can create and manage simulations for their teams, 
+                    track progress, and generate analytics reports.
+                  </p>
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading || (accountType === 'organization' && !orgName.trim())}
+              className="w-full py-3.5 bg-[#5e6ad2] text-white font-semibold rounded-[6px] hover:bg-[#828fff] transition-colors focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? 'Creating Account...' : `Create ${accountType === 'organization' ? 'Organization' : ''} Account`}
             </button>
           </form>
 
-          <p className="text-center mt-6 text-gray-600">
+          <p className="text-center mt-6 text-text-secondary">
             Already have an account?{' '}
-            <a href="/sign-in" className="text-blue-600 hover:text-blue-700 font-medium">
+            <a href="/sign-in" className="text-[#7170ff] hover:text-[#828fff] font-medium">
               Log in
             </a>
           </p>
 
-          <p className="text-xs text-gray-400 text-center mt-8 leading-relaxed">
+          <p className="text-xs text-text-tertiary text-center mt-8 leading-relaxed">
             By signing up, you agree to our{' '}
-            <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>
+            <a href="#" className="text-[#7170ff] hover:underline">Terms of Service</a>
             {' '}and{' '}
-            <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
+            <a href="#" className="text-[#7170ff] hover:underline">Privacy Policy</a>
             . Turnve is a professional simulator platform for career benchmarking.
           </p>
         </div>

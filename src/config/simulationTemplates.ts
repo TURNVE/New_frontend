@@ -13,6 +13,23 @@
 import type { ProjectBriefingData } from '../components/simulation/ProjectReferencePanel';
 import type { KPI } from '../components/simulation/KPICard';
 import type { SuccessCriterion } from '../components/simulation/SuccessCriteriaList';
+import type { WeeklySignal, WeeklyEvent, WeeklyActionItem } from '../shared/simulation/types';
+import { 
+  pm001WeeklySignals, 
+  pm001WeeklyEvents, 
+  pm001WeeklyActions,
+  pm001EvaluationRubrics,
+  pm001StakeholderChallenges,
+  pm001Guidance 
+} from '../simulation/content/pm-001/pm-001-content';
+import {
+  webdev01WeeklySignals,
+  webdev01WeeklyEvents,
+  webdev01WeeklyActions,
+  webdev01EvaluationRubrics,
+  webdev01StakeholderChallenges,
+  webdev01Guidance
+} from '../simulation/content/web-dev-01/web-dev-01-content';
 
 export interface SimulationTask {
   id: string;
@@ -61,6 +78,40 @@ export interface SimulationTemplate {
   // Thresholds
   passThreshold: number;
   strongPassThreshold: number;
+
+  // NEW: Structured per-week content
+  weeklySignals?: WeeklySignal[];
+  weeklyEvents?: WeeklyEvent[];
+  weeklyActions?: WeeklyActionItem[];
+  
+  // NEW: Evaluation rubrics
+  evaluationRubrics?: Record<string, {
+    criteria: Array<{ id: string; label: string; weight: number; description: string }>;
+    examples: { excellent: string; poor: string };
+  }>;
+  
+  // NEW: Stakeholder challenges
+  stakeholderChallenges?: Record<string, Record<string, {
+    trigger?: string[];
+    triggerKeywords?: string[];
+    missingKeywords?: string[];
+    condition?: (decisions: any[], state: any) => boolean;
+    challenge: {
+      stakeholderId: string;
+      channel: string;
+      subject: string;
+      message: string;
+      context: string;
+      timeoutMinutes: number;
+    };
+  }>>;
+  
+  // NEW: In-context guidance
+  guidance?: Record<string, {
+    opening?: string;
+    hints: string[];
+    stakeholderTips?: Record<string, string>;
+  }>;
 }
 
 // Helper to create KPIs
@@ -362,7 +413,15 @@ The clock is ticking. Every decision counts.`,
     difficulty: 'advanced',
     durationHours: 72,
     passThreshold: 60,
-    strongPassThreshold: 85
+    strongPassThreshold: 85,
+    
+    // NEW: Structured content
+    weeklySignals: pm001WeeklySignals,
+    weeklyEvents: pm001WeeklyEvents,
+    weeklyActions: pm001WeeklyActions,
+    evaluationRubrics: pm001EvaluationRubrics as any,
+    stakeholderChallenges: pm001StakeholderChallenges as any,
+    guidance: pm001Guidance as any
   },
 
   'sim-pm-002': {
@@ -689,7 +748,15 @@ Success metrics:
     difficulty: 'advanced',
     durationHours: 40,
     passThreshold: 70,
-    strongPassThreshold: 90
+    strongPassThreshold: 90,
+    
+    // NEW: Structured content
+    weeklySignals: webdev01WeeklySignals,
+    weeklyEvents: webdev01WeeklyEvents,
+    weeklyActions: webdev01WeeklyActions,
+    evaluationRubrics: webdev01EvaluationRubrics as any,
+    stakeholderChallenges: webdev01StakeholderChallenges as any,
+    guidance: webdev01Guidance as any
   }
 };
 
