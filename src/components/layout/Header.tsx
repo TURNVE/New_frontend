@@ -79,7 +79,7 @@ export function Header() {
 
           {/* Mobile Menu */}
           {menuState && (
-            <div className="md:hidden absolute top-full left-0 right-0 border-b border-border shadow-2xl bg-background">
+            <div className="md:hidden absolute top-full left-0 right-0 border-b border-border shadow-2xl bg-background/100 backdrop-blur-none">
               <div className="px-6 py-6 space-y-4">
                 {/* Nav Links */}
                 <ul className="space-y-2">

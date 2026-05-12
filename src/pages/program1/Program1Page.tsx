@@ -336,7 +336,7 @@ function Program1Page() {
               icon={<Settings className="w-5 h-5" />}
               title="Operations"
               role="Project Management"
-              color="bg-amber-50 text-amber-600"
+              color="bg-amber-50 text-primary"
             />
           </div>
         </div>

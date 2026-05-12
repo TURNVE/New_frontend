@@ -25,7 +25,7 @@ const ProfilePage = () => {
   const [stats, setStats] = useState([
     { name: 'Simulations', value: '0', icon: Briefcase, color: 'text-blue-600', bgColor: 'bg-blue-50' },
     { name: 'Projects', value: '0', icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
-    { name: 'Avg Score', value: '0.0', icon: Star, color: 'text-amber-600', bgColor: 'bg-amber-50' }
+    { name: 'Avg Score', value: '0.0', icon: Star, color: 'text-primary', bgColor: 'bg-amber-50' }
   ]);
   const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
@@ -65,7 +65,7 @@ const ProfilePage = () => {
       setStats([
         { name: 'Simulations', value: sessionCount.toString(), icon: Briefcase, color: 'text-blue-600', bgColor: 'bg-blue-50' },
         { name: 'Projects', value: completedCount.toString(), icon: FileText, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
-        { name: 'Avg Score', value: avgScore, icon: Star, color: 'text-amber-600', bgColor: 'bg-amber-50' }
+        { name: 'Avg Score', value: avgScore, icon: Star, color: 'text-primary', bgColor: 'bg-amber-50' }
       ]);
 
       if (scores && scores.length > 0) {
@@ -411,7 +411,7 @@ const ProfilePage = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 dark:bg-amber-950 rounded-lg">
-                      <Star className="h-4 w-4 text-amber-500 fill-current" />
+                      <Star className="h-4 w-4 text-primary fill-current" />
                       <span className="text-sm font-bold text-foreground">{item.rating}</span>
                     </div>
                   </div>

@@ -116,8 +116,8 @@ const ProjectsPage = () => {
         </div>
         <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-amber-50 dark:bg-amber-500/20 rounded-xl flex items-center justify-center">
-              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <div className="w-10 h-10 bg-amber-50 dark:bg-primary/20 rounded-xl flex items-center justify-center">
+              <Clock className="h-5 w-5 text-primary dark:text-primary" />
             </div>
             <span className="text-sm text-muted-foreground">Pending</span>
           </div>
@@ -178,7 +178,7 @@ const ProjectsPage = () => {
               <div className="absolute top-3 right-3">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                   project.status === 'active' ? 'bg-emerald-500 text-white' :
-                  project.status === 'pending' ? 'bg-amber-500 text-white' :
+                  project.status === 'pending' ? 'bg-primary text-white' :
                   'bg-violet-500 text-white'
                 }`}>
                   {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
@@ -213,7 +213,7 @@ const ProjectsPage = () => {
                     <Calendar className="h-4 w-4" />
                     <span>Due {project.deadline}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-amber-500">
+                  <div className="flex items-center gap-1 text-primary">
                     <Star className="h-4 w-4 fill-current" />
                     <span className="font-semibold">{project.rating}</span>
                   </div>
@@ -258,7 +258,7 @@ const ProjectsPage = () => {
           <h3 className="text-lg font-semibold text-foreground mb-2">No projects found</h3>
           <p className="text-muted-foreground mb-4">Try adjusting your search or filters.</p>
           <Link
-            to="/industries"
+            to="/start-simulation"
             className="inline-flex items-center px-5 py-2.5 text-white font-medium rounded-xl"
             style={{ backgroundColor: pageTheme.primary }}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = pageTheme.primaryDark; }}

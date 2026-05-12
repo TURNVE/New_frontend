@@ -1,6 +1,25 @@
 import { useState } from 'react';
 import { X, CheckCircle, Circle, AlertTriangle, FileText, ClipboardList, ThumbsUp, RotateCcw } from 'lucide-react';
 import type { WeeklyActionItem, ScenarioAction, ActionChoice } from '../types';
+import { TypingText } from '../../../components/ui/TypingText';
+import { HintSystem } from '../../../components/simulation/HintSystem';
+
+interface HintConfig {
+    whatThisIs: string;
+    whatThatIs?: string;
+    hint: string;
+    tips?: string[];
+}
+
+interface ActionModalProps {
+    action: ModalAction;
+    gameState?: any;
+    onComplete: (actionId: string, result: Record<string, unknown>) => void;
+    onLegacyDecision?: (choice: ActionChoice) => void;
+    onClose: () => void;
+    hint?: HintConfig;
+    primaryColor?: string;
+}
 
 // ─── Unified action shape the modal can handle ────────────────
 export type ModalAction =
@@ -16,7 +35,7 @@ interface ActionModalProps {
 }
 
 const CATEGORY_ICON: Record<string, React.ReactNode> = {
-    decision: <AlertTriangle className="w-5 h-5 text-amber-400" />,
+    decision: <AlertTriangle className="w-5 h-5 text-primary" />,
     document: <FileText className="w-5 h-5 text-blue-400" />,
     task: <ClipboardList className="w-5 h-5 text-purple-400" />,
     approval: <ThumbsUp className="w-5 h-5 text-emerald-400" />,
@@ -24,7 +43,7 @@ const CATEGORY_ICON: Record<string, React.ReactNode> = {
     notification: <CheckCircle className="w-5 h-5 text-gray-400" />,
 };
 
-export default function ActionModal({ action, gameState, onComplete, onLegacyDecision, onClose }: ActionModalProps) {
+export default function ActionModal({ action, gameState, onComplete, onLegacyDecision, onClose, hint, primaryColor = '#7170ff' }: ActionModalProps) {
     const [textValue, setTextValue] = useState('');
     const [prdValues, setPrdValues] = useState<Record<string, string>>({});
     const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
@@ -109,7 +128,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
 
     const priorityBadge: Record<string, string> = {
         urgent: 'bg-red-500/20 text-red-400 border border-red-500/30',
-        high: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+        high: 'bg-primary/20 text-primary border border-primary/30',
         normal: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
         low: 'bg-gray-500/20 text-gray-400 border border-gray-500/30',
     };
@@ -125,20 +144,20 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${priorityBadge[item.priority]}`}>
-                                    {item.priority}
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${priorityBadge[item.priority]}`}>
+                                    {item.priority.charAt(0).toUpperCase() + item.priority.slice(1)}
                                 </span>
                                 <span className="text-[10px] text-gray-400 uppercase">{item.category}</span>
                                 {item.dueWeek && <span className="text-[10px] text-gray-400">Due Week {item.dueWeek}</span>}
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{item.title}</h3>
+                            <TypingText text={item.title} speed={30} delay={400} className="text-lg font-bold text-gray-900 dark:text-white" key={`title-${item.id}`} />
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         {hasPrevious && (
                             <button
                                 onClick={handleRecallPrevious}
-                                className="flex items-center gap-1 px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-[10px] font-bold rounded border border-amber-500/20 transition-colors"
+                                className="flex items-center gap-1 px-2 py-1 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-bold rounded border border-primary/20 transition-colors"
                                 title="Recall previous submission for this task"
                             >
                                 <RotateCcw className="w-3 h-3" /> Recall
@@ -158,15 +177,99 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                         <div className="relative bg-white dark:bg-gray-900 border border-blue-500/10 rounded-[16px] p-5 shadow-sm">
                             <div className="flex items-center gap-2 mb-3">
                                 <div className="p-1 px-2 bg-blue-500/10 rounded text-[10px] font-black text-blue-500 uppercase tracking-widest">
-                                    Strategic Briefing
+                                    Your Task
                                 </div>
                                 <div className="h-px flex-1 bg-gradient-to-r from-blue-500/10 to-transparent"></div>
                             </div>
-                            <p className="text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed font-medium antialiased">
-                                {item.description}
-                            </p>
+                            <TypingText text={item.description} speed={20} delay={800} className="text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed font-medium antialiased" key={`desc-${item.id}`} />
                         </div>
                     </div>
+
+                    {/* Hint System - For Intern Onboarding */}
+                    {hint && (
+                        <HintSystem hint={hint} primaryColor={primaryColor} compact={false} />
+                    )}
+
+                    {/* Guidance Box */}
+                    {item.actionType === 'choice' && (
+                        <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/5 border border-blue-500/20">
+                            <p className="text-xs text-blue-600 dark:text-blue-400">
+                                <strong>Tip:</strong> Each choice has trade-offs. Consider your current KPIs before deciding.
+                            </p>
+                        </div>
+                    )}
+                    {item.actionType === 'decision_text' && (
+                        <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-500/20">
+                            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                <strong>Tip:</strong> Be specific. Include your reasoning and any risks you've considered.
+                            </p>
+                        </div>
+                    )}
+                    {item.actionType === 'submit_prd' && (
+                        <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-500/5 border border-purple-500/20">
+                            <p className="text-xs text-purple-600 dark:text-purple-400">
+                                <strong>Tip:</strong> Fill all required fields. Clear documents score higher.
+                            </p>
+                        </div>
+                    )}
+                    {item.actionType === 'task' && (
+                        <div className="p-3 rounded-lg bg-primary/5 dark:bg-primary/5 border border-primary/20">
+                            <p className="text-xs text-primary dark:text-primary">
+                                <strong>Tip:</strong> Check off all required items to complete this task.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Success Criteria Hint */}
+                    {item.actionType === 'decision_text' && (
+                        <div className="bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-500/20 rounded-[12px] p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">What makes a good response</span>
+                            </div>
+                            <ul className="text-xs text-emerald-600 dark:text-emerald-400 space-y-1 list-disc list-inside">
+                                <li>Be specific and actionable in your recommendation</li>
+                                <li>Consider trade-offs and constraints</li>
+                                <li>Include next steps or immediate actions</li>
+                            </ul>
+                        </div>
+                    )}
+
+                    {item.actionType === 'choice' && (
+                        <div className="bg-blue-50 dark:bg-blue-500/5 border border-blue-500/20 rounded-[12px] p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle className="w-4 h-4 text-blue-500" />
+                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">How to decide</span>
+                            </div>
+                            <p className="text-xs text-blue-600 dark:text-blue-400">
+                                Each choice has trade-offs. Consider your current KPIs (Budget, Risk, Morale) and stakeholder priorities before selecting.
+                            </p>
+                        </div>
+                    )}
+
+                    {item.actionType === 'submit_prd' && (
+                        <div className="bg-purple-50 dark:bg-purple-500/5 border border-purple-500/20 rounded-[12px] p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle className="w-4 h-4 text-purple-500" />
+                                <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase">Document requirements</span>
+                            </div>
+                            <p className="text-xs text-purple-600 dark:text-purple-400">
+                                Fill in all required fields. Clear, concise documents score higher and help stakeholders understand your reasoning.
+                            </p>
+                        </div>
+                    )}
+
+                    {item.actionType === 'task' && (
+                        <div className="bg-primary/5 dark:bg-primary/5 border border-primary/20 rounded-[12px] p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle className="w-4 h-4 text-primary" />
+                                <span className="text-xs font-bold text-primary dark:text-primary uppercase">Task completion</span>
+                            </div>
+                            <p className="text-xs text-primary dark:text-primary">
+                                Check off all required items to complete this task. Each item represents a key step in the process.
+                            </p>
+                        </div>
+                    )}
 
                     {/* CHOICE */}
                     {item.actionType === 'choice' && item.choices && (
@@ -342,10 +445,10 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                             disabled={!canSubmit()}
                             className="flex-1 py-2.5 text-sm font-bold bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
                         >
-                            {item.actionType === 'decision_text' ? 'Submit Memo'
+                            {item.actionType === 'decision_text' ? 'Submit Decision'
                                 : item.actionType === 'submit_prd' ? 'Submit Document'
-                                    : item.actionType === 'task' ? 'Mark Complete'
-                                        : item.actionType === 'approval' ? 'Submit Decision'
+                                    : item.actionType === 'task' ? 'Complete Task'
+                                        : item.actionType === 'approval' ? 'Submit Approval'
                                             : 'Acknowledge'}
                         </button>
                     </div>
@@ -370,7 +473,7 @@ export default function ActionModal({ action, gameState, onComplete, onLegacyDec
                             disabled={!selectedApproval || textValue.length < 10 || approvalReason.length < 10}
                             className="flex-1 py-2.5 text-sm font-bold bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
                         >
-                            Confirm Decision
+                            Confirm Choice
                         </button>
                     </div>
                 )}

@@ -55,9 +55,9 @@ const features = [
     icon: UsersRound,
     title: 'Team Management',
     description: 'Organize learners into groups, assign mentors, and manage access',
-    color: 'from-amber-500/20 to-orange-500/20',
-    iconBg: 'bg-amber-500/10',
-    iconColor: 'text-amber-500'
+    color: 'from-primary/20 to-orange-500/20',
+    iconBg: 'bg-primary/10',
+    iconColor: 'text-primary'
   },
   {
     icon: BadgeCheck,
@@ -413,7 +413,7 @@ export default function OrganizationPage() {
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-foreground text-sm sm:text-base">Product</h4>
               <ul className="space-y-2.5 sm:space-y-3 text-sm text-text-tertiary">
-                <li><Link to="/industries" className="hover:text-foreground transition-colors">Industries</Link></li>
+                <li><Link to="/start-simulation" className="hover:text-foreground transition-colors">Industries</Link></li>
                 <li><Link to="/features" className="hover:text-foreground transition-colors">Features</Link></li>
                 <li><Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
               </ul>

@@ -112,13 +112,9 @@ const DashboardPage = () => {
       {/* First Time User CTA - Your First Step Awaits */}
       {isFirstTimeUser && (
         <div className="relative overflow-hidden bg-gradient-to-br from-[#5e6ad2] via-[#6366d3] to-[#7170ff] rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-5 mb-4 sm:mb-6 lg:mb-8 text-white shadow-lg shadow-[rgba(94,106,210,0.2)] animate-scale-in border border-white/10">
-          {/* Decorative Background Elements */}
-          <div className="absolute top-0 right-0 -mr-12 -mt-12 w-32 h-32 sm:w-48 sm:h-48 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -ml-12 -mb-12 w-24 h-24 sm:w-32 sm:h-32 bg-[#7170ff]/20 rounded-full blur-3xl"></div>
-
-          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-3 sm:gap-4 lg:gap-6">
+          <div className="relative z-10">
             {/* Left Content */}
-            <div className="flex-1 text-center lg:text-left w-full">
+            <div className="text-left">
               {/* Badge */}
               <div className="inline-flex items-center px-2 sm:px-2.5 py-1 sm:py-1 rounded-full bg-white/10 border border-white/20 text-white text-[10px] sm:text-xs font-semibold uppercase tracking-widest mb-2 sm:mb-3 backdrop-blur-md shadow-sm">
                 Get Started
@@ -130,57 +126,27 @@ const DashboardPage = () => {
               </h2>
 
               {/* Description */}
-              <p className="text-indigo-100/90 mb-3 sm:mb-4 lg:mb-5 text-xs sm:text-sm max-w-lg leading-relaxed mx-auto lg:mx-0">
+              <p className="text-indigo-100/90 mb-3 sm:mb-4 lg:mb-5 text-xs sm:text-sm max-w-lg leading-relaxed">
                 Start your first simulation journey. Choose your industry and role to begin making real-world management decisions.
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5">
                 <Link
-                  to="/industries"
+                  to="/start-simulation"
                   className="group inline-flex items-center justify-center gap-2 bg-white text-[#5e6ad2] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md shadow-white/20 tap-target"
                 >
                   Start Simulation
                   <ArrowRight className="h-3.5 w-3.5 opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                 </Link>
                 <Link
-                  to="/tracks"
+                  to="/start-simulation"
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] tap-target"
                 >
                   <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Explore Tracks
                 </Link>
               </div>
-            </div>
-
-            {/* Right Visual - Hidden on mobile, shown on sm+ */}
-            <div className="flex-shrink-0 hidden sm:block relative">
-              <div className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 bg-white/10 backdrop-blur-md rounded-xl lg:rounded-2xl flex items-center justify-center border border-white/20 shadow-lg hover:-translate-y-0.5 transition-transform duration-500 ease-out">
-                {/* Floating badge */}
-                <div className="absolute -right-2 -top-2 sm:-right-3 sm:-top-3 bg-white/20 backdrop-blur-lg rounded-lg p-1.5 sm:p-2 border border-white/20 shadow-md animate-float">
-                  <Star className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-400 fill-emerald-400" />
-                </div>
-                {/* Secondary floating element */}
-                <div className="absolute -left-1.5 -bottom-1.5 sm:-left-2 sm:-bottom-2 bg-white/15 backdrop-blur-lg rounded-md p-1.5 border border-white/20 shadow-md animate-float-delayed">
-                  <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress indicator for mobile */}
-          <div className="sm:hidden mt-3 pt-3 border-t border-white/10">
-            <div className="flex items-center justify-between text-[10px] text-white/80 mb-1.5">
-              <span>Getting started</span>
-              <span>Step 1 of 4</span>
-            </div>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4].map((step) => (
-                <div
-                  key={step}
-                  className={`flex-1 h-0.5 rounded-full ${step === 1 ? 'bg-white' : 'bg-white/20'}`}
-                />
-              ))}
             </div>
           </div>
         </div>
@@ -191,7 +157,7 @@ const DashboardPage = () => {
         <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-foreground mb-3 sm:mb-4 lg:mb-5">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           <Link
-            to="/industries"
+            to="/start-simulation"
             className={`flex flex-col items-center p-4 sm:p-5 lg:p-6 rounded-2xl transition-all duration-300 tap-target border group ${isFirstTimeUser ? 'bg-primary/5 border-primary/20 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary/40' : 'bg-card border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30'}`}
           >
             <div className={`h-12 w-12 sm:h-14 sm:w-14 rounded-xl sm:rounded-[16px] flex items-center justify-center mb-3 sm:mb-4 transition-colors duration-300 ${isFirstTimeUser ? 'bg-primary text-primary-foreground group-hover:bg-primary/90 shadow-md' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'}`}>
@@ -228,12 +194,12 @@ const DashboardPage = () => {
             <div className="bg-card rounded-2xl sm:rounded-3xl border border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden">
               <div className="bg-secondary/50 px-4 sm:px-6 py-4 sm:py-5 border-b border-border flex items-center justify-between">
                 <h2 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
-                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 fill-amber-500" />
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-primary fill-primary" />
                   Recommended for You
                 </h2>
               </div>
               <div className="p-4 sm:p-6">
-                <Link to="/industries" className="block group p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[rgba(94,106,210,0.1)] to-[rgba(113,112,255,0.1)] border border-[rgba(94,106,210,0.2)] hover:shadow-md transition-all duration-300 tap-target relative overflow-hidden">
+                <Link to="/start-simulation" className="block group p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[rgba(94,106,210,0.1)] to-[rgba(113,112,255,0.1)] border border-[rgba(94,106,210,0.2)] hover:shadow-md transition-all duration-300 tap-target relative overflow-hidden">
                   <div className="absolute right-0 top-0 w-24 h-24 sm:w-32 sm:h-32 bg-[#5e6ad2]/10 rounded-full blur-3xl group-hover:bg-[#5e6ad2]/20 transition-colors"></div>
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2 sm:mb-3">
@@ -300,7 +266,7 @@ const DashboardPage = () => {
               <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">No active simulations</h3>
               <p className="text-sm sm:text-base text-muted-foreground mb-5 sm:mb-8 max-w-sm mx-auto">Start your first simulation journey today and build real-world experience!</p>
               <Link
-                to="/industries"
+                to="/start-simulation"
                 className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-primary text-primary-foreground rounded-xl font-semibold text-sm sm:text-base hover:bg-primary/90 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 tap-target"
               >
                 <Play className="h-4 w-4 sm:h-5 sm:w-5 fill-primary-foreground" />

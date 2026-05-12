@@ -135,17 +135,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </nav>
             {/* Mobile sidebar footer */}
             <div className="p-4 border-t border-border shrink-0">
-              {isFirstTimeUser && (
-                <div className="bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] rounded-xl p-3 text-white mb-4">
-                  <Link
-                    to="/industries"
-                    onClick={() => setSidebarOpen(false)}
-                    className="text-xs font-semibold bg-white text-[#5e6ad2] px-3 py-1.5 rounded-lg hover:bg-white/90 transition-colors block text-center"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              )}
               <button
                 onClick={() => { signOut?.(); setSidebarOpen(false); }}
                 className="w-full flex items-center px-3 py-3 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-950 transition-colors tap-target"
@@ -186,16 +175,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             ))}
           </nav>
           <div className="p-4 border-t border-border">
-            {isFirstTimeUser && (
-              <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-xl p-3 text-white mb-4">
-                <Link
-                  to="/industries"
-                  className="text-xs font-semibold bg-white text-violet-600 px-3 py-1.5 rounded-lg hover:bg-violet-50 transition-colors block text-center"
-                >
-                  Get Started
-                </Link>
-              </div>
-            )}
             <div className="bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] rounded-xl p-4 text-white mb-4">
               <div className="flex items-center space-x-2 mb-2">
                 <Zap className="h-5 w-5" />

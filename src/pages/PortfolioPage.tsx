@@ -701,8 +701,8 @@ const PortfolioPage = () => {
               </div>
               <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-amber-50 dark:bg-amber-500/20 rounded-xl flex items-center justify-center">
-                    <Award className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <Award className="h-5 w-5 text-primary" />
                   </div>
                   <span className="text-sm text-muted-foreground">Achievements</span>
                 </div>
@@ -796,7 +796,7 @@ const PortfolioPage = () => {
                       </div>
                       <div className="absolute bottom-3 left-3 flex items-center gap-2">
                         <div className="flex items-center gap-1 px-2 py-1 bg-background/90 backdrop-blur rounded-lg">
-                          <Star className="h-3 w-3 text-amber-500 fill-current" />
+                          <Star className="h-3 w-3 text-primary fill-current" />
                           <span className="text-xs font-bold text-foreground">{item.rating}</span>
                         </div>
                       </div>
@@ -883,8 +883,8 @@ const PortfolioPage = () => {
                             <h3 className="text-lg font-bold text-foreground">{item.title}</h3>
                             <p className="text-sm text-muted-foreground">{item.role} &bull; {item.industry}</p>
                           </div>
-                          <div className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/20 rounded-lg">
-                            <Star className="h-4 w-4 text-amber-500 fill-current" />
+                          <div className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 dark:bg-primary/20 rounded-lg">
+                            <Star className="h-4 w-4 text-primary fill-current" />
                             <span className="text-sm font-bold text-foreground">{item.rating}</span>
                           </div>
                         </div>

@@ -80,7 +80,8 @@ const ProjectBriefingPage = () => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const pmSimulationId = getRandomPMSimulation();
+  const templateIdParam = searchParams.get('templateId');
+  const pmSimulationId = templateIdParam || getRandomPMSimulation();
   const pmTemplate = simulationTemplates[pmSimulationId];
 
   const briefs: Record<string, SimulationBrief> = {
@@ -326,7 +327,7 @@ const ProjectBriefingPage = () => {
             </span>
             <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap ${
               brief.difficulty === 'Intermediate'
-                ? 'bg-amber-500/20 text-amber-600'
+                ? 'bg-primary/20 text-primary'
                 : brief.difficulty === 'Beginner'
                 ? 'bg-green-500/20 text-green-600'
                 : 'bg-red-500/20 text-red-600'
@@ -521,7 +522,7 @@ const ProjectBriefingPage = () => {
         <TeamAvatar name="Alex C." role="Senior Engineer" color={`from-[${pageTheme.primary}] to-[${pageTheme.primaryDark}]`} />
         <TeamAvatar name="Sarah M." role="Junior Engineer" color="from-emerald-500 to-emerald-600" />
         <TeamAvatar name="Jordan P." role="Product Designer" color="from-sky-500 to-sky-600" />
-        <TeamAvatar name="Taylor K." role="QA Engineer" color="from-amber-500 to-amber-600" />
+        <TeamAvatar name="Taylor K." role="QA Engineer" color="from-primary to-primary" />
       </div>
     </CollapsibleSection>
   );
@@ -590,11 +591,11 @@ const ProjectBriefingPage = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl mb-6 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+            <div className="p-4 rounded-xl mb-6 bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/20">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-semibold mb-1 text-amber-700 dark:text-amber-400">
+                  <h4 className="text-sm font-semibold mb-1 text-primary dark:text-primary">
                     Important Notice
                   </h4>
                   <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">

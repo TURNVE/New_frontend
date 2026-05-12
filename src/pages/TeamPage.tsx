@@ -69,8 +69,8 @@ const TeamPage = () => {
           </div>
           <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-amber-50 dark:bg-amber-500/20 rounded-xl flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <div className="w-10 h-10 bg-amber-50 dark:bg-primary/20 rounded-xl flex items-center justify-center">
+                <Clock className="h-5 w-5 text-primary dark:text-primary" />
               </div>
               <span className="text-sm text-muted-foreground">Away</span>
             </div>
@@ -130,7 +130,7 @@ const TeamPage = () => {
                     </div>
                     <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card ${
                       member.status === 'online' ? 'bg-emerald-500' :
-                      member.status === 'away' ? 'bg-amber-500' : 'bg-muted-foreground'
+                      member.status === 'away' ? 'bg-primary' : 'bg-muted-foreground'
                     }`} />
                   </div>
                   <div>

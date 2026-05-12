@@ -38,7 +38,7 @@ export default function IntegrationsSection() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
               <Button className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 sm:py-3 rounded-xl font-medium hover:bg-blue-700 transition-all whitespace-nowrap text-sm sm:text-base tap-target">
-                <Link to="/industries">Start Learning</Link>
+                <Link to="/start-simulation">Start Learning</Link>
               </Button>
               <Button 
                 variant="outline" 

@@ -311,7 +311,7 @@ const LandingPage = () => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link 
-                  to="/industries" 
+                  to="/start-simulation" 
                   className="inline-flex items-center justify-center px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent text-white text-base font-semibold rounded-[6px] border-2 border-white/30 hover:bg-white/10 transition-all whitespace-nowrap tap-target"
                 >
                   Explore Industries
@@ -367,8 +367,8 @@ const LandingPage = () => {
             <div>
               <h4 className="font-semibold mb-3 sm:mb-4 text-foreground text-sm sm:text-base">Product</h4>
               <ul className="space-y-2.5 sm:space-y-3 text-sm text-text-tertiary">
-                <li><Link to="/industries" className="hover:text-foreground transition-colors">Industries</Link></li>
-                <li><Link to="/tracks" className="hover:text-foreground transition-colors">Tracks</Link></li>
+                <li><Link to="/start-simulation" className="hover:text-foreground transition-colors">Industries</Link></li>
+                <li><Link to="/start-simulation" className="hover:text-foreground transition-colors">Tracks</Link></li>
                 <li><Link to="/simulations" className="hover:text-foreground transition-colors">Simulations</Link></li>
                 <li><Link to="/portfolio" className="hover:text-foreground transition-colors">Portfolio</Link></li>
               </ul>

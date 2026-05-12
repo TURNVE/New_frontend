@@ -34,7 +34,7 @@ const WEEKLY_SIGNALS: WeeklySignal[] = [
     },
     {
         id: 'sig-w1-3', week: 1, source: 'Executive Office', sourceInitials: 'EO',
-        sourceColor: 'bg-amber-500/20 text-amber-400',
+        sourceColor: 'bg-primary/20 text-primary',
         message: 'CEO Marcus Johnson confirms the board presentation is Friday. No delays permitted.',
         severity: 'warning', tags: ['executive', 'deadline'],
     },
@@ -86,7 +86,7 @@ const WEEKLY_SIGNALS: WeeklySignal[] = [
     },
     {
         id: 'sig-w3-3', week: 3, source: 'CEO Office', sourceInitials: 'CE',
-        sourceColor: 'bg-amber-500/20 text-amber-400',
+        sourceColor: 'bg-primary/20 text-primary',
         message: 'Marcus is on the call. The board is ready for the Go/No-Go confirmation.',
         severity: 'critical', tags: ['executive', 'urgent'],
     },
@@ -100,7 +100,7 @@ const WEEKLY_EVENTS: WeeklyEvent[] = [
         timeInWeek: 300,
         title: 'Immediate Risk Briefing',
         description: 'Prepare your assessment memo. We need a clear summary of PCI gaps and the staging outage.',
-        from: 'CEO Marcus Johnson', fromInitials: 'MJ', fromColor: 'bg-amber-500/20 text-amber-400',
+        from: 'CEO Marcus Johnson', fromInitials: 'MJ', fromColor: 'bg-primary/20 text-primary',
         priority: 'high', requiresAction: true, actionId: 'action-w1-memo',
     },
     {
@@ -142,7 +142,7 @@ const WEEKLY_EVENTS: WeeklyEvent[] = [
         id: 'evt-w3-1', week: 3, type: 'request',
         title: 'Final Launch Briefing Due',
         description: 'Submit your Go/No-Go recommendation. Include constraints, risks, and your rationale.',
-        from: 'CEO Office', fromInitials: 'CE', fromColor: 'bg-amber-500/20 text-amber-400',
+        from: 'CEO Office', fromInitials: 'CE', fromColor: 'bg-primary/20 text-primary',
         priority: 'urgent', requiresAction: true, actionId: 'action-w3-final',
     },
     {

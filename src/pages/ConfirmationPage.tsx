@@ -13,7 +13,7 @@ const ConfirmationPage = () => {
   const avatarColors = [
     'bg-blue-700',
     'bg-emerald-600',
-    'bg-amber-600',
+    'bg-primary',
     'bg-red-600',
     'bg-violet-600',
     'bg-cyan-600'
@@ -24,7 +24,7 @@ const ConfirmationPage = () => {
     marketing: { name: 'Marketing', color: 'bg-emerald-600' },
     finance: { name: 'Finance', color: 'bg-violet-600' },
     healthcare: { name: 'Healthcare', color: 'bg-red-600' },
-    consulting: { name: 'Consulting', color: 'bg-amber-600' },
+    consulting: { name: 'Consulting', color: 'bg-primary' },
     retail: { name: 'Retail', color: 'bg-cyan-600' },
     education: { name: 'Education', color: 'bg-indigo-600' },
     manufacturing: { name: 'Manufacturing', color: 'bg-slate-600' }
@@ -33,9 +33,9 @@ const ConfirmationPage = () => {
   const trackData = {
     'product-management': { name: 'Product Manager', color: 'bg-emerald-600' },
     'ux-design': { name: 'UX Designer', color: 'bg-emerald-600' },
-    'data-analytics': { name: 'Data Analyst', color: 'bg-amber-600' },
+    'data-analytics': { name: 'Data Analyst', color: 'bg-primary' },
     'digital-marketing': { name: 'Digital Marketer', color: 'bg-emerald-600' },
-    'financial-analysis': { name: 'Financial Analyst', color: 'bg-amber-600' },
+    'financial-analysis': { name: 'Financial Analyst', color: 'bg-primary' },
     consulting: { name: 'Strategy Consultant', color: 'bg-red-600' }
   };
 
@@ -126,10 +126,10 @@ const ConfirmationPage = () => {
         {/* Continue Button */}
         <div className="flex justify-center mb-8">
           <Link
-            to={`/simulation/${track}?industry=${industry}`}
+            to={`/simulation/sim-intern-001`}
             className="px-8 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800 transition-colors min-w-[200px] text-center"
           >
-            Continue
+            Start Your Journey
           </Link>
         </div>
 

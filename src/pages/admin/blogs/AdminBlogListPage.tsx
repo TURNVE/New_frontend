@@ -219,7 +219,7 @@ export function AdminBlogListPage() {
         </div>
         <div className="bg-[#111418] border border-[#23252a] rounded-xl p-4">
           <p className="text-[#8a8f98] text-sm">Drafts</p>
-          <p className="text-2xl font-bold text-amber-400 mt-1">
+          <p className="text-2xl font-bold text-primary mt-1">
             {posts.filter(p => !p.published).length}
           </p>
         </div>
@@ -292,7 +292,7 @@ export function AdminBlogListPage() {
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                           post.published
                             ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
-                            : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20'
+                            : 'bg-primary/10 text-primary hover:bg-primary/20'
                         }`}
                       >
                         {post.published ? (

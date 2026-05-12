@@ -148,7 +148,7 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
                                         </div>
 
                                         {node.comments && node.comments.length > 0 && (
-                                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white dark:border-[#0a0a0a]">
+                                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white dark:border-[#0a0a0a]">
                                                 {node.comments.length}
                                             </div>
                                         )}
@@ -203,12 +203,12 @@ export default function SimRoadmapMindmap({ currentWeek, totalWeeks, phases, onT
 
                             {/* Simulation Tip */}
                             {selectedNode.status === 'active' && (
-                                <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-[12px] space-y-2">
+                                <div className="bg-primary/10 border border-primary/20 p-4 rounded-[12px] space-y-2">
                                     <div className="flex items-center gap-2">
-                                        <AlertTriangle className="w-4 h-4 text-amber-500" />
-                                        <span className="text-xs font-bold text-amber-500 uppercase">Strategic Insight</span>
+                                        <AlertTriangle className="w-4 h-4 text-primary" />
+                                        <span className="text-xs font-bold text-primary uppercase">Strategic Insight</span>
                                     </div>
-                                    <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80 leading-relaxed">
+                                    <p className="text-[11px] text-primary/80 leading-relaxed">
                                         Completing this milestone will likely trigger a response from the Board. Ensure your rationale is locked in the memo.
                                     </p>
                                 </div>

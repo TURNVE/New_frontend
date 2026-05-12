@@ -39,6 +39,8 @@ import AchievementsPage from '../pages/AchievementsPage';
 import ProjectsPage from '../pages/ProjectsPage';
 import SimulationsPage from '../pages/SimulationsPage';
 import AuthPage from '../pages/auth/AuthPage';
+import StartSimulationPage from '../pages/StartSimulationPage';
+import ProjectBriefingPage from '../pages/ProjectBriefingPage';
 import SignUpPage from '../pages/auth/SignUpPage';
 import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage';
 import { NotFound } from '../pages/NotFoundPage';
@@ -115,6 +117,8 @@ const router = createBrowserRouter([
       { path: '/industries', element: <IndustriesPage /> },
       { path: '/tracks', element: <TracksPage /> },
       { path: '/confirmation', element: <ConfirmationPage /> },
+      { path: '/start-simulation', element: <StartSimulationPage /> },
+      { path: '/briefing', element: <ProjectBriefingPage /> },
 
       // ── Simulations (Isolated, Code-Split) ───────────────────────
       // Each simulation path maps to its own standalone page.

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Briefcase, Clock, CheckCircle, TrendingUp,
-  Play, Calendar, Users, DollarSign, Flag, Star
+  Play, Calendar, Users, DollarSign, Flag, Star, ChevronRight, Rocket
 } from 'lucide-react';
 import { simulations, supabase } from '../lib/supabase';
 import { usePageSetup } from '../hooks/usePageSetup';
@@ -24,6 +24,7 @@ interface Simulation {
   completedDate?: string;
   scenario_key?: string;
   primaryColor?: string;
+  currentPhase?: string;
 }
 
 const SimulationsPage = () => {
@@ -35,7 +36,7 @@ const SimulationsPage = () => {
   useEffect(() => {
     async function loadSimulations() {
       setIsLoading(true);
-      const user = (await supabase.auth.getUser()).data.user;
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { sessions: allSessions } = await simulations.getAllUserSessions(user.id);
@@ -48,6 +49,14 @@ const SimulationsPage = () => {
           const isCompleted = session.status === 'completed';
           const template = session.scenario_key ? simulationTemplates[session.scenario_key] : undefined;
 
+          const phaseNames: Record<string, string> = {
+            '1': 'Discovery',
+            '2': 'Definition',
+            '3': 'Delivery',
+            '4': 'Launch'
+          };
+          const currentPhase = phaseNames[String(session.current_phase)] || 'Discovery';
+          
           return {
             id: session.id,
             title: stateData.project?.title || session.scenario_key || 'Simulation Project',
@@ -63,7 +72,8 @@ const SimulationsPage = () => {
             rating: scoreMatch ? (scoreMatch.overall_score / 20).toFixed(1) : undefined,
             completedDate: scoreMatch ? new Date(scoreMatch.completed_at).toLocaleDateString() : undefined,
             scenario_key: session.scenario_key,
-            primaryColor: template?.primaryColor || '#6366f1'
+            primaryColor: template?.primaryColor || '#6366f1',
+            currentPhase: isCompleted ? 'Completed' : `Week ${session.current_week} · ${currentPhase}`
           };
         });
         setSimulationsList(mapped);
@@ -92,252 +102,218 @@ const SimulationsPage = () => {
     return sim.primaryColor || '#6366f1';
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'ongoing':
-        return 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400';
-      case 'in-progress':
-        return 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400';
-      case 'completed':
-        return 'bg-muted text-muted-foreground';
-      default:
-        return 'bg-muted text-muted-foreground';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'ongoing':
-        return <Play className="h-4 w-4" />;
-      case 'in-progress':
-        return <TrendingUp className="h-4 w-4" />;
-      case 'completed':
-        return <CheckCircle className="h-4 w-4" />;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="animate-fade-in">
-      {/* Page Title */}
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">My Simulations</h1>
-        <p className="text-muted-foreground">Track your ongoing, in-progress, and completed simulations</p>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <Play className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.ongoing}</p>
-              <p className="text-sm text-muted-foreground">Ongoing</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/20 rounded-xl flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.inProgress}</p>
-              <p className="text-sm text-muted-foreground">In Progress</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center">
-              <CheckCircle className="h-5 w-5 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.completed}</p>
-              <p className="text-sm text-muted-foreground">Completed</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-amber-50 dark:bg-amber-500/20 rounded-xl flex items-center justify-center">
-              <Star className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.avgRating}</p>
-              <p className="text-sm text-muted-foreground">Avg Rating</p>
+    <div className="min-h-screen bg-background text-foreground animate-fade-in">
+      {/* Top Navigation */}
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/dashboard" className="text-xl font-bold tracking-tighter text-primary">TURNVE</Link>
+            <div className="flex gap-2">
+              {(['all', 'ongoing', 'completed'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                    filter === f 
+                      ? 'bg-primary/10 text-primary border border-primary/20' 
+                      : 'text-muted-foreground hover:text-foreground border border-transparent'
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-2 mb-8">
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-              filter === 'all'
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-secondary'
-            }`}
-          >
-            All Simulations
-          </button>
-          <button
-            onClick={() => setFilter('ongoing')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
-              filter === 'ongoing'
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-secondary'
-            }`}
-          >
-            <Play className="h-4 w-4" />
-            Ongoing
-          </button>
-          <button
-            onClick={() => setFilter('in-progress')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
-              filter === 'in-progress'
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-secondary'
-            }`}
-          >
-            <TrendingUp className="h-4 w-4" />
-            In Progress
-          </button>
-          <button
-            onClick={() => setFilter('completed')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
-              filter === 'completed'
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-secondary'
-            }`}
-          >
-            <CheckCircle className="h-4 w-4" />
-            Completed
-          </button>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 bg-primary/10 border border-primary/20 text-primary">
+            <Rocket className="h-3.5 w-3.5 mr-1.5" />
+            Project Mastery
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground">
+            Your <span className="text-primary">Simulation Projects</span>
+          </h1>
+          <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Monitor your progress, review performance metrics, and continue your journey 
+            through real-world product management scenarios.
+          </p>
         </div>
-      </div>
 
-      {/* Simulations List */}
-      <div className="space-y-4">
-        {filteredSimulations.map((simulation) => {
-          const simColor = getSimColor(simulation);
-          return (
-            <Link
-              key={simulation.id}
-              to={`/simulation/${simulation.id}`}
-              className="block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1 ${getStatusBadge(simulation.status)}`}>
-                        {getStatusIcon(simulation.status)}
-                        {simulation.status.replace('-', ' ')}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{simulation.industry}</span>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-500/10 text-blue-500">
+                <Play className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{stats.ongoing}</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Ongoing</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-500">
+                <CheckCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{stats.completed}</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Completed</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary">
+                <Star className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{stats.avgRating}</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Avg Rating</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-500">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{filteredSimulations.length}</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Total</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Simulation Cards */}
+        <div className="space-y-6">
+          {filteredSimulations.map((simulation) => {
+            const simColor = getSimColor(simulation);
+            return (
+              <Link
+                key={simulation.id}
+                to={`/simulation/${simulation.id}`}
+                className="group block"
+              >
+                <div className="bg-card border border-border rounded-2xl p-6 lg:p-8 hover:border-primary/30 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                          {simulation.currentPhase || simulation.status}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">{simulation.industry}</span>
+                      </div>
+                      <h3 className="text-xl font-bold mb-1 text-foreground group-hover:text-primary transition-colors">{simulation.title}</h3>
+                      <p className="text-sm text-muted-foreground">Client: <span className="text-foreground font-medium">{simulation.client}</span></p>
                     </div>
-                    <h3 className="text-lg font-bold text-foreground mb-1">{simulation.title}</h3>
-                    <p className="text-sm text-muted-foreground">Client: {simulation.client}</p>
+                    
+                    <div className="flex items-center gap-6">
+                      {simulation.status === 'completed' && simulation.rating && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
+                          <Star className="h-4 w-4 fill-current" />
+                          <span className="text-sm font-bold">{simulation.rating}</span>
+                        </div>
+                      )}
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        <ChevronRight className="h-6 w-6 transition-transform group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
                   </div>
-                  {simulation.status === 'completed' && simulation.rating && (
-                    <div className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/20 rounded-lg">
-                      <Star className="h-4 w-4 text-amber-500 fill-current" />
-                      <span className="text-sm font-bold text-foreground">{simulation.rating}</span>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-border/60">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-500">
+                        <DollarSign className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Budget</p>
+                        <p className="text-xs font-bold text-foreground">${(simulation.budget / 1000).toFixed(0)}K</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-500">
+                        <Clock className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Duration</p>
+                        <p className="text-xs font-bold text-foreground">{simulation.duration}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-500/10 text-indigo-500">
+                        <Users className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Team</p>
+                        <p className="text-xs font-bold text-foreground">{simulation.teamSize} members</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-500/10 text-rose-500">
+                        <Flag className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Deadline</p>
+                        <p className="text-xs font-bold text-foreground">{simulation.deadline}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {simulation.status !== 'completed' && (
+                    <div className="mt-8">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">{simulation.progress}% Progress</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${simulation.progress}%`, backgroundColor: simColor }}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Budget</p>
-                      <p className="text-sm font-semibold text-foreground">${simulation.budget.toLocaleString()}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-50 dark:bg-blue-500/20 rounded-lg flex items-center justify-center">
-                      <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Duration</p>
-                      <p className="text-sm font-semibold text-foreground">{simulation.duration}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-violet-50 dark:bg-violet-500/20 rounded-lg flex items-center justify-center">
-                      <Users className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Team</p>
-                      <p className="text-sm font-semibold text-foreground">{simulation.teamSize} members</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-amber-50 dark:bg-amber-500/20 rounded-lg flex items-center justify-center">
-                      <Flag className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Deadline</p>
-                      <p className="text-sm font-semibold text-foreground">{simulation.deadline}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {simulation.status !== 'completed' && (
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground font-medium">{simulation.progress}% complete</span>
-                      <span className="text-xs text-muted-foreground">{simulation.deadline}</span>
-                    </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full transition-all"
-                        style={{ width: `${simulation.progress}%`, backgroundColor: simColor }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {simulation.status === 'completed' && simulation.completedDate && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    Completed {simulation.completedDate}
-                  </div>
-                )}
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {filteredSimulations.length === 0 && (
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-12 text-center">
-          <Briefcase className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-bold text-foreground mb-2">No simulations found</h3>
-          <p className="text-muted-foreground mb-6">
-            {filter === 'all'
-              ? "You haven't started any simulations yet"
-              : `No ${filter} simulations at the moment`}
-          </p>
-          <Link
-            to="/industries"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
-          >
-            <Play className="h-4 w-4" />
-            Start a Simulation
-          </Link>
+              </Link>
+            );
+          })}
         </div>
-      )}
+
+        {filteredSimulations.length === 0 && !isLoading && (
+          <div className="bg-card border border-border rounded-2xl p-16 text-center shadow-sm">
+            <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Briefcase className="h-10 w-10 text-muted-foreground/40" />
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-foreground">No simulations found</h3>
+            <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
+              {filter === 'all'
+                ? "You haven't started any simulations yet. Kickstart your journey today!"
+                : `You don't have any ${filter} simulations at the moment.`}
+            </p>
+            <Link
+              to="/start-simulation"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-primary/90 shadow-lg shadow-primary/20"
+            >
+              <Play className="h-4 w-4" />
+              Start a Simulation
+            </Link>
+          </div>
+        )}
+
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Loading your journey...</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
