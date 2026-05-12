@@ -28,8 +28,6 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
 const AchievementsPage = lazy(() => import('./pages/AchievementsPage'));
 const TeamPage = lazy(() => import('./pages/TeamPage'));
-const TracksPage = lazy(() => import('./pages/TracksPage'));
-const IndustriesPage = lazy(() => import('./pages/IndustriesPage'));
 const ConfirmationPage = lazy(() => import('./pages/ConfirmationPage'));
 const StartSimulationPage = lazy(() => import('./pages/StartSimulationPage'));
 const ProjectBriefingPage = lazy(() => import('./pages/ProjectBriefingPage'));
