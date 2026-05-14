@@ -60,6 +60,17 @@ export function getPortalLoginPath(portal: AuthPortal) {
   return AUTH_ROUTES.SIGN_IN
 }
 
+export function getAdminRedirectPath(from?: string) {
+  if (!from) return AUTH_ROUTES.ADMIN
+
+  const isSafeAdminPath =
+    from.startsWith('/admin') &&
+    !from.startsWith('/admin/login') &&
+    !from.startsWith('/admin/auth')
+
+  return isSafeAdminPath ? from : AUTH_ROUTES.ADMIN
+}
+
 export function rememberAuthPortal(portal: AuthPortal) {
   window.localStorage.setItem(AUTH_PORTAL_STORAGE_KEY, portal)
 }

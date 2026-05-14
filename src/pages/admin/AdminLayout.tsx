@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
   Gamepad2,
@@ -12,6 +12,8 @@ import {
   List,
   BookOpen,
   PenLine,
+  CreditCard,
+  SlidersHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -62,16 +64,25 @@ const navItems: NavItem[] = [
     label: 'Settings',
     href: '/admin/settings',
     icon: Settings,
+    children: [
+      { label: 'Security & Access', href: '/admin/settings', icon: Shield },
+      { label: 'Payments', href: '/admin/settings?tab=payments', icon: CreditCard },
+      { label: 'Operations', href: '/admin/settings?tab=operations', icon: SlidersHorizontal },
+    ],
   },
 ]
 
 export function AdminLayout() {
   const { user, signOut } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const handleSignOut = async () => {
     await signOut()
+    navigate('/admin/login', { replace: true })
   }
+
+  const getRoutePath = (href: string) => href.split('?')[0]
 
   return (
     <div className="min-h-screen bg-[#0d0f11] flex">
@@ -94,8 +105,9 @@ export function AdminLayout() {
         <nav className="flex-1 overflow-y-auto py-4 px-3">
           <ul className="space-y-1">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.href ||
-                (item.children?.some(child => location.pathname.startsWith(child.href)) ?? false)
+              const itemPath = getRoutePath(item.href)
+              const isActive = location.pathname === itemPath ||
+                (item.children?.some(child => location.pathname === getRoutePath(child.href)) ?? false)
 
               return (
                 <li key={item.href}>
@@ -127,7 +139,7 @@ export function AdminLayout() {
                             to={child.href}
                             className={cn(
                               'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200',
-                              location.pathname === child.href
+                              location.pathname === getRoutePath(child.href) && location.search === (child.href.includes('?') ? `?${child.href.split('?')[1]}` : '')
                                 ? 'text-[#7170ff] bg-[#5e6ad2]/5'
                                 : 'text-[#8a8f98] hover:text-[#d0d6e0]'
                             )}

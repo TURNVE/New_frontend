@@ -42,6 +42,7 @@ const AdminLayout = lazy(() => import('./pages/admin').then(m => ({ default: m.A
 const AdminDashboardPage = lazy(() => import('./pages/admin').then(m => ({ default: m.AdminDashboardPage })));
 const AdminUsersPage = lazy(() => import('./pages/admin').then(m => ({ default: m.AdminUsersPage })));
 const AdminAnalyticsPage = lazy(() => import('./pages/admin').then(m => ({ default: m.AdminAnalyticsPage })));
+const AdminSettingsPage = lazy(() => import('./pages/admin').then(m => ({ default: m.AdminSettingsPage })));
 const AdminSimulationsPage = lazy(() => import('./pages/admin/simulations').then(m => ({ default: m.AdminSimulationsPage })));
 const CreateSimulationPage = lazy(() => import('./pages/admin/simulations').then(m => ({ default: m.CreateSimulationPage })));
 const EditSimulationPage = lazy(() => import('./pages/admin/simulations').then(m => ({ default: m.EditSimulationPage })));
@@ -144,6 +145,7 @@ function Router() {
             </Route>
 
             {/* ── Admin Routes ──────────────────────────────────────────────── */}
+            <Route path="/admin/auth" element={<Navigate to="/admin/login" replace />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
 
             <Route
@@ -165,6 +167,7 @@ function Router() {
               <Route path="blogs/:id/edit" element={<EditBlogPage />} />
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="analytics" element={<AdminAnalyticsPage />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
 
             <Route path="*" element={<NotFoundPage />} />

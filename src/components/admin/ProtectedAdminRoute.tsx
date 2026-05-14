@@ -21,7 +21,7 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
     return (
       <Navigate
         to="/admin/login"
-        state={{ from: location.pathname }}
+        state={{ from: `${location.pathname}${location.search}` }}
         replace
       />
     )
