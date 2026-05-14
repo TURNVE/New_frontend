@@ -37,138 +37,38 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { cn } from '@/lib/utils'
-
-interface Simulation {
-  id: string
-  key: string
-  name: string
-  companyName: string
-  industry: string
-  archetype: string
-  difficulty: 'intro' | 'intermediate' | 'advanced'
-  isActive: boolean
-  totalWeeks: number
-  createdAt: string
-  updatedAt: string
-  createdBy: string
-}
+import { adminSimulations, type AdminSimulation } from '@/lib/admin'
 
 type SortField = 'name' | 'companyName' | 'difficulty' | 'createdAt' | 'isActive'
 type SortDirection = 'asc' | 'desc'
 
 export function AdminSimulationsPage() {
   const navigate = useNavigate()
-  const [simulations, setSimulations] = useState<Simulation[]>([])
-  const [filteredSimulations, setFilteredSimulations] = useState<Simulation[]>([])
+  const [simulations, setSimulations] = useState<AdminSimulation[]>([])
+  const [filteredSimulations, setFilteredSimulations] = useState<AdminSimulation[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterArchetype, setFilterArchetype] = useState<string>('all')
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all')
   const [sortField, setSortField] = useState<SortField>('createdAt')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [simulationToDelete, setSimulationToDelete] = useState<Simulation | null>(null)
+  const [simulationToDelete, setSimulationToDelete] = useState<AdminSimulation | null>(null)
 
   // Load simulations (mock data for now)
   useEffect(() => {
     const loadSimulations = async () => {
       setIsLoading(true)
       try {
-        // TODO: Replace with actual API call
-        // const { data, error } = await adminApi.getSimulations()
-
-        // Mock data
-        const mockSimulations: Simulation[] = [
-          {
-            id: 'sim-pm-001',
-            key: 'sim-pm-001',
-            name: '72-Hour Launch Crisis',
-            companyName: 'PayLink',
-            industry: 'Fintech/Payments',
-            archetype: 'crisis',
-            difficulty: 'advanced',
-            isActive: true,
-            totalWeeks: 12,
-            createdAt: '2026-04-20T10:30:00Z',
-            updatedAt: '2026-04-22T08:15:00Z',
-            createdBy: 'admin@turnve.com',
-          },
-          {
-            id: 'sim-pm-002',
-            key: 'sim-pm-002',
-            name: 'The Growth Bet',
-            companyName: 'ShopEase',
-            industry: 'E-commerce',
-            archetype: 'growth',
-            difficulty: 'intermediate',
-            isActive: true,
-            totalWeeks: 8,
-            createdAt: '2026-04-18T14:22:00Z',
-            updatedAt: '2026-04-21T16:45:00Z',
-            createdBy: 'admin@turnve.com',
-          },
-          {
-            id: 'sim-pm-003',
-            key: 'sim-pm-003',
-            name: 'The Core Rebuild',
-            companyName: 'TechCore Systems',
-            industry: 'Enterprise SaaS',
-            archetype: 'platform',
-            difficulty: 'advanced',
-            isActive: true,
-            totalWeeks: 12,
-            createdAt: '2026-04-15T09:15:00Z',
-            updatedAt: '2026-04-19T11:30:00Z',
-            createdBy: 'admin@turnve.com',
-          },
-          {
-            id: 'sim-pm-004',
-            key: 'sim-pm-004',
-            name: 'The New Frontier',
-            companyName: 'NewWave',
-            industry: 'EdTech',
-            archetype: 'zero_to_one',
-            difficulty: 'intermediate',
-            isActive: true,
-            totalWeeks: 6,
-            createdAt: '2026-04-10T16:45:00Z',
-            updatedAt: '2026-04-17T14:20:00Z',
-            createdBy: 'admin@turnve.com',
-          },
-          {
-            id: 'brand-01',
-            key: 'brand-01',
-            name: 'Brand Identity Refresh',
-            companyName: 'Nike Vision',
-            industry: 'Technology/Sports',
-            archetype: 'creative',
-            difficulty: 'advanced',
-            isActive: true,
-            totalWeeks: 6,
-            createdAt: '2026-04-05T11:00:00Z',
-            updatedAt: '2026-04-12T09:30:00Z',
-            createdBy: 'admin@turnve.com',
-          },
-          {
-            id: 'web-dev-01',
-            key: 'web-dev-01',
-            name: 'Checkout Performance Under Fire',
-            companyName: 'TurnVe Commerce',
-            industry: 'E-commerce / Technology',
-            archetype: 'crisis',
-            difficulty: 'advanced',
-            isActive: false,
-            totalWeeks: 8,
-            createdAt: '2026-03-28T13:45:00Z',
-            updatedAt: '2026-04-08T15:00:00Z',
-            createdBy: 'admin@turnve.com',
-          },
-        ]
-
-        setSimulations(mockSimulations)
-        setFilteredSimulations(mockSimulations)
+        setLoadError(null)
+        const { simulations: adminSimulationList, error } = await adminSimulations.list()
+        if (error) throw error
+        setSimulations(adminSimulationList)
+        setFilteredSimulations(adminSimulationList)
       } catch (error) {
         console.error('Failed to load simulations:', error)
+        setLoadError('Unable to load simulations. Confirm you are signed in with an ADMIN profile.')
       } finally {
         setIsLoading(false)
       }
@@ -239,7 +139,7 @@ export function AdminSimulationsPage() {
     }
   }
 
-  const handleDelete = async (simulation: Simulation) => {
+  const handleDelete = async (simulation: AdminSimulation) => {
     setSimulationToDelete(simulation)
     setDeleteDialogOpen(true)
   }
@@ -248,8 +148,8 @@ export function AdminSimulationsPage() {
     if (!simulationToDelete) return
 
     try {
-      // TODO: Call API to delete simulation
-      // await adminApi.deleteSimulation(simulationToDelete.id)
+      const { error } = await adminSimulations.delete(simulationToDelete.id)
+      if (error) throw error
 
       setSimulations((prev) => prev.filter((s) => s.id !== simulationToDelete.id))
     } catch (error) {
@@ -260,26 +160,30 @@ export function AdminSimulationsPage() {
     }
   }
 
-  const handleDuplicate = async (simulation: Simulation) => {
+  const handleDuplicate = async (simulation: AdminSimulation) => {
     try {
-      // TODO: Call API to duplicate simulation
-      // const { data } = await adminApi.duplicateSimulation(simulation.id)
-      console.log('Duplicating simulation:', simulation.id)
+      const { simulation: duplicated, error } = await adminSimulations.duplicate(simulation.id)
+      if (error) throw error
+      if (duplicated) {
+        setSimulations((prev) => [duplicated, ...prev])
+      }
     } catch (error) {
       console.error('Failed to duplicate simulation:', error)
     }
   }
 
-  const handleToggleActive = async (simulation: Simulation) => {
+  const handleToggleActive = async (simulation: AdminSimulation) => {
     try {
-      // TODO: Call API to toggle active status
-      // await adminApi.updateSimulation(simulation.id, { isActive: !simulation.isActive })
-
-      setSimulations((prev) =>
-        prev.map((s) =>
-          s.id === simulation.id ? { ...s, isActive: !s.isActive } : s
-        )
+      const { simulation: updated, error } = await adminSimulations.updateActive(
+        simulation.id,
+        !simulation.isActive
       )
+      if (error) throw error
+      if (updated) {
+        setSimulations((prev) =>
+          prev.map((s) => (s.id === simulation.id ? updated : s))
+        )
+      }
     } catch (error) {
       console.error('Failed to toggle active status:', error)
     }
@@ -410,6 +314,18 @@ export function AdminSimulationsPage() {
             {[...Array(5)].map((_, i) => (
               <div key={i} className="h-16 bg-[#1a1d21] rounded-lg animate-pulse" />
             ))}
+          </div>
+        ) : loadError ? (
+          <div className="p-12 text-center">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-[#f7f8f8] mb-2">Could not load simulations</h3>
+            <p className="text-[#8a8f98] mb-6">{loadError}</p>
+            <Button
+              className="bg-[#5e6ad2] hover:bg-[#828fff] text-white"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
           </div>
         ) : filteredSimulations.length === 0 ? (
           <div className="p-12 text-center">

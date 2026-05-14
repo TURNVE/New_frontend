@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import {
-  Lightbulb, Target, Clock, ChevronRight, X,
+  Lightbulb, Target, ChevronRight, X,
   Trophy, Zap, Bell,
-  LayoutList, CheckCircle
+  LayoutList, Mail, MonitorPlay, PartyPopper
 } from 'lucide-react';
 import { enableSounds } from '../../utils/sounds';
 import { TypingText } from '../ui/TypingText';
@@ -16,6 +16,8 @@ interface WelcomeHintProps {
 }
 
 export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, companyName, challengeTitle, archetype }) => {
+  const [step, setStep] = useState(0);
+
   if (!isOpen) return null;
 
   const handleClose = () => {
@@ -23,15 +25,14 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
     onClose();
   };
 
-  const [step, setStep] = useState(0);
-
   const archetypeLabel = archetype.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const isInternWelcome = companyName === 'TechCorp';
 
-  const steps = [
+  const genericSteps = [
     {
       icon: Trophy,
       title: `Welcome to ${companyName}`,
-      content: `You're stepping into a real-world management simulation. Your role: make strategic decisions that balance budget, team morale, stakeholder satisfaction, and project risk.`,
+      content: `You're stepping into a real-world management simulation as a ${archetypeLabel}. Your role: make strategic decisions that balance budget, team morale, stakeholder satisfaction, and project risk.`,
       highlight: `Challenge: ${challengeTitle}`,
     },
     {
@@ -60,18 +61,53 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
     },
   ];
 
+  const internSteps = [
+    {
+      icon: Trophy,
+      title: 'You are stepping into TechCorp',
+      content: 'Sarah from Product is waiting for you. This onboarding works like a mission room: open the objects, join live moments, and unlock tasks one action at a time.',
+      highlight: 'First quest: open your offer letter and accept the internship.',
+    },
+    {
+      icon: Mail,
+      title: 'Start with the letter',
+      content: 'Your offer letter is now an interactive object. Open it, read the details, and confirm before the next mission appears.',
+      highlight: 'Look for mailbox-style cards and animated mission prompts.',
+    },
+    {
+      icon: MonitorPlay,
+      title: 'Meet people in rooms',
+      content: 'Calls now open as small TechCorp meeting environments with participants, agenda cards, and a clear completion moment.',
+      highlight: 'When a call appears, join it like a live scene.',
+    },
+    {
+      icon: PartyPopper,
+      title: 'Unlock the week',
+      content: 'Week 1 no longer throws every task at you. The next task appears after you act, so onboarding feels like a guided game path.',
+      highlight: 'Complete the visible action, then watch the next action unlock.',
+    },
+  ];
+
+  const steps = isInternWelcome ? internSteps : genericSteps;
+
   const currentStep = steps[step];
+  const titleClass = isInternWelcome ? 'text-xl font-bold text-slate-950 dark:text-white' : 'text-xl font-bold text-gray-900 dark:text-white';
+  const bodyClass = isInternWelcome ? 'text-slate-700 mb-5 leading-relaxed font-medium dark:text-slate-300' : 'text-gray-600 dark:text-gray-300 mb-5 leading-relaxed';
+  const tipClass = isInternWelcome ? 'text-sm font-bold text-sky-700 dark:text-sky-200' : 'text-sm text-blue-700 dark:text-blue-300';
+  const secondaryButtonClass = isInternWelcome
+    ? 'text-sm font-semibold text-slate-600 hover:text-slate-950 transition-colors dark:text-slate-300 dark:hover:text-white'
+    : 'text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors';
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-[20px] max-w-lg w-full p-6 relative overflow-hidden shadow-2xl">
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl" />
+      <div className={`${isInternWelcome ? 'bg-gradient-to-br from-white via-orange-50 to-sky-50 border-white/80 max-w-3xl rounded-[28px] dark:from-[#111318] dark:via-[#0f1011] dark:to-[#101827] dark:border-white/10' : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 max-w-lg rounded-[20px]'} border w-full p-6 relative overflow-hidden shadow-2xl`}>
+        <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl ${isInternWelcome ? 'bg-fuchsia-300/40 dark:bg-fuchsia-500/10' : 'bg-blue-500/10'}`} />
 
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          className="absolute top-4 right-4 p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <X className="w-5 h-5 text-gray-500 dark:text-slate-300" />
         </button>
 
         {/* Progress dots */}
@@ -84,9 +120,11 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
           ))}
         </div>
 
+        <div className={isInternWelcome ? 'grid gap-5 md:grid-cols-[1fr_220px] md:items-end' : ''}>
+          <div>
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-            <currentStep.icon className="w-6 h-6 text-blue-500" />
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isInternWelcome ? 'bg-violet-100 text-violet-600 shadow-lg dark:bg-violet-400/15 dark:text-violet-200' : 'bg-blue-500/10 text-blue-500'}`}>
+            <currentStep.icon className="w-6 h-6" />
           </div>
           <div>
             <TypingText
@@ -94,10 +132,10 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
               text={currentStep.title}
               speed={25}
               delay={300}
-              className="text-xl font-bold text-gray-900 dark:text-white"
+              className={titleClass}
               key={`title-${step}`}
             />
-            <p className="text-xs text-gray-500">Step {step + 1} of {steps.length}</p>
+            <p className={isInternWelcome ? 'text-xs font-bold text-slate-500 dark:text-slate-400' : 'text-xs text-gray-500'}>Step {step + 1} of {steps.length}</p>
           </div>
         </div>
 
@@ -106,21 +144,37 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
           speed={20}
           delay={600}
           as="p"
-          className="text-gray-600 dark:text-gray-300 mb-5 leading-relaxed"
+          className={bodyClass}
           key={`content-${step}`}
         />
 
-        <div className="bg-blue-50 dark:bg-blue-500/5 border border-blue-500/20 rounded-lg p-3 mb-6">
+        <div className={`${isInternWelcome ? 'bg-sky-50 border-sky-200 dark:bg-sky-400/10 dark:border-sky-300/20' : 'bg-blue-50 dark:bg-blue-500/5 border-blue-500/20'} border rounded-lg p-3 mb-6`}>
           <div className="flex items-start gap-2">
-            <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-            <TypingText text={currentStep.highlight} speed={20} key={`tip-${step}`} className="text-sm text-blue-700 dark:text-blue-300" />
+            <Lightbulb className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isInternWelcome ? 'text-sky-600 dark:text-sky-200' : 'text-blue-500'}`} />
+            <TypingText text={currentStep.highlight} speed={20} key={`tip-${step}`} className={tipClass} />
           </div>
+        </div>
+          </div>
+
+          {isInternWelcome && (
+            <div className="relative hidden min-h-[250px] md:block">
+              <div className="absolute inset-x-5 bottom-0 h-24 rounded-full bg-violet-300/25 blur-2xl" />
+              <img
+                src="/images/intern-mentor.png"
+                alt="Product mentor"
+                className="relative z-10 mx-auto max-h-[270px] w-full object-contain drop-shadow-2xl"
+              />
+              <div className="absolute left-0 top-8 z-20 rounded-3xl rounded-bl-md bg-white p-3 text-xs font-black text-slate-700 shadow-xl dark:bg-[#15171d] dark:text-slate-100 dark:ring-1 dark:ring-white/10">
+                Welcome aboard!
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between">
           <button
             onClick={handleClose}
-            className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            className={secondaryButtonClass}
           >
             Skip
           </button>
@@ -129,14 +183,14 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
             {step > 0 && (
               <button
                 onClick={() => setStep(s => s - 1)}
-                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                className={`px-4 py-2 ${secondaryButtonClass}`}
               >
                 Back
               </button>
             )}
             <button
               onClick={() => step < steps.length - 1 ? setStep(s => s + 1) : handleClose()}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
+              className={`${isInternWelcome ? 'bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200' : 'bg-blue-500 hover:bg-blue-600'} text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2`}
             >
               {step < steps.length - 1 ? 'Next' : 'Start Simulation'}
               <ChevronRight className="w-4 h-4" />

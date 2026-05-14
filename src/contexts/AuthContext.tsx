@@ -1,39 +1,27 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
-import type { Session, User, AuthResponse, OAuthResponse } from '@supabase/supabase-js'
 import type { Profile } from '../lib/supabase'
-
-export type UserRole = 'USER' | 'RECRUITER' | 'COMPANY' | 'MENTOR' | 'ADMIN'
-
-export const AUTH_PROVIDERS = {
-    GOOGLE: 'google',
-    GITHUB: 'github',
-    LINKEDIN: 'linkedin_oidc',
-} as const
-
-export const AUTH_ERRORS = {
-    EMAIL_NOT_VERIFIED: 'Please verify your email address before signing in. Check your inbox for the verification link.',
-    SIGN_IN_FAILED: 'Failed to sign in. Please check your credentials.',
-    SIGN_UP_FAILED: 'Failed to create account. Please try again.',
-    OAUTH_FAILED: 'Failed to sign in with social provider.',
-    GENERIC: 'An unexpected error occurred. Please try again.',
-    NOT_AUTHENTICATED: 'You must be signed in to perform this action.',
-} as const
-
-export const AUTH_ROUTES = {
-    SIGN_IN: '/sign-in',
-    SIGN_UP: '/sign-up',
-    CALLBACK: '/auth/callback',
-    DASHBOARD: '/dashboard',
-    COMPANY: '/company',
-} as const
-
-type OAuthProvider = typeof AUTH_PROVIDERS[keyof typeof AUTH_PROVIDERS]
+import {
+    AUTH_ERRORS,
+    AUTH_PROVIDERS,
+    AUTH_ROUTES,
+    getAuthRedirectUrl,
+    getProfileForUser,
+    normalizeRole,
+    type AuthResponse,
+    type OAuthProvider,
+    type OAuthResponse,
+    type Session,
+    type User,
+    type UserRole,
+} from '../lib/auth'
 
 export interface AuthContextValue {
     user: User | null
     session: Session | null
     profile: Profile | null
+    profileError: Error | null
     role: UserRole
     isAuthenticated: boolean
     isLoading: boolean
@@ -52,25 +40,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [session, setSession] = useState<Session | null>(null)
     const [profile, setProfile] = useState<Profile | null>(null)
+    const [profileError, setProfileError] = useState<Error | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const authRequestIdRef = useRef(0)
 
-    const fetchProfile = useCallback(async (userId: string) => {
-        const { profile: data } = await (await import('../lib/supabase')).profiles.getProfile(userId)
-        setProfile(data)
-        return data
+    const applySession = useCallback(async (nextSession: Session | null) => {
+        const requestId = ++authRequestIdRef.current
+        setSession(nextSession)
+        setUser(nextSession?.user ?? null)
+
+        if (!nextSession?.user) {
+            setProfile(null)
+            setProfileError(null)
+            return null
+        }
+
+        const { profile: nextProfile, error } = await getProfileForUser(nextSession.user.id)
+        if (requestId !== authRequestIdRef.current) return nextProfile
+
+        setProfile(nextProfile)
+        setProfileError(error ?? null)
+        return nextProfile
     }, [])
 
     useEffect(() => {
         const initializeAuth = async () => {
             try {
                 const { data: { session: currentSession } } = await supabase.auth.getSession()
-                if (currentSession) {
-                    setSession(currentSession)
-                    setUser(currentSession.user)
-                    await fetchProfile(currentSession.user.id)
-                }
+                await applySession(currentSession)
             } catch (err) {
                 console.error('Failed to initialize auth:', err)
+                setProfileError(err instanceof Error ? err : new Error(AUTH_ERRORS.GENERIC))
             } finally {
                 setIsLoading(false)
             }
@@ -80,13 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (_event, newSession) => {
-                setSession(newSession)
-                setUser(newSession?.user ?? null)
-                if (newSession?.user) {
-                    await fetchProfile(newSession.user.id)
-                } else {
-                    setProfile(null)
-                }
+                setIsLoading(true)
+                await applySession(newSession)
                 setIsLoading(false)
             }
         )
@@ -94,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return () => {
             authListener.subscription.unsubscribe()
         }
-    }, [fetchProfile])
+    }, [applySession])
 
     const signUp = useCallback(
         async (email: string, password: string, options?: { data?: Record<string, unknown> }): Promise<AuthResponse> => {
@@ -103,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 password,
                 options: {
                     data: options?.data,
-                    emailRedirectTo: window.location.origin + AUTH_ROUTES.CALLBACK,
+                    emailRedirectTo: getAuthRedirectUrl(),
                 },
             })
         },
@@ -122,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return await supabase.auth.signInWithOAuth({
                 provider,
                 options: {
-                    redirectTo: window.location.origin + AUTH_ROUTES.CALLBACK,
+                    redirectTo: getAuthRedirectUrl(),
                 },
             })
         },
@@ -131,24 +126,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signOut = useCallback(async () => {
         await supabase.auth.signOut()
+        setSession(null)
+        setUser(null)
         setProfile(null)
+        setProfileError(null)
     }, [])
 
     const resetPassword = useCallback(async (email: string) => {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + AUTH_ROUTES.SIGN_IN,
+            redirectTo: getAuthRedirectUrl(AUTH_ROUTES.SIGN_IN),
         })
         return { error }
     }, [])
 
     const refreshSession = useCallback(async () => {
-        const { data: { session: refreshed } } = await supabase.auth.getSession()
-        setSession(refreshed)
-        setUser(refreshed?.user ?? null)
-        if (refreshed?.user) {
-            await fetchProfile(refreshed.user.id)
-        }
-    }, [fetchProfile])
+        const { data: { session: refreshed } } = await supabase.auth.refreshSession()
+        await applySession(refreshed)
+    }, [applySession])
 
     const checkEmailExists = useCallback(async (email: string) => {
         const { data, error } = await supabase.rpc('is_email_registered', { email_address: email })
@@ -160,13 +154,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     const isAuthenticated = useMemo(() => !!user && !!session, [user, session])
-    const role = useMemo<UserRole>(() => (profile?.role as UserRole) || 'USER', [profile?.role])
+    const role = useMemo<UserRole>(() => normalizeRole(profile?.role), [profile?.role])
 
     const value = useMemo<AuthContextValue>(
         () => ({
             user,
             session,
             profile,
+            profileError,
             role,
             isAuthenticated,
             isLoading,
@@ -178,7 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             refreshSession,
             checkEmailExists,
         }),
-        [user, session, profile, role, isAuthenticated, isLoading, signUp, signIn, signInWithOAuth, signOut, resetPassword, refreshSession, checkEmailExists]
+        [user, session, profile, profileError, role, isAuthenticated, isLoading, signUp, signIn, signInWithOAuth, signOut, resetPassword, refreshSession, checkEmailExists]
     )
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
@@ -192,4 +187,5 @@ export function useAuth(): AuthContextValue {
     return context
 }
 
-export type { User, Session, AuthResponse, OAuthResponse }
+export { AUTH_ERRORS, AUTH_PROVIDERS, AUTH_ROUTES }
+export type { User, Session, AuthResponse, OAuthResponse, UserRole }

@@ -93,12 +93,11 @@ export function Footer7({
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-white/50 text-sm">{copyright}</p>
             <div className="flex items-center gap-6">
-              {/* Admin Link */}
               <a
-                href="/admin"
+                href="/admin/login"
                 className="text-white/50 hover:text-white transition-colors text-sm"
               >
-                Admin
+                Admin sign in
               </a>
               {/* Theme Toggle */}
               <div className="flex items-center gap-2">

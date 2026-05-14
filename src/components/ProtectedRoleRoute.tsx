@@ -1,8 +1,10 @@
-import { Navigate } from 'react-router-dom'
+import type { ReactNode } from 'react'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth, AUTH_ROUTES, type UserRole } from '../contexts/AuthContext'
+import { AuthLoadingScreen } from './AuthLoadingScreen'
 
 interface ProtectedRoleRouteProps {
-    children: React.ReactNode
+    children: ReactNode
     allowedRoles: UserRole[]
     loginPath?: string
     unauthorizedPath?: string
@@ -15,24 +17,18 @@ export function ProtectedRoleRoute({
     unauthorizedPath = AUTH_ROUTES.DASHBOARD,
 }: ProtectedRoleRouteProps) {
     const { isAuthenticated, isLoading, role } = useAuth()
+    const location = useLocation()
 
     if (isLoading) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-[#0a0a0a]">
-                <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Loading...</p>
-                </div>
-            </div>
-        )
+        return <AuthLoadingScreen />
     }
 
     if (!isAuthenticated) {
-        return <Navigate to={loginPath} replace />
+        return <Navigate to={loginPath} state={{ from: location.pathname }} replace />
     }
 
     if (!allowedRoles.includes(role)) {
-        return <Navigate to={unauthorizedPath} replace />
+        return <Navigate to={unauthorizedPath} state={{ error: 'You do not have permission to access this page' }} replace />
     }
 
     return <>{children}</>

@@ -3,27 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { AUTH_ROUTES, AUTH_ERRORS } from '../../contexts/AuthContext';
 import { SignInPage } from '../../components/ui/sign-in';
+import { getPostAuthRedirectPath, getProfileForUser, rememberAuthPortal, validatePortalAccess } from '../../lib/auth';
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { user, isLoading, signIn, signInWithOAuth, resetPassword, role } = useAuth();
+  const { user, isLoading, signIn, signInWithOAuth, signOut, resetPassword, role } = useAuth();
 
   useEffect(() => {
     if (!isLoading && user) {
-      const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
-      navigate(redirectPath);
+      navigate(getPostAuthRedirectPath(role), { replace: true });
     }
   }, [user, isLoading, navigate, role]);
 
   const handleEmailSignIn = async (email: string, password: string) => {
-    const { error } = await signIn(email, password);
-    if (error) {
-      return { error: { message: error.message || AUTH_ERRORS.SIGN_IN_FAILED } };
+    const { data, error } = await signIn(email, password);
+    if (error || !data.user) {
+      return { error: { message: error?.message || AUTH_ERRORS.SIGN_IN_FAILED } };
     }
+
+    const { profile } = await getProfileForUser(data.user.id);
+    const access = validatePortalAccess(profile, 'individual');
+    if (access.error) {
+      await signOut();
+      return { error: { message: access.error } };
+    }
+
+    navigate(access.redirectPath, { replace: true });
     return { error: null };
   };
 
   const handleGoogleSignIn = async () => {
+    rememberAuthPortal('individual');
     const { error } = await signInWithOAuth('google');
     if (error) {
       console.error('Google sign-in error:', error);
@@ -83,13 +93,18 @@ function AuthPage() {
         testimonials={testimonials}
         onEmailSignIn={handleEmailSignIn}
         onSignedIn={() => {
-          const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
-          navigate(redirectPath);
+          navigate(getPostAuthRedirectPath(role), { replace: true });
         }}
         onGoogleSignIn={handleGoogleSignIn}
         onCreateAccount={handleCreateAccount}
         onResetPassword={handleResetPassword}
       />
+      <a
+        href={AUTH_ROUTES.ORG_SIGN_IN}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-sm font-medium text-[#7170ff] hover:text-[#828fff]"
+      >
+        Organization sign in
+      </a>
     </div>
   );
 }

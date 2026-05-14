@@ -7,8 +7,9 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
 import { cn } from '../../lib/utils';
+import { useAuth } from '../../hooks/useAuth';
+import { companySimulations } from '../../lib/companySimulations';
 import {
   SimulationFormProvider,
   useSimulationForm,
@@ -43,6 +44,7 @@ const FORM_SECTIONS: { id: string; label: string; description: string; component
 
 function CompanySimulationCreatorContent() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
@@ -54,15 +56,19 @@ function CompanySimulationCreatorContent() {
     validationErrors,
     validateSection,
     resetForm,
+    formData,
+    setIsDirty,
   } = useSimulationForm();
 
   const currentSectionData = FORM_SECTIONS[currentSection];
   const CurrentComponent = currentSectionData.component;
 
   const handleSave = async () => {
+    if (!user) return;
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      companySimulations.saveDraft(user.id, formData);
+      setIsDirty(false);
       setLastSaved(new Date());
     } finally {
       setIsSaving(false);
@@ -100,7 +106,10 @@ function CompanySimulationCreatorContent() {
       if (!isValid) allValid = false;
     }
 
-    if (allValid) {
+    if (allValid && user) {
+      const simulation = companySimulations.saveDraft(user.id, formData);
+      companySimulations.publish(simulation.id, user.id);
+      resetForm();
       navigate('/company/simulations');
     } else {
       const firstInvalid = FORM_SECTIONS.find(

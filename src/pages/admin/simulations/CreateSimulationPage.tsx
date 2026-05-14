@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { adminSimulations } from '@/lib/admin'
 import {
   SimulationFormProvider,
   useSimulationForm,
@@ -62,6 +63,8 @@ function CreateSimulationContent() {
     setCurrentSection,
     completedSections,
     isDirty,
+    setIsDirty,
+    formData,
     validationErrors,
     validateSection,
     resetForm,
@@ -73,9 +76,17 @@ function CreateSimulationContent() {
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      // TODO: Call API to save draft
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const { error } = await adminSimulations.create({
+        ...formData,
+        id: formData.id.trim(),
+        route: formData.route.trim() || `/simulation/${formData.id.trim()}`,
+      })
+      if (error) throw error
+      setIsDirty(false)
       setLastSaved(new Date())
+    } catch (error) {
+      console.error('Failed to save simulation:', error)
+      window.alert('Unable to save simulation. Check that the ID is unique and your account has ADMIN access.')
     } finally {
       setIsSaving(false)
     }
@@ -116,8 +127,22 @@ function CreateSimulationContent() {
     }
 
     if (allValid) {
-      // TODO: Call API to create simulation
-      navigate('/admin/simulations')
+      setIsSaving(true)
+      try {
+        const { error } = await adminSimulations.create({
+          ...formData,
+          id: formData.id.trim(),
+          route: formData.route.trim() || `/simulation/${formData.id.trim()}`,
+        })
+        if (error) throw error
+        setIsDirty(false)
+        navigate('/admin/simulations')
+      } catch (error) {
+        console.error('Failed to create simulation:', error)
+        window.alert('Unable to create simulation. Check that the ID is unique and your account has ADMIN access.')
+      } finally {
+        setIsSaving(false)
+      }
     } else {
       // Find first invalid section
       const firstInvalid = FORM_SECTIONS.find(

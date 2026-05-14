@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Briefcase, Clock, CheckCircle, TrendingUp,
-  Play, Calendar, Users, DollarSign, Flag, Star, ChevronRight, Rocket
+  Briefcase, Clock, CheckCircle,
+  Play, Users, DollarSign, Flag, Star, ChevronRight, Rocket
 } from 'lucide-react';
 import { simulations, supabase } from '../lib/supabase';
 import { usePageSetup } from '../hooks/usePageSetup';
 import { simulationTemplates } from '../config/simulationTemplates';
+import { companySimulations } from '../lib/companySimulations';
 
 interface Simulation {
   id: string;
@@ -25,6 +26,8 @@ interface Simulation {
   scenario_key?: string;
   primaryColor?: string;
   currentPhase?: string;
+  isPublicOrgSimulation?: boolean;
+  livePath?: string;
 }
 
 const SimulationsPage = () => {
@@ -37,7 +40,10 @@ const SimulationsPage = () => {
     async function loadSimulations() {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
       const { sessions: allSessions } = await simulations.getAllUserSessions(user.id);
       const { scores } = await simulations.getScores();
@@ -76,7 +82,25 @@ const SimulationsPage = () => {
             currentPhase: isCompleted ? 'Completed' : `Week ${session.current_week} · ${currentPhase}`
           };
         });
-        setSimulationsList(mapped);
+        const publicOrgSimulations: Simulation[] = companySimulations.listPublic().map((simulation) => ({
+          id: simulation.id,
+          title: simulation.title,
+          industry: simulation.industry,
+          client: simulation.companyName,
+          budget: simulation.budget,
+          duration: `${simulation.durationWeeks} weeks`,
+          progress: 0,
+          deadline: 'Live',
+          status: 'ongoing',
+          color: 'bg-violet-500',
+          teamSize: simulation.teamSize,
+          primaryColor: simulation.template.primaryColor || '#5e6ad2',
+          currentPhase: 'Organization simulation',
+          isPublicOrgSimulation: true,
+          livePath: simulation.livePath,
+        }));
+
+        setSimulationsList([...publicOrgSimulations, ...mapped]);
       }
       setIsLoading(false);
     }
@@ -144,6 +168,30 @@ const SimulationsPage = () => {
           </p>
         </div>
 
+        <Link
+          to="/simulations/product-management"
+          className="mb-10 block rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+        >
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Rocket className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-primary">Simulation track</p>
+                <h2 className="mt-1 text-2xl font-black text-foreground">Product Management</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  Start with the first unlocked TechCorp simulation, then preview the premium workforce scenarios behind the paywall.
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-2 self-start rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground lg:self-center">
+              Open track
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          </div>
+        </Link>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
@@ -199,7 +247,7 @@ const SimulationsPage = () => {
             return (
               <Link
                 key={simulation.id}
-                to={`/simulation/${simulation.id}`}
+                to={simulation.livePath || `/simulation/${simulation.id}`}
                 className="group block"
               >
                 <div className="bg-card border border-border rounded-2xl p-6 lg:p-8 hover:border-primary/30 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5">
@@ -298,7 +346,7 @@ const SimulationsPage = () => {
                 : `You don't have any ${filter} simulations at the moment.`}
             </p>
             <Link
-              to="/start-simulation"
+              to="/simulations/product-management"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-primary/90 shadow-lg shadow-primary/20"
             >
               <Play className="h-4 w-4" />

@@ -132,10 +132,10 @@ export default function OrganizationPage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link 
-                  to="/contact"
+                  to="/organization/login"
                   className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
                 >
-                  Contact Sales
+                  Organization Login
                 </Link>
               </div>
             </motion.div>
@@ -285,10 +285,10 @@ export default function OrganizationPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
                 <Link 
-                  to="/contact" 
+                  to="/organization/login" 
                   className="inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground text-sm font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
                 >
-                  Contact Sales
+                  Organization Login
                 </Link>
               </div>
             </motion.div>
@@ -375,10 +375,10 @@ export default function OrganizationPage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link 
-                  to="/contact" 
+                  to="/organization/login" 
                   className="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-white text-base font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all whitespace-nowrap"
                 >
-                  Contact Sales
+                  Organization Login
                 </Link>
               </div>
             </div>

@@ -1,53 +1,67 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/hooks/useAuth';
-import { AUTH_ROUTES } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/lib/supabase'
+import { AUTH_ROUTES } from '@/contexts/AuthContext'
+import { consumeAuthPortal, getPortalLoginPath, getProfileForUser, validatePortalAccess } from '@/lib/auth'
 
 function OAuthCallbackPage() {
-  const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, isLoading, role } = useAuth();
+  const navigate = useNavigate()
+  const [error, setError] = useState<string | null>(null)
+  const [returnPath, setReturnPath] = useState(AUTH_ROUTES.SIGN_IN)
 
   useEffect(() => {
+    let isMounted = true
+
     const handleOAuthCallback = async () => {
+      const authPortal = consumeAuthPortal()
+      setReturnPath(getPortalLoginPath(authPortal))
+
       try {
-        const { searchParams, hash } = new URL(window.location.href);
-        const code = searchParams.get('code');
-        const errorParam = searchParams.get('error_description') || searchParams.get('error');
+        const { searchParams, hash } = new URL(window.location.href)
+        const code = searchParams.get('code')
+        const errorParam = searchParams.get('error_description') || searchParams.get('error')
 
         if (errorParam) {
-          setError(errorParam);
-          return;
+          if (isMounted) setError(errorParam)
+          return
         }
 
         if (code) {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
           if (exchangeError) {
-            setError(exchangeError.message);
-            return;
+            if (isMounted) setError(exchangeError.message)
+            return
           }
-        } else if (hash) {
+        } else if (!hash) {
+          if (isMounted) setError('Authentication callback is missing a session code.')
+          return
         }
 
-        setTimeout(() => {
-          const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
-          navigate(redirectPath, { replace: true });
-        }, 500);
-      } catch (err) {
-        setError('Failed to complete authentication. Please try again.');
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+
+        const { profile } = user ? await getProfileForUser(user.id) : { profile: null }
+        const access = validatePortalAccess(profile, authPortal)
+
+        if (access.error) {
+          await supabase.auth.signOut()
+          if (isMounted) setError(access.error)
+          return
+        }
+
+        navigate(access.redirectPath, { replace: true })
+      } catch {
+        if (isMounted) setError('Failed to complete authentication. Please try again.')
       }
-    };
-
-    handleOAuthCallback();
-  }, [navigate, role]);
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      const redirectPath = role === 'COMPANY' ? AUTH_ROUTES.COMPANY : AUTH_ROUTES.DASHBOARD;
-      navigate(redirectPath, { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate, role]);
+
+    handleOAuthCallback()
+
+    return () => {
+      isMounted = false
+    }
+  }, [navigate])
 
   if (error) {
     return (
@@ -61,24 +75,24 @@ function OAuthCallbackPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Authentication Error</h1>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
-            onClick={() => navigate(AUTH_ROUTES.SIGN_IN)}
+            onClick={() => navigate(returnPath)}
             className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
           >
             Back to Sign In
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
-        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
         <p className="text-gray-600">Completing authentication...</p>
       </div>
     </div>
-  );
+  )
 }
 
-export default OAuthCallbackPage;
+export default OAuthCallbackPage

@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { getProfileForUser, rememberAuthPortal, validatePortalAccess } from '@/lib/auth';
 
 function AdminLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isLoading, isAuthenticated, role, signIn, signInWithOAuth } = useAuth();
+  const { user, isLoading, isAuthenticated, role, signIn, signInWithOAuth, signOut } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -33,10 +34,21 @@ function AdminLoginPage() {
     setIsSubmitting(true);
 
     try {
-      const { error: signInError } = await signIn(email, password);
-      if (signInError) {
-        setError(signInError.message || AUTH_ERRORS.SIGN_IN_FAILED);
+      const { data, error: signInError } = await signIn(email, password);
+      if (signInError || !data.user) {
+        setError(signInError?.message || AUTH_ERRORS.SIGN_IN_FAILED);
+        return;
       }
+
+      const { profile } = await getProfileForUser(data.user.id);
+      const access = validatePortalAccess(profile, 'admin');
+      if (access.error) {
+        await signOut();
+        setError(access.error);
+        return;
+      }
+
+      navigate(access.redirectPath, { replace: true });
       // Successful login will trigger the useEffect above
     } catch {
       setError(AUTH_ERRORS.GENERIC);
@@ -48,6 +60,7 @@ function AdminLoginPage() {
   const handleGoogleSignIn = async () => {
     setError(null);
     try {
+      rememberAuthPortal('admin');
       const { error: oauthError } = await signInWithOAuth('google');
       if (oauthError) {
         setError(oauthError.message || AUTH_ERRORS.OAUTH_FAILED);

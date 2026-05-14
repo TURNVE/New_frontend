@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import {
   Gamepad2,
@@ -11,11 +12,23 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { companySimulations } from '../../lib/companySimulations';
 
 export function CompanyDashboardPage() {
   const { user, profile } = useAuth();
+  const [stats, setStats] = useState({ total: 0, live: 0, public: 0 });
 
   const orgName = profile?.full_name || user?.email?.split('@')[0] || 'Organization';
+
+  useEffect(() => {
+    if (!user) return;
+    const simulations = companySimulations.listForOwner(user.id);
+    setStats({
+      total: simulations.length,
+      live: simulations.filter((simulation) => simulation.status === 'live').length,
+      public: simulations.filter((simulation) => simulation.isPublic).length,
+    });
+  }, [user]);
 
   return (
     <div className="p-8">
@@ -34,16 +47,16 @@ export function CompanyDashboardPage() {
             </div>
             <span className="text-sm text-[#8a8f98]">Total Simulations</span>
           </div>
-          <p className="text-3xl font-bold text-white">0</p>
+          <p className="text-3xl font-bold text-white">{stats.total}</p>
         </div>
         <div className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
               <CheckCircle className="h-5 w-5 text-emerald-400" />
             </div>
-            <span className="text-sm text-[#8a8f98]">Completed</span>
+            <span className="text-sm text-[#8a8f98]">Public</span>
           </div>
-          <p className="text-3xl font-bold text-white">0</p>
+          <p className="text-3xl font-bold text-white">{stats.public}</p>
         </div>
         <div className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">
@@ -52,7 +65,7 @@ export function CompanyDashboardPage() {
             </div>
             <span className="text-sm text-[#8a8f98]">Active</span>
           </div>
-          <p className="text-3xl font-bold text-white">0</p>
+          <p className="text-3xl font-bold text-white">{stats.live}</p>
         </div>
         <div className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">

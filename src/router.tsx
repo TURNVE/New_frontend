@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { NotificationProvider } from './components/communications/NotificationCenter';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ProtectedRoleRoute } from './components/ProtectedRoleRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
 
 // ── Eager loaded pages (critical path) ────────────────────────
@@ -33,6 +34,7 @@ const StartSimulationPage = lazy(() => import('./pages/StartSimulationPage'));
 const ProjectBriefingPage = lazy(() => import('./pages/ProjectBriefingPage'));
 const NotFoundPage = lazy(() => import('./pages/notfound/NotFoundPage'));
 const OAuthCallbackPage = lazy(() => import('./pages/auth/OAuthCallbackPage'));
+const OrganizationLoginPage = lazy(() => import('./pages/auth/OrganizationLoginPage'));
 
 // ── Admin pages ────────────────────────────────────────────────
 const ProtectedAdminRoute = lazy(() => import('./components/admin/ProtectedAdminRoute').then(m => ({ default: m.ProtectedAdminRoute })));
@@ -47,6 +49,11 @@ const AdminBlogListPage = lazy(() => import('./pages/admin/blogs').then(m => ({ 
 const CreateBlogPage = lazy(() => import('./pages/admin/blogs').then(m => ({ default: m.CreateBlogPage })));
 const EditBlogPage = lazy(() => import('./pages/admin/blogs').then(m => ({ default: m.EditBlogPage })));
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
+
+const CompanyLayout = lazy(() => import('./pages/company/CompanyLayout'));
+const CompanyDashboardPage = lazy(() => import('./pages/company/CompanyDashboardPage'));
+const CompanySimulationsPage = lazy(() => import('./pages/company/CompanySimulationsPage'));
+const CompanySimulationCreator = lazy(() => import('./pages/company/CompanySimulationCreator'));
 
 // ── Simulations ───────────────────────────────────────────────
 const PayLinkSimulation = lazy(() => import('./features/sim-pm-001-paylink/PayLinkSimulation'));
@@ -82,6 +89,7 @@ function Router() {
             {/* ── Auth ────────────────────────────────────────────────── */}
             <Route path="/login" element={<Navigate to="/sign-in" replace />} />
             <Route path="/sign-in" element={<AuthPage />} />
+            <Route path="/organization/login" element={<OrganizationLoginPage />} />
             <Route path="/sign-up" element={<SignUpPage />} />
             <Route path="/auth/callback" element={<OAuthCallbackPage />} />
 
@@ -90,15 +98,16 @@ function Router() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/simulations" element={<SimulationsPage />} />
+              <Route path="/simulations/product-management" element={<StartSimulationPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/achievements" element={<AchievementsPage />} />
               <Route path="/team" element={<TeamPage />} />
-              <Route path="/tracks" element={<Navigate to="/start-simulation" replace />} />
-              <Route path="/industries" element={<Navigate to="/start-simulation" replace />} />
+              <Route path="/tracks" element={<Navigate to="/simulations/product-management" replace />} />
+              <Route path="/industries" element={<Navigate to="/simulations/product-management" replace />} />
               <Route path="/confirmation" element={<ConfirmationPage />} />
-              <Route path="/start-simulation" element={<StartSimulationPage />} />
+              <Route path="/start-simulation" element={<Navigate to="/simulations/product-management" replace />} />
               <Route path="/briefing" element={<ProjectBriefingPage />} />
             </Route>
 
@@ -112,12 +121,27 @@ function Router() {
             <Route path="/simulation/pm-04/*" element={<ProtectedRoute><NewWaveSimulation /></ProtectedRoute>} />
             <Route path="/simulation/sim-pm-004/*" element={<ProtectedRoute><NewWaveSimulation /></ProtectedRoute>} />
 
-            {/* ── Intern Onboarding Simulation ── */}
-            <Route path="/simulation/intern/*" element={<ProtectedRoute><InternOnboarding /></ProtectedRoute>} />
+            {/* ── First Product Management Simulation ── */}
+            <Route path="/simulation/intern/*" element={<Navigate to="/simulation/sim-intern-001" replace />} />
             <Route path="/simulation/sim-intern-001/*" element={<ProtectedRoute><InternOnboarding /></ProtectedRoute>} />
 
             {/* ── Legacy simulation route - redirect to simulations list ── */}
             <Route path="/simulation/:id" element={<Navigate to="/simulations" replace />} />
+
+            <Route
+              path="/company/*"
+              element={
+                <ProtectedRoleRoute allowedRoles={['COMPANY']} loginPath="/organization/login">
+                  <CompanyLayout />
+                </ProtectedRoleRoute>
+              }
+            >
+              <Route index element={<CompanyDashboardPage />} />
+              <Route path="simulations" element={<CompanySimulationsPage />} />
+              <Route path="simulations/new" element={<CompanySimulationCreator />} />
+              <Route path="analytics" element={<div className="p-8 text-white">Analytics coming soon.</div>} />
+              <Route path="settings" element={<div className="p-8 text-white">Organization settings coming soon.</div>} />
+            </Route>
 
             {/* ── Admin Routes ──────────────────────────────────────────────── */}
             <Route path="/admin/login" element={<AdminLoginPage />} />

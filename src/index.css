@@ -148,6 +148,21 @@
     overscroll-behavior-y: contain;
   }
 
+  select {
+    color-scheme: light;
+    background-color: var(--color-input);
+    color: var(--color-foreground);
+  }
+
+  select option {
+    background-color: var(--color-popover);
+    color: var(--color-popover-foreground);
+  }
+
+  .dark select {
+    color-scheme: dark;
+  }
+
   /* Selection color */
   ::selection {
     background-color: rgba(113, 112, 255, 0.3);
@@ -508,6 +523,35 @@
   }
 }
 
+@keyframes intern-card-pop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes intern-floaty {
+  0%, 100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes intern-bounce-slow {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.04);
+  }
+}
+
 /* Animation Utilities */
 .animate-fade-slide {
   opacity: 0;
@@ -535,6 +579,14 @@
 .animate-float-delayed {
   animation: float-delayed 3s ease-in-out infinite;
   animation-delay: 0.5s;
+}
+
+.animate-floaty {
+  animation: intern-floaty 4s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: intern-bounce-slow 2.4s ease-in-out infinite;
 }
 
 .animate-slide-in-left {

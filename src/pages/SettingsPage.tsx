@@ -83,6 +83,7 @@ const SettingsPage = () => {
         console.error('Upgrade error:', error);
         return;
       }
+      await refreshSession();
       navigate('/company');
     } catch (err) {
       setUpgradeError('An unexpected error occurred.');
@@ -129,7 +130,7 @@ const SettingsPage = () => {
             <div className="pt-4 mt-4 border-t border-border">
               {showOrgSwitch && (
                 <button 
-                  onClick={handleUpgradeToOrganization}
+                  onClick={() => role === 'COMPANY' ? navigate('/company') : handleUpgradeToOrganization()}
                   disabled={isUpgrading}
                   className="w-full text-left px-4 py-3 rounded-xl text-primary hover:bg-primary/10 transition-colors flex items-center gap-3 mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -139,7 +140,7 @@ const SettingsPage = () => {
                     <Building2 className="h-5 w-5" />
                   )}
                   <span className="font-medium text-sm">
-                    {isUpgrading ? 'Upgrading...' : 'Upgrade to Organization'}
+                  {role === 'COMPANY' ? 'Organization Dashboard' : isUpgrading ? 'Upgrading...' : 'Upgrade to Organization'}
                   </span>
                 </button>
               )}
@@ -294,8 +295,8 @@ const SettingsPage = () => {
                           </p>
                         </div>
                         <button
-                          onClick={handleUpgradeToOrganization}
-                          disabled={isUpgrading || role === 'COMPANY'}
+                          onClick={() => role === 'COMPANY' ? navigate('/company') : handleUpgradeToOrganization()}
+                          disabled={isUpgrading}
                           className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isUpgrading ? (
@@ -303,7 +304,7 @@ const SettingsPage = () => {
                           ) : role === 'COMPANY' ? (
                             <>
                               <CheckCircle2 className="h-4 w-4" />
-                              Already Active
+                              Open Dashboard
                             </>
                           ) : (
                             <>

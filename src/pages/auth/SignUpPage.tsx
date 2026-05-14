@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, Building2, Briefcase, Globe, Users, ListChecks } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, Eye, EyeOff, Mail, Lock, User, Building2, Briefcase, Globe, Users, ListChecks } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
 import { AUTH_ROUTES, AUTH_ERRORS } from '../../contexts/AuthContext';
+import { rememberAuthPortal } from '../../lib/auth';
 
 type AccountType = 'individual' | 'organization';
 
@@ -75,9 +76,10 @@ export const SignUpPage = () => {
         }
 
         setError('Please check your email to verify your account.');
-        setTimeout(() => navigate(AUTH_ROUTES.SIGN_IN), 3000);
+        const loginPath = accountType === 'organization' ? AUTH_ROUTES.ORG_SIGN_IN : AUTH_ROUTES.SIGN_IN;
+        setTimeout(() => navigate(loginPath), 3000);
       }
-    } catch (err) {
+    } catch {
       setError(AUTH_ERRORS.GENERIC);
     } finally {
       setIsLoading(false);
@@ -89,13 +91,14 @@ export const SignUpPage = () => {
     setError(null);
 
     try {
+      rememberAuthPortal(accountType === 'organization' ? 'organization' : 'individual');
       const { error: oauthError } = await signInWithOAuth('google');
 
       if (oauthError) {
         setError(oauthError.message || AUTH_ERRORS.OAUTH_FAILED);
         setIsOAuthLoading(false);
       }
-    } catch (err) {
+    } catch {
       setError(AUTH_ERRORS.GENERIC);
       setIsOAuthLoading(false);
     }
@@ -327,18 +330,21 @@ export const SignUpPage = () => {
                 <label htmlFor="roleInterest" className="block text-sm font-medium text-text-secondary mb-1.5">
                   Role Interest
                 </label>
-                <select
-                  id="roleInterest"
-                  className="w-full px-4 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
-                  required
-                >
-                  <option value="" disabled>Select your target track</option>
-                  <option value="product-manager">Product Manager</option>
-                  <option value="engineering-manager">Engineering Manager</option>
-                  <option value="data-analytics">Data & Analytics</option>
-                  <option value="operations">Operations Manager</option>
-                  <option value="consulting">Consulting</option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="roleInterest"
+                    className="w-full px-4 py-3 pr-11 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
+                    required
+                  >
+                    <option value="" disabled>Select your target track</option>
+                    <option value="product-manager">Product Manager</option>
+                    <option value="engineering-manager">Engineering Manager</option>
+                    <option value="data-analytics">Data & Analytics</option>
+                    <option value="operations">Operations Manager</option>
+                    <option value="consulting">Consulting</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-quaternary" />
+                </div>
               </div>
             )}
 
@@ -375,7 +381,7 @@ export const SignUpPage = () => {
                       id="orgIndustry"
                       value={orgIndustry}
                       onChange={(e) => setOrgIndustry(e.target.value)}
-                      className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
+                      className="w-full pl-11 pr-11 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
                     >
                       <option value="" disabled>Select industry</option>
                       <option value="technology">Technology</option>
@@ -390,6 +396,7 @@ export const SignUpPage = () => {
                       <option value="nonprofit">Nonprofit</option>
                       <option value="other">Other</option>
                     </select>
+                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-quaternary" />
                   </div>
                 </div>
 
@@ -405,7 +412,7 @@ export const SignUpPage = () => {
                       id="orgSize"
                       value={orgSize}
                       onChange={(e) => setOrgSize(e.target.value)}
-                      className="w-full pl-11 px-4 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
+                      className="w-full pl-11 pr-11 py-3 border border-border rounded-[6px] bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:border-transparent transition-shadow appearance-none"
                     >
                       <option value="" disabled>Select team size</option>
                       <option value="1-10">1-10 employees</option>
@@ -415,6 +422,7 @@ export const SignUpPage = () => {
                       <option value="501-1000">501-1000 employees</option>
                       <option value="1000+">1000+ employees</option>
                     </select>
+                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-quaternary" />
                   </div>
                 </div>
 
@@ -439,7 +447,7 @@ export const SignUpPage = () => {
 
           <p className="text-center mt-6 text-text-secondary">
             Already have an account?{' '}
-            <a href="/sign-in" className="text-[#7170ff] hover:text-[#828fff] font-medium">
+            <a href={accountType === 'organization' ? AUTH_ROUTES.ORG_SIGN_IN : AUTH_ROUTES.SIGN_IN} className="text-[#7170ff] hover:text-[#828fff] font-medium">
               Log in
             </a>
           </p>
