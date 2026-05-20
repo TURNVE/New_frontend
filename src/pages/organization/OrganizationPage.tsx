@@ -125,7 +125,7 @@ export default function OrganizationPage() {
               </p>
               <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
                 <Link 
-                  to="/sign-up?type=organization" 
+                  to="/organization/sign-up"
                   className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
                 >
                   Get Started
@@ -278,7 +278,7 @@ export default function OrganizationPage() {
               
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Link 
-                  to="/sign-up?type=organization" 
+                  to="/organization/sign-up"
                   className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
                 >
                   Get Started
@@ -368,7 +368,7 @@ export default function OrganizationPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
-                  to="/sign-up?type=organization" 
+                  to="/organization/sign-up"
                   className="inline-flex items-center justify-center px-8 py-4 bg-primary-foreground text-primary text-base font-semibold rounded-xl hover:bg-primary-foreground/90 transition-all hover:shadow-lg whitespace-nowrap"
                 >
                   Get Started

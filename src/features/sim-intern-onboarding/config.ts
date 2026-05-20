@@ -40,7 +40,7 @@ export const INTERN_ONBOARDING_CONFIG: SimulationConfig = {
     challengeDetails: 'Start as an intern, learn the company, meet the team, and earn your promotion to Junior Product Manager.',
 
     // Simulation engine config
-    totalWeeks: 1, // Single week for fast onboarding
+    totalWeeks: 3,
     teamSize: 6,
     durationHours: 1, // ~1 hour for complete onboarding
     difficulty: 'intro',
@@ -160,17 +160,17 @@ export const INTERN_ONBOARDING_CONFIG: SimulationConfig = {
         },
         {
             id: 'phase-day2',
-            name: 'Day 2: Team & Calendar',
+            name: 'Week 2: Team & Calendar',
             status: 'pending',
             description: 'Meet the team and accept CEO meeting',
-            week: 1,
+            week: 2,
         },
         {
             id: 'phase-day3',
-            name: 'Day 3: First Task & Promotion',
+            name: 'Week 3: First Task & Promotion',
             status: 'pending',
             description: 'Complete your first task and get promoted',
-            week: 1,
+            week: 3,
         },
     ],
 

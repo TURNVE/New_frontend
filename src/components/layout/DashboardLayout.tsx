@@ -104,7 +104,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <div className="flex items-center justify-between h-16 px-4 border-b border-border shrink-0">
               <Link to="/" className="flex items-center space-x-2" onClick={() => setSidebarOpen(false)}>
                 <img src="/logo.png" alt="TURNVE" className="h-8 w-auto" />
-                <span className="text-lg font-bold text-foreground">TURNVE</span>
               </Link>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -210,7 +209,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </button>
               <Link to="/dashboard" className="flex items-center space-x-2">
                 <img src="/logo.png" alt="TURNVE" className="h-7 w-auto sm:h-8" />
-                <span className="text-base font-bold text-foreground hidden sm:inline">TURNVE</span>
               </Link>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -221,7 +219,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-semibold text-foreground">{userName}</p>
-                  <p className="text-xs text-muted-foreground">Explorer</p>
                 </div>
                 <Link to="/profile">
                   <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-primary-foreground font-semibold text-sm sm:text-base cursor-pointer hover:opacity-90 transition-opacity">

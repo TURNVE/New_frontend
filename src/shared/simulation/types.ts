@@ -165,6 +165,38 @@ export interface PRDField {
     required?: boolean;
 }
 
+export interface WorkplaceMaterial {
+    id: string;
+    title: string;
+    source: string;
+    content: string[];
+}
+
+export interface OutputTemplateItem {
+    id: string;
+    label: string;
+    guidance?: string;
+}
+
+export interface TaskScoringCriterion {
+    id: string;
+    label: string;
+    points: number;
+    description: string;
+}
+
+export interface ActionReviewResult {
+    score: number;
+    maxScore: number;
+    percentage: number;
+    level: 'needs_revision' | 'developing' | 'job_ready' | 'strong';
+    strengths: string[];
+    gaps: string[];
+    revisionPrompt: string;
+    stakeholderReaction: string;
+    requiresRevision: boolean;
+}
+
 export interface WeeklyActionItem {
     id: string;
     week: number;
@@ -192,6 +224,16 @@ export interface WeeklyActionItem {
     // For 'approval' actionType
     approvalContext?: string;
     approvalOptions?: { id: string; label: string; requiresReason?: boolean }[];
+
+    // Product Management workplace simulation metadata
+    workplaceScenario?: string;
+    workplaceMaterials?: WorkplaceMaterial[];
+    learnerInstruction?: string;
+    outputTemplate?: OutputTemplateItem[];
+    expectedAnswerGuide?: string[];
+    scoringRubric?: TaskScoringCriterion[];
+    feedbackCriteria?: string[];
+    artifactType?: 'prd' | 'roadmap' | 'stakeholder_update' | 'retrospective' | 'risk_assessment' | 'user_research' | 'metrics_report' | 'decision_log' | 'project_charter';
 }
 
 // ============================================================
@@ -248,6 +290,10 @@ export interface SimulationConfig {
     weeklyEvents?: WeeklyEvent[];
     weeklyActions?: WeeklyActionItem[];
 
+    // Optional PM simulation metadata
+    evaluationRubrics?: Record<string, TaskScoringCriterion[]>;
+    promptEngine?: string;
+
     // Context text (drives AI/narrative generation)
     marketContext: string;
     technicalStack: string;
@@ -262,6 +308,7 @@ export interface CompletedAction {
     actionId: string;
     week: number;
     result: Record<string, unknown>;
+    review?: ActionReviewResult;
 }
 
 export interface BacklogActionItem extends WeeklyActionItem {
@@ -331,6 +378,9 @@ export interface ArtifactRecord {
     description: string;
     createdAt: string;
     week: number;
+    status?: 'draft' | 'generated' | 'exported' | 'archived';
+    content?: Record<string, unknown>;
+    metadata?: Record<string, unknown>;
 }
 
 export interface BacklogItem {

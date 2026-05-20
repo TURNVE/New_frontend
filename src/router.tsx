@@ -35,6 +35,7 @@ const ProjectBriefingPage = lazy(() => import('./pages/ProjectBriefingPage'));
 const NotFoundPage = lazy(() => import('./pages/notfound/NotFoundPage'));
 const OAuthCallbackPage = lazy(() => import('./pages/auth/OAuthCallbackPage'));
 const OrganizationLoginPage = lazy(() => import('./pages/auth/OrganizationLoginPage'));
+const OrganizationSignUpPage = lazy(() => import('./pages/auth/OrganizationSignUpPage'));
 
 // ── Admin pages ────────────────────────────────────────────────
 const ProtectedAdminRoute = lazy(() => import('./components/admin/ProtectedAdminRoute').then(m => ({ default: m.ProtectedAdminRoute })));
@@ -62,6 +63,10 @@ const ShopEaseSimulation = lazy(() => import('./features/sim-pm-002-shopease/Sho
 const TechCoreSimulation = lazy(() => import('./features/sim-pm-003-techcore/TechCoreSimulation'));
 const NewWaveSimulation = lazy(() => import('./features/sim-pm-004-newwave/NewWaveSimulation'));
 const InternOnboarding = lazy(() => import('./features/sim-intern-onboarding/InternOnboarding'));
+const PayLoopFirstTransactionSimulation = lazy(() => import('./features/sim-pm-fintech-track/PayLoopFirstTransactionSimulation'));
+const VeriCashKycSimulation = lazy(() => import('./features/sim-pm-fintech-track/VeriCashKycSimulation'));
+const SwiftPayFailedTransferSimulation = lazy(() => import('./features/sim-pm-fintech-track/SwiftPayFailedTransferSimulation'));
+const RegisteredSimulationRoute = lazy(() => import('./features/simulations/RegisteredSimulationRoute'));
 
 const Loading = () => (
   <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -91,6 +96,7 @@ function Router() {
             <Route path="/login" element={<Navigate to="/sign-in" replace />} />
             <Route path="/sign-in" element={<AuthPage />} />
             <Route path="/organization/login" element={<OrganizationLoginPage />} />
+            <Route path="/organization/sign-up" element={<OrganizationSignUpPage />} />
             <Route path="/sign-up" element={<SignUpPage />} />
             <Route path="/auth/callback" element={<OAuthCallbackPage />} />
 
@@ -105,10 +111,10 @@ function Router() {
               <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/achievements" element={<AchievementsPage />} />
               <Route path="/team" element={<TeamPage />} />
-              <Route path="/tracks" element={<Navigate to="/simulations/product-management" replace />} />
-              <Route path="/industries" element={<Navigate to="/simulations/product-management" replace />} />
+              <Route path="/tracks" element={<Navigate to="/simulations" replace />} />
+              <Route path="/industries" element={<Navigate to="/simulations" replace />} />
               <Route path="/confirmation" element={<ConfirmationPage />} />
-              <Route path="/start-simulation" element={<Navigate to="/simulations/product-management" replace />} />
+              <Route path="/start-simulation" element={<Navigate to="/simulations" replace />} />
               <Route path="/briefing" element={<ProjectBriefingPage />} />
             </Route>
 
@@ -121,13 +127,17 @@ function Router() {
             <Route path="/simulation/sim-pm-003/*" element={<ProtectedRoute><TechCoreSimulation /></ProtectedRoute>} />
             <Route path="/simulation/pm-04/*" element={<ProtectedRoute><NewWaveSimulation /></ProtectedRoute>} />
             <Route path="/simulation/sim-pm-004/*" element={<ProtectedRoute><NewWaveSimulation /></ProtectedRoute>} />
+            <Route path="/simulation/sim-pm-fintech-001/*" element={<ProtectedRoute><PayLoopFirstTransactionSimulation /></ProtectedRoute>} />
+            <Route path="/simulation/sim-pm-fintech-002/*" element={<ProtectedRoute><VeriCashKycSimulation /></ProtectedRoute>} />
+            <Route path="/simulation/sim-pm-fintech-003/*" element={<ProtectedRoute><SwiftPayFailedTransferSimulation /></ProtectedRoute>} />
+            <Route path="/simulation/:simulationId/*" element={<ProtectedRoute><RegisteredSimulationRoute /></ProtectedRoute>} />
 
             {/* ── First Product Management Simulation ── */}
             <Route path="/simulation/intern/*" element={<Navigate to="/simulation/sim-intern-001" replace />} />
             <Route path="/simulation/sim-intern-001/*" element={<ProtectedRoute><InternOnboarding /></ProtectedRoute>} />
 
             {/* ── Legacy simulation route - redirect to simulations list ── */}
-            <Route path="/simulation/:id" element={<Navigate to="/simulations" replace />} />
+            <Route path="/simulation/:simulationId" element={<ProtectedRoute><RegisteredSimulationRoute /></ProtectedRoute>} />
 
             <Route
               path="/company/*"

@@ -4,14 +4,15 @@ import { useTypingEffect } from '../../hooks/useTypingEffect';
 interface TypingTextProps {
   text: string;
   speed?: number;
+  delay?: number;
   className?: string;
   as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
   enabled?: boolean;
   onComplete?: () => void;
 }
 
-export function TypingText({ text, speed = 30, className = '', as = 'span', enabled = true, onComplete }: TypingTextProps) {
-  const { displayedText, isTyping } = useTypingEffect(text, { speed, enabled });
+export function TypingText({ text, speed = 30, delay = 500, className = '', as = 'span', enabled = true, onComplete }: TypingTextProps) {
+  const { displayedText, isTyping } = useTypingEffect(text, { speed, delay, enabled });
   const [showCursor, setShowCursor] = useState(true);
   const Tag = as;
 

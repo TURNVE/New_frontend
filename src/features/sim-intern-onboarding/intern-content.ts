@@ -190,7 +190,7 @@ export const INTERN_WEEKLY_SIGNALS: WeeklySignal[] = [
     // Week 1 - Day 2
     {
         id: 'intern-sig-d2-01',
-        week: 1,
+        week: 2,
         source: 'Lisa Martinez',
         sourceInitials: 'LM',
         sourceColor: 'bg-emerald-500/20 text-emerald-400',
@@ -200,7 +200,7 @@ export const INTERN_WEEKLY_SIGNALS: WeeklySignal[] = [
     },
     {
         id: 'intern-sig-d2-02',
-        week: 1,
+        week: 2,
         source: 'Calendar',
         sourceInitials: 'CL',
         sourceColor: 'bg-blue-500/20 text-blue-400',
@@ -211,7 +211,7 @@ export const INTERN_WEEKLY_SIGNALS: WeeklySignal[] = [
     // Week 1 - Day 3 (after promotion)
     {
         id: 'intern-sig-promo-01',
-        week: 1,
+        week: 3,
         source: 'System',
         sourceInitials: 'SY',
         sourceColor: 'bg-primary/20 text-primary',
@@ -221,7 +221,7 @@ export const INTERN_WEEKLY_SIGNALS: WeeklySignal[] = [
     },
     {
         id: 'intern-sig-promo-02',
-        week: 1,
+        week: 3,
         source: 'Marcus Johnson',
         sourceInitials: 'MJ',
         sourceColor: 'bg-primary/20 text-primary',
@@ -254,7 +254,7 @@ export const INTERN_WEEKLY_EVENTS: WeeklyEvent[] = [
     // Day 1 - Meet PM
     {
         id: 'intern-evt-d1-pm-intro',
-        week: 1,
+        week: 2,
         type: 'meeting',
         title: 'Meet Your Product Manager',
         description: 'Sarah Chen wants to welcome you to the team and explain your role.',
@@ -283,7 +283,7 @@ export const INTERN_WEEKLY_EVENTS: WeeklyEvent[] = [
     // Day 2 - CEO Meeting
     {
         id: 'intern-evt-d2-ceo-invite',
-        week: 1,
+        week: 2,
         type: 'meeting',
         title: 'CEO Meeting Invitation',
         description: 'Marcus Johnson invites you to a 6PM meeting today. Check your calendar to accept.',
@@ -313,7 +313,7 @@ export const INTERN_WEEKLY_EVENTS: WeeklyEvent[] = [
     // Day 2 - Meeting reminder
     {
         id: 'intern-evt-d2-meeting-reminder',
-        week: 1,
+        week: 2,
         type: 'notification',
         title: 'Meeting Starts in 5 Minutes',
         description: 'Your CEO meeting starts at 6PM. Join now!',
@@ -328,7 +328,7 @@ export const INTERN_WEEKLY_EVENTS: WeeklyEvent[] = [
     // Day 3 - First real task
     {
         id: 'intern-evt-d3-first-task',
-        week: 1,
+        week: 3,
         type: 'request',
         title: 'First Microtask',
         description: 'Sarah Chen has assigned you your first real work task.',
@@ -343,7 +343,7 @@ export const INTERN_WEEKLY_EVENTS: WeeklyEvent[] = [
     // Day 3 - Promotion event
     {
         id: 'intern-evt-d3-promotion',
-        week: 1,
+        week: 3,
         type: 'notification',
         title: 'Promotion Alert!',
         description: 'Congratulations! You have been promoted to Junior Product Manager!',
@@ -402,13 +402,13 @@ export const INTERN_WEEKLY_ACTIONS: WeeklyActionItem[] = [
     // === TASK 4: Accept CEO Meeting ===
     {
         id: 'intern-action-accept-ceo-meeting',
-        week: 1,
+        week: 2,
         title: 'Accept CEO Meeting Invitation',
         description: 'You have a meeting invitation from Marcus Johnson (CEO). Accept to confirm your attendance.',
         category: 'task',
         actionType: 'choice',
         priority: 'urgent',
-        dueWeek: 1,
+        dueWeek: 2,
         choices: [
             {
                 id: 'accept-ceo-meeting',
@@ -426,25 +426,25 @@ export const INTERN_WEEKLY_ACTIONS: WeeklyActionItem[] = [
     // === TASK 5: Team Introduction ===
     {
         id: 'intern-action-team-intro',
-        week: 1,
+        week: 2,
         title: 'Team Introduction with HR',
         description: 'Lisa Martinez (HR) will introduce you to your team members. Get to know your colleagues!',
         category: 'meeting',
         actionType: 'acknowledge',
         priority: 'high',
-        dueWeek: 1,
+        dueWeek: 2,
     },
     
     // === TASK 6: Join CEO Meeting ===
     {
         id: 'intern-action-join-ceo-meeting',
-        week: 1,
+        week: 2,
         title: 'Join CEO Welcome Meeting',
         description: 'Your meeting with Marcus Johnson is starting. Join to hear about the company vision.',
         category: 'meeting',
         actionType: 'choice',
         priority: 'urgent',
-        dueWeek: 1,
+        dueWeek: 2,
         choices: [
             {
                 id: 'join-ceo-meeting',
@@ -462,13 +462,13 @@ export const INTERN_WEEKLY_ACTIONS: WeeklyActionItem[] = [
     // === TASK 7: First Real Task ===
     {
         id: 'intern-action-first-task',
-        week: 1,
+        week: 3,
         title: 'Complete Your First Microtask',
         description: 'Sarah Chen has assigned you a simple task: Review the product backlog and identify one feature to improve.',
         category: 'task',
         actionType: 'decision_text',
         priority: 'high',
-        dueWeek: 1,
+        dueWeek: 3,
         decisionPrompt: 'Review the product backlog below and identify one feature that needs improvement. Explain why you chose it and how you would improve it.',
         decisionPlaceholder: 'Feature Name: ...\n\nWhy this feature: ...\n\nSuggested improvement: ...\n\nExpected impact: ...',
     },
@@ -476,13 +476,13 @@ export const INTERN_WEEKLY_ACTIONS: WeeklyActionItem[] = [
     // === TASK 8: Promotion ===
     {
         id: 'intern-action-promotion',
-        week: 1,
+        week: 3,
         title: 'Promotion to Junior PM',
         description: 'Congratulations! Your PM Sarah Chen has been promoted to a new role. The CEO has decided to promote YOU to take her place as the new Product Manager!',
         category: 'notification',
         actionType: 'acknowledge',
         priority: 'urgent',
-        dueWeek: 1,
+        dueWeek: 3,
     },
 ];
 

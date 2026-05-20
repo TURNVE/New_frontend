@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Briefcase, Clock, CheckCircle,
-  Play, Users, DollarSign, Flag, Star, ChevronRight, Rocket
+  Briefcase, Clock,
+  Play, Users, DollarSign, Flag, Star, ChevronRight, Rocket, Lock, Sparkles, BookOpen, Target, CheckCircle2
 } from 'lucide-react';
-import { simulations, supabase } from '../lib/supabase';
+import { simulations, supabase, type SimulationSession } from '../lib/supabase';
 import { usePageSetup } from '../hooks/usePageSetup';
-import { simulationTemplates } from '../config/simulationTemplates';
 import { companySimulations } from '../lib/companySimulations';
+import { getAllSimulations, getSimulationConfig } from '../features/simulations';
 
 interface Simulation {
   id: string;
@@ -27,14 +27,53 @@ interface Simulation {
   primaryColor?: string;
   currentPhase?: string;
   isPublicOrgSimulation?: boolean;
+  isCatalogueSimulation?: boolean;
+  description?: string;
+  difficulty?: string;
+  moduleCount?: number;
+  metricLabel?: string;
   livePath?: string;
+}
+
+interface SessionStateData {
+  project?: { title?: string };
+  industry?: string;
+  company?: { name?: string };
+  budget?: number;
+  teamSize?: number;
 }
 
 const SimulationsPage = () => {
   usePageSetup();
-  const [filter, setFilter] = useState<'all' | 'ongoing' | 'in-progress' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
   const [simulationsList, setSimulationsList] = useState<Simulation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const catalogueSimulations: Simulation[] = getAllSimulations().map((simulation) => {
+    const moduleCount = simulation.weeklyActions?.length || simulation.totalWeeks;
+    const isUpdatedPM = simulation.id.startsWith('sim-pm-fintech');
+
+    return {
+      id: simulation.id,
+      title: simulation.name,
+      industry: simulation.industry,
+      client: simulation.companyName,
+      budget: simulation.budget,
+      duration: `${moduleCount} ${moduleCount === 1 ? 'module' : 'modules'}`,
+      progress: 0,
+      deadline: isUpdatedPM ? 'Updated PM simulation' : 'Available',
+      status: 'active',
+      color: isUpdatedPM ? 'bg-emerald-500' : 'bg-indigo-500',
+      teamSize: simulation.teamSize,
+      primaryColor: simulation.primaryColor,
+      currentPhase: `${simulation.difficulty} - ${moduleCount} tasks`,
+      isCatalogueSimulation: true,
+      description: simulation.challengeDetails,
+      difficulty: simulation.difficulty,
+      moduleCount,
+      metricLabel: simulation.kpis[0]?.label,
+      livePath: `/simulation/${simulation.id}`,
+    };
+  });
 
   useEffect(() => {
     async function loadSimulations() {
@@ -49,11 +88,11 @@ const SimulationsPage = () => {
       const { scores } = await simulations.getScores();
 
       if (allSessions) {
-        const mapped = allSessions.map((session: any) => {
+        const mapped = allSessions.map((session: SimulationSession) => {
           const scoreMatch = scores?.find(sc => sc.session_id === session.id);
-          const stateData: any = session.state || {};
+          const stateData = (session.state || {}) as SessionStateData;
           const isCompleted = session.status === 'completed';
-          const template = session.scenario_key ? simulationTemplates[session.scenario_key] : undefined;
+          const template = session.scenario_key ? getSimulationConfig(session.scenario_key) : undefined;
 
           const phaseNames: Record<string, string> = {
             '1': 'Discovery',
@@ -65,9 +104,9 @@ const SimulationsPage = () => {
           
           return {
             id: session.id,
-            title: stateData.project?.title || session.scenario_key || 'Simulation Project',
-            industry: stateData.industry || 'Technology',
-            client: stateData.company?.name || 'Unknown Client',
+            title: stateData.project?.title || template?.name || session.scenario_key || 'Simulation Project',
+            industry: stateData.industry || template?.industry || 'Technology',
+            client: stateData.company?.name || template?.companyName || 'Unknown Client',
             budget: stateData.budget || 50000,
             duration: `${session.total_weeks} weeks`,
             progress: session.total_weeks ? Math.round((session.current_week / session.total_weeks) * 100) : 0,
@@ -79,7 +118,7 @@ const SimulationsPage = () => {
             completedDate: scoreMatch ? new Date(scoreMatch.completed_at).toLocaleDateString() : undefined,
             scenario_key: session.scenario_key,
             primaryColor: template?.primaryColor || '#6366f1',
-            currentPhase: isCompleted ? 'Completed' : `Week ${session.current_week} · ${currentPhase}`
+            currentPhase: isCompleted ? 'Completed' : `Week ${session.current_week} - ${currentPhase}`
           };
         });
         const publicOrgSimulations: Simulation[] = companySimulations.listPublic().map((simulation) => ({
@@ -107,20 +146,15 @@ const SimulationsPage = () => {
     loadSimulations();
   }, []);
 
+  const organizationSimulations = simulationsList.filter(sim => sim.isPublicOrgSimulation);
+  const activeSessionSimulations = simulationsList.filter(sim => !sim.isPublicOrgSimulation);
+  const availableSimulations = [...catalogueSimulations, ...organizationSimulations];
+
   const filteredSimulations = filter === 'all'
-    ? simulationsList
-    : simulationsList.filter(sim => 
+    ? activeSessionSimulations
+    : activeSessionSimulations.filter(sim =>
         sim.status === filter || (filter === 'ongoing' && (sim.status === 'active' || sim.status === 'ongoing'))
       );
-
-  const stats = {
-    ongoing: simulationsList.filter(s => s.status === 'ongoing' || s.status === 'active').length,
-    inProgress: simulationsList.filter(s => s.status === 'in-progress').length,
-    completed: simulationsList.filter(s => s.status === 'completed').length,
-    avgRating: simulationsList.filter(s => s.rating).length > 0
-      ? (simulationsList.filter(s => s.rating).reduce((sum, s) => sum + Number(s.rating), 0) / simulationsList.filter(s => s.rating).length).toFixed(1)
-      : '0.0'
-  };
 
   const getSimColor = (sim: Simulation) => {
     return sim.primaryColor || '#6366f1';
@@ -154,90 +188,119 @@ const SimulationsPage = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <div className="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 bg-primary/10 border border-primary/20 text-primary">
             <Rocket className="h-3.5 w-3.5 mr-1.5" />
-            Project Mastery
+            View simulations
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground">
-            Your <span className="text-primary">Simulation Projects</span>
+            All simulations in <span className="text-primary">one workspace</span>
           </h1>
-          <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Monitor your progress, review performance metrics, and continue your journey 
-            through real-world product management scenarios.
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Browse the complete TURNVE simulation catalogue, including the updated fintech Product Management projects, previous PM simulations, and any live organization simulations available to you.
           </p>
         </div>
 
-        <Link
-          to="/simulations/product-management"
-          className="mb-10 block rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-        >
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <div className="mb-10 grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
+          <Link
+            to="/simulations/product-management"
+            className="group block min-w-0 rounded-2xl border border-primary/20 bg-primary/5 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md sm:p-5 lg:p-6"
+          >
+            <div className="grid min-w-0 gap-5 sm:grid-cols-[auto_minmax(0,1fr)] xl:grid-cols-[auto_minmax(0,1fr)_auto] xl:items-center">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary sm:h-14 sm:w-14">
                 <Rocket className="h-6 w-6" />
               </div>
-              <div>
-                <p className="text-xs font-black uppercase tracking-widest text-primary">Simulation track</p>
-                <h2 className="mt-1 text-2xl font-black text-foreground">Product Management</h2>
+              <div className="min-w-0">
+                <p className="text-[11px] font-black uppercase tracking-widest text-primary sm:text-xs">Available path</p>
+                <h2 className="mt-1 text-xl font-black leading-tight text-foreground transition-colors group-hover:text-primary sm:text-2xl">Product Management</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Start with the first unlocked TechCorp simulation, then preview the premium workforce scenarios behind the paywall.
+                  Start with the updated fintech PM simulations, then continue into the previous crisis, growth, platform, and zero-to-one PM scenarios.
+                </p>
+              </div>
+              <span className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground sm:col-start-2 sm:w-fit xl:col-start-auto xl:justify-self-end xl:whitespace-nowrap">
+                Select path
+                <ChevronRight className="h-4 w-4" />
+              </span>
+            </div>
+          </Link>
+
+          <div className="min-w-0 rounded-2xl border border-border bg-card p-4 opacity-80 sm:p-5 lg:p-6">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start xl:flex-col">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                <Lock className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground sm:text-xs">Coming soon</p>
+                <h2 className="mt-1 text-xl font-black leading-tight text-foreground">More tracks</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Marketing, operations, finance, and engineering leadership paths will appear here as they launch.
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-2 self-start rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground lg:self-center">
-              Open track
-              <ChevronRight className="h-4 w-4" />
+          </div>
+        </div>
+
+        <div className="mb-12">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="mb-2 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-black text-foreground">All available simulations</h2>
+              </div>
+              <p className="text-sm leading-6 text-muted-foreground">
+                Every routed simulation appears here, so the new PM fintech simulations and the previous PM simulations are visible from the same page.
+              </p>
+            </div>
+            <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-black uppercase tracking-widest text-muted-foreground">
+              {availableSimulations.length} total
             </span>
           </div>
-        </Link>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-500/10 text-blue-500">
-                <Play className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.ongoing}</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Ongoing</p>
-              </div>
-            </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {availableSimulations.map((simulation) => {
+              const simColor = getSimColor(simulation);
+              return (
+                <Link
+                  key={`available-${simulation.id}`}
+                  to={simulation.livePath || `/simulation/${simulation.id}`}
+                  className="group block rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+                >
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-black text-white shadow-sm"
+                      style={{ backgroundColor: simColor }}
+                    >
+                      {simulation.client.slice(0, 2).toUpperCase()}
+                    </div>
+                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-primary">
+                      {simulation.deadline}
+                    </span>
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{simulation.industry}</p>
+                  <h3 className="mt-1 text-lg font-black leading-snug text-foreground group-hover:text-primary">{simulation.title}</h3>
+                  <p className="mt-1 text-sm font-medium text-muted-foreground">{simulation.client}</p>
+                  {simulation.description && (
+                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">{simulation.description}</p>
+                  )}
+                  <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border/60 pt-4 text-xs">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                      <span>{simulation.moduleCount ? `${simulation.moduleCount} tasks` : simulation.duration}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Target className="h-4 w-4 text-blue-500" />
+                      <span>{simulation.metricLabel || simulation.difficulty || 'Practice'}</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-500">
-                <CheckCircle className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.completed}</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Completed</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary">
-                <Star className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stats.avgRating}</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Avg Rating</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-500">
-                <Users className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{filteredSimulations.length}</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Total</p>
-              </div>
-            </div>
-          </div>
+        </div>
+
+        <div className="mb-6 flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-black text-foreground">Your active simulations</h2>
         </div>
 
         {/* Simulation Cards */}
@@ -339,18 +402,18 @@ const SimulationsPage = () => {
             <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Briefcase className="h-10 w-10 text-muted-foreground/40" />
             </div>
-            <h3 className="text-xl font-bold mb-2 text-foreground">No simulations found</h3>
+            <h3 className="text-xl font-bold mb-2 text-foreground">No active simulations found</h3>
             <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
               {filter === 'all'
-                ? "You haven't started any simulations yet. Kickstart your journey today!"
+                ? "You have not started a simulation yet. Choose any simulation from the catalogue above."
                 : `You don't have any ${filter} simulations at the moment.`}
             </p>
             <Link
-              to="/simulations/product-management"
+              to="/simulation/sim-pm-fintech-001"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-primary/90 shadow-lg shadow-primary/20"
             >
               <Play className="h-4 w-4" />
-              Start a Simulation
+              Start PayLoop Simulation
             </Link>
           </div>
         )}

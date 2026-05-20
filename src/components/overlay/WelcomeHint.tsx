@@ -1,39 +1,74 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Lightbulb, Target, ChevronRight, X,
   Trophy, Zap, Bell,
-  LayoutList, Mail, MonitorPlay, PartyPopper
+  LayoutList, Mail, MonitorPlay, PartyPopper,
+  Volume2, VolumeX
 } from 'lucide-react';
 import { enableSounds } from '../../utils/sounds';
 import { TypingText } from '../ui/TypingText';
 
+const VOICEOVER_MUTED_KEY = 'turnve_voiceover_muted';
+
 interface WelcomeHintProps {
   isOpen: boolean;
   onClose: () => void;
-  companyName: string;
-  challengeTitle: string;
-  archetype: string;
+  companyName?: string;
+  challengeTitle?: string;
+  archetype?: string;
 }
 
 export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, companyName, challengeTitle, archetype }) => {
   const [step, setStep] = useState(0);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [isVoiceMuted, setIsVoiceMuted] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem(VOICEOVER_MUTED_KEY) === 'true';
+  });
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setVoiceSupported(
+      typeof window !== 'undefined' &&
+      'speechSynthesis' in window &&
+      'SpeechSynthesisUtterance' in window
+    );
+  }, []);
+
+  const stopVoiceover = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  };
 
   const handleClose = () => {
+    stopVoiceover();
     enableSounds();
     onClose();
   };
 
-  const archetypeLabel = archetype.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  const isInternWelcome = companyName === 'TechCorp';
+  const toggleVoiceMute = () => {
+    setIsVoiceMuted((muted) => {
+      const nextMuted = !muted;
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(VOICEOVER_MUTED_KEY, String(nextMuted));
+      }
+      if (nextMuted) stopVoiceover();
+      return nextMuted;
+    });
+  };
+
+  const safeCompanyName = companyName || 'FlowDesk';
+  const safeChallengeTitle = challengeTitle || 'First Simulation';
+  const safeArchetype = archetype || 'project_manager';
+  const archetypeLabel = safeArchetype.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const isInternWelcome = safeCompanyName === 'TechCorp';
 
   const genericSteps = [
     {
       icon: Trophy,
-      title: `Welcome to ${companyName}`,
+      title: `Welcome to ${safeCompanyName}`,
       content: `You're stepping into a real-world management simulation as a ${archetypeLabel}. Your role: make strategic decisions that balance budget, team morale, stakeholder satisfaction, and project risk.`,
-      highlight: `Challenge: ${challengeTitle}`,
+      highlight: `Challenge: ${safeChallengeTitle}`,
     },
     {
       icon: Zap,
@@ -65,7 +100,7 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
     {
       icon: Trophy,
       title: 'You are stepping into TechCorp',
-      content: 'Sarah from Product is waiting for you. This onboarding works like a mission room: open the objects, join live moments, and unlock tasks one action at a time.',
+      content: 'Welcome. You are first employed as an intern at TechCorp. Sarah from Product is waiting for you, and this onboarding works like a mission room: open the objects, join live moments, and unlock tasks one action at a time.',
       highlight: 'First quest: open your offer letter and accept the internship.',
     },
     {
@@ -91,12 +126,49 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
   const steps = isInternWelcome ? internSteps : genericSteps;
 
   const currentStep = steps[step];
+  const voiceoverText = useMemo(
+    () => `${currentStep.title}. Step ${step + 1} of ${steps.length}. ${currentStep.content} ${currentStep.highlight}`,
+    [currentStep, step, steps.length]
+  );
   const titleClass = isInternWelcome ? 'text-xl font-bold text-slate-950 dark:text-white' : 'text-xl font-bold text-gray-900 dark:text-white';
   const bodyClass = isInternWelcome ? 'text-slate-700 mb-5 leading-relaxed font-medium dark:text-slate-300' : 'text-gray-600 dark:text-gray-300 mb-5 leading-relaxed';
   const tipClass = isInternWelcome ? 'text-sm font-bold text-sky-700 dark:text-sky-200' : 'text-sm text-blue-700 dark:text-blue-300';
   const secondaryButtonClass = isInternWelcome
     ? 'text-sm font-semibold text-slate-600 hover:text-slate-950 transition-colors dark:text-slate-300 dark:hover:text-white'
     : 'text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors';
+
+  useEffect(() => {
+    if (!isOpen || isVoiceMuted || !voiceSupported) return undefined;
+
+    const synth = window.speechSynthesis;
+    synth.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(voiceoverText);
+    utterance.rate = isInternWelcome ? 0.94 : 0.98;
+    utterance.pitch = isInternWelcome ? 1.05 : 1;
+    utterance.volume = 0.9;
+
+    const voices = synth.getVoices();
+    const preferredVoice =
+      voices.find((voice) => /aria|jenny|zira|samantha|natural|female/i.test(`${voice.name} ${voice.voiceURI}`)) ||
+      voices.find((voice) => voice.lang?.toLowerCase().startsWith('en')) ||
+      voices[0];
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+
+    const timer = window.setTimeout(() => synth.speak(utterance), 350);
+
+    return () => {
+      window.clearTimeout(timer);
+      synth.cancel();
+    };
+  }, [isOpen, isVoiceMuted, voiceSupported, voiceoverText, isInternWelcome]);
+
+  useEffect(() => () => stopVoiceover(), []);
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -106,9 +178,25 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+          aria-label="Close onboarding"
         >
           <X className="w-5 h-5 text-gray-500 dark:text-slate-300" />
         </button>
+
+        {voiceSupported && (
+          <button
+            onClick={toggleVoiceMute}
+            className="absolute top-4 right-12 p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+            aria-label={isVoiceMuted ? 'Turn voiceover on' : 'Mute voiceover'}
+            title={isVoiceMuted ? 'Turn voiceover on' : 'Mute voiceover'}
+          >
+            {isVoiceMuted ? (
+              <VolumeX className="w-5 h-5 text-gray-500 dark:text-slate-300" />
+            ) : (
+              <Volume2 className="w-5 h-5 text-gray-500 dark:text-slate-300" />
+            )}
+          </button>
+        )}
 
         {/* Progress dots */}
         <div className="flex gap-1.5 mb-5">
@@ -160,8 +248,8 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
             <div className="relative hidden min-h-[250px] md:block">
               <div className="absolute inset-x-5 bottom-0 h-24 rounded-full bg-violet-300/25 blur-2xl" />
               <img
-                src="/images/intern-mentor.png"
-                alt="Product mentor"
+                src={step === 0 ? '/images/intern-welcome-guide.svg' : '/images/intern-mentor.png'}
+                alt={step === 0 ? 'Intern welcome guide' : 'Product mentor'}
                 className="relative z-10 mx-auto max-h-[270px] w-full object-contain drop-shadow-2xl"
               />
               <div className="absolute left-0 top-8 z-20 rounded-3xl rounded-bl-md bg-white p-3 text-xs font-black text-slate-700 shadow-xl dark:bg-[#15171d] dark:text-slate-100 dark:ring-1 dark:ring-white/10">
@@ -182,14 +270,20 @@ export const WelcomeHint: React.FC<WelcomeHintProps> = ({ isOpen, onClose, compa
           <div className="flex gap-2">
             {step > 0 && (
               <button
-                onClick={() => setStep(s => s - 1)}
+                onClick={() => {
+                  stopVoiceover();
+                  setStep(s => s - 1);
+                }}
                 className={`px-4 py-2 ${secondaryButtonClass}`}
               >
                 Back
               </button>
             )}
             <button
-              onClick={() => step < steps.length - 1 ? setStep(s => s + 1) : handleClose()}
+              onClick={() => {
+                stopVoiceover();
+                step < steps.length - 1 ? setStep(s => s + 1) : handleClose();
+              }}
               className={`${isInternWelcome ? 'bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200' : 'bg-blue-500 hover:bg-blue-600'} text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2`}
             >
               {step < steps.length - 1 ? 'Next' : 'Start Simulation'}

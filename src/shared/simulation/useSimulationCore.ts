@@ -12,14 +12,15 @@ import type {
     ScenarioAction,
     ActionChoice,
     DecisionRecord,
-    StakeholderState,
     SimulationScore,
     Signal,
     WeeklyActionItem,
     WeeklyEvent,
     BacklogActionItem,
     CompletedAction,
+    ArtifactRecord,
 } from './types';
+import { evaluateWeeklyActionSubmission } from './pmReview';
 import { playSound } from '../../utils/sounds';
 
 // ─── Constants ───────────────────────────────────────────────
@@ -122,7 +123,12 @@ function advanceWeekState(
 
 // ─── Helper: compute score ────────────────────────────────────
 function computeScore(state: GameStateSnapshot, config: SimulationConfig): SimulationScore {
-    const decisionsScore = Math.min(100, (state.decisionsMade.length / Math.max(1, config.tasks.length)) * 100);
+    const reviewedActions = state.completedActions.filter((action) => action.review);
+    const artifactQualityScore = reviewedActions.length
+        ? reviewedActions.reduce((sum, action) => sum + (action.review?.percentage ?? 0), 0) / reviewedActions.length
+        : null;
+    const completionScore = Math.min(100, (state.completedActions.length / Math.max(1, config.weeklyActions?.length ?? config.tasks.length)) * 100);
+    const decisionsScore = artifactQualityScore ?? Math.min(100, (state.decisionsMade.length / Math.max(1, config.tasks.length)) * 100);
     const stakeholderScore = state.stakeholders.length
         ? state.stakeholders.reduce((acc, s) => acc + s.satisfaction, 0) / state.stakeholders.length
         : 50;
@@ -130,7 +136,7 @@ function computeScore(state: GameStateSnapshot, config: SimulationConfig): Simul
     const timelineScore = Math.round(state.progress);
 
     const overall = Math.round(
-        decisionsScore * 0.3 + stakeholderScore * 0.3 + budgetScore * 0.2 + timelineScore * 0.2
+        decisionsScore * 0.45 + stakeholderScore * 0.25 + budgetScore * 0.1 + Math.max(timelineScore, completionScore) * 0.2
     );
 
     const grade =
@@ -148,6 +154,44 @@ function computeScore(state: GameStateSnapshot, config: SimulationConfig): Simul
             stakeholders: Math.round(stakeholderScore),
             budget: budgetScore,
             timeline: timelineScore,
+        },
+    };
+}
+
+function getArtifactTypeForAction(action?: WeeklyActionItem): string | null {
+    if (!action) return null;
+    if (action.artifactType) return action.artifactType;
+    if (action.actionType === 'submit_prd') return 'prd';
+    if (action.actionType === 'decision_text' || action.actionType === 'choice') return 'decision_log';
+    return null;
+}
+
+function buildArtifactFromAction(
+    action: WeeklyActionItem | undefined,
+    completed: CompletedAction
+): ArtifactRecord | null {
+    const artifactType = getArtifactTypeForAction(action);
+    if (!action || !artifactType) return null;
+
+    return {
+        id: `artifact-${completed.actionId}-${Date.now()}`,
+        type: artifactType,
+        title: action.prdTitle ?? action.title,
+        description: action.description,
+        createdAt: new Date().toISOString(),
+        week: completed.week,
+        status: 'generated',
+        content: completed.result,
+        metadata: {
+            actionId: action.id,
+            moduleTitle: action.title,
+            moduleWeek: action.week,
+            deliverable: action.outputTemplate?.[0]?.label ?? action.prdTitle ?? action.title,
+            sourceMaterials: action.workplaceMaterials?.map((material) => ({
+                title: material.title,
+                source: material.source,
+            })) ?? [],
+            ...(completed.review ? { review: completed.review } : {}),
         },
     };
 }
@@ -258,13 +302,16 @@ export default function useSimulationCore(config: SimulationConfig): UseSimulati
 
     // ── Effect: check completion ──────────────────────────────
     useEffect(() => {
-        if (!gameState || !isRunning) return;
+        if (!gameState || !isRunning || isCompleted) return;
         if (gameState.week > gameState.totalWeeks) {
-            setIsRunning(false);
-            setIsCompleted(true);
-            setScore(computeScore(gameState, config));
+            const finalScore = computeScore(gameState, config);
+            queueMicrotask(() => {
+                setIsRunning(false);
+                setIsCompleted(true);
+                setScore(finalScore);
+            });
         }
-    }, [gameState?.week, gameState?.totalWeeks, isRunning, config]);
+    }, [gameState, isRunning, isCompleted, config]);
 
     // ── Actions ───────────────────────────────────────────────
     const startSimulation = useCallback(() => {
@@ -325,11 +372,22 @@ export default function useSimulationCore(config: SimulationConfig): UseSimulati
     // ── New: completeWeeklyAction ─────────────────────────────
     const completeWeeklyAction = useCallback(
         (actionId: string, result: Record<string, unknown>): { feedback: string } => {
-            const feedback = `Action completed. ${result.summary ?? ''}`;
+            const currentActionFromState = gameState
+                ? [
+                    ...gameState.weeklyActionsForThisWeek,
+                    ...gameState.backlogActionItems,
+                    ...(config.weeklyActions ?? []),
+                ].find((action) => action.id === actionId)
+                : undefined;
+            const review = currentActionFromState ? evaluateWeeklyActionSubmission(currentActionFromState, result) : undefined;
+            const feedback = review
+                ? `${review.stakeholderReaction} Score: ${review.score}/${review.maxScore}. ${review.requiresRevision ? review.revisionPrompt : 'Artifact saved to Documents.'}`
+                : `Action completed. ${result.summary ?? ''}`;
             const completed: CompletedAction = {
                 actionId,
                 week: gameState?.week ?? 1,
                 result,
+                review,
             };
 
             // Audio Feedback
@@ -341,6 +399,17 @@ export default function useSimulationCore(config: SimulationConfig): UseSimulati
                 // Simple "automated email" logic for certain actions
                 const updatedEvents = [...prev.weeklyEventsShown];
                 const updatedActions = [...prev.weeklyActionsForThisWeek];
+                const currentAction = [
+                    ...prev.weeklyActionsForThisWeek,
+                    ...prev.backlogActionItems,
+                    ...(config.weeklyActions ?? []),
+                ].find((action) => action.id === actionId);
+                const generatedArtifact = buildArtifactFromAction(currentAction, completed);
+                const reviewAdjustment = completed.review
+                    ? completed.review.requiresRevision
+                        ? { morale: -2, risk: 0.03, stakeholder: -3 }
+                        : { morale: 2, risk: -0.02, stakeholder: 2 }
+                    : { morale: 0, risk: 0, stakeholder: 0 };
 
                 // Example: Trigger a follow-up task if this is a 'Crisis Triage'
                 if (actionId === 'action-w1-triage') {
@@ -357,17 +426,42 @@ export default function useSimulationCore(config: SimulationConfig): UseSimulati
                     updatedEvents.push(followup);
                 }
 
+                if (completed.review) {
+                    updatedEvents.push({
+                        id: `evt-review-${actionId}-${Date.now()}`,
+                        week: prev.week,
+                        type: 'notification',
+                        title: completed.review.requiresRevision ? 'PM review: revision requested' : 'PM review: artifact accepted',
+                        description: completed.review.stakeholderReaction,
+                        from: 'Product Review',
+                        fromInitials: 'PR',
+                        fromColor: completed.review.requiresRevision ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400',
+                        priority: completed.review.requiresRevision ? 'high' : 'normal',
+                        requiresAction: false,
+                    });
+                }
+
                 return {
                     ...prev,
                     completedActions: [...prev.completedActions, completed],
+                    artifacts: generatedArtifact ? [...prev.artifacts, generatedArtifact] : prev.artifacts,
                     backlogActionItems: prev.backlogActionItems.filter((b) => b.id !== actionId),
                     weeklyEventsShown: updatedEvents,
                     weeklyActionsForThisWeek: updatedActions,
+                    teamMorale: Math.max(0, Math.min(100, prev.teamMorale + reviewAdjustment.morale)),
+                    riskLevel: Math.max(0, Math.min(1, prev.riskLevel + reviewAdjustment.risk)),
+                    stakeholders: prev.stakeholders.map((stakeholder, index) => index === 0
+                        ? {
+                            ...stakeholder,
+                            satisfaction: Math.max(0, Math.min(100, stakeholder.satisfaction + reviewAdjustment.stakeholder)),
+                        }
+                        : stakeholder
+                    ),
                 };
             });
             return { feedback };
         },
-        [gameState?.week]
+        [gameState, config.weeklyActions]
     );
 
     const updateCustomState = useCallback(
@@ -382,7 +476,7 @@ export default function useSimulationCore(config: SimulationConfig): UseSimulati
             if (!prev || !prev.activeMeeting) return prev;
 
             const meeting = prev.activeMeeting;
-            let updatedBacklog = [...prev.backlogActionItems];
+            const updatedBacklog = [...prev.backlogActionItems];
 
             // If user says "later", "unavailable" or "ignore", ensure the linked action is in the backlog
             if ((response === 'later' || response === 'unavailable' || response === 'ignore') && meeting.actionId) {

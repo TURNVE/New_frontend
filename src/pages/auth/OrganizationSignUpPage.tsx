@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
-import { ChevronDown, Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Building2, ChevronDown, Eye, EyeOff, Globe, ListChecks, Lock, Mail } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 import { AUTH_ERRORS, AUTH_ROUTES } from '../../contexts/AuthContext'
 import { rememberAuthPortal } from '../../lib/auth'
 
@@ -14,24 +15,19 @@ const GoogleIcon = () => (
   </svg>
 )
 
-export const SignUpPage = () => {
-  const [searchParams] = useSearchParams()
+function OrganizationSignUpPage() {
   const navigate = useNavigate()
   const { signUp, signInWithOAuth, checkEmailExists } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+  const [orgName, setOrgName] = useState('')
+  const [orgWebsite, setOrgWebsite] = useState('')
+  const [orgIndustry, setOrgIndustry] = useState('')
+  const [orgSize, setOrgSize] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [roleInterest, setRoleInterest] = useState('product-manager')
   const [isLoading, setIsLoading] = useState(false)
   const [isOAuthLoading, setIsOAuthLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (searchParams.get('type') === 'organization') {
-      navigate(AUTH_ROUTES.ORG_SIGN_UP, { replace: true })
-    }
-  }, [navigate, searchParams])
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -41,15 +37,17 @@ export const SignUpPage = () => {
     try {
       const emailExists = await checkEmailExists(email)
       if (emailExists) {
-        setError('User already exists. Please log in with your details.')
+        setError('Organization user already exists. Please log in with your details.')
         return
       }
 
       const { data, error: signUpError } = await signUp(email.trim(), password, {
         data: {
-          full_name: fullName.trim(),
-          role: 'USER',
-          role_interest: roleInterest,
+          full_name: orgName.trim(),
+          role: 'COMPANY',
+          org_website: orgWebsite || undefined,
+          org_industry: orgIndustry || undefined,
+          org_size: orgSize || undefined,
         },
       })
 
@@ -59,8 +57,17 @@ export const SignUpPage = () => {
       }
 
       if (data.user) {
-        setError('Please check your email to verify your account.')
-        setTimeout(() => navigate(AUTH_ROUTES.SIGN_IN), 3000)
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ role: 'COMPANY' })
+          .eq('id', data.user.id)
+
+        if (profileError) {
+          console.error('Error updating organization profile role:', profileError)
+        }
+
+        setError('Please check your email to verify your organization account.')
+        setTimeout(() => navigate(AUTH_ROUTES.ORG_SIGN_IN), 3000)
       }
     } catch {
       setError(AUTH_ERRORS.GENERIC)
@@ -74,7 +81,7 @@ export const SignUpPage = () => {
     setError(null)
 
     try {
-      rememberAuthPortal('individual')
+      rememberAuthPortal('organization')
       const { error: oauthError } = await signInWithOAuth('google')
       if (oauthError) {
         setError(oauthError.message || AUTH_ERRORS.OAUTH_FAILED)
@@ -95,45 +102,33 @@ export const SignUpPage = () => {
         </div>
 
         <div className="relative z-10">
-          <div className="mb-12 flex items-center gap-2">
+          <a href="/organization" className="mb-12 flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#5e6ad2] to-[#7170ff]">
-              <span className="text-sm font-bold text-white">T</span>
+              <Building2 className="h-4 w-4 text-white" />
             </div>
-            <span className="text-xl font-bold text-foreground">Turnve</span>
-          </div>
+            <span className="text-xl font-bold text-foreground">Turnve Organizations</span>
+          </a>
 
           <div className="max-w-md">
             <h1 className="mb-6 text-4xl font-bold leading-tight text-foreground lg:text-5xl">
-              Build career proof through practice.
+              Build simulations for your team.
             </h1>
             <p className="mb-8 text-lg leading-relaxed text-text-secondary">
-              Create an individual account to access career simulations, build a portfolio, and benchmark your professional growth.
+              Create an organization workspace to design simulations, manage training cohorts, and track team performance.
             </p>
           </div>
         </div>
 
         <div className="relative z-10">
-          <p className="text-sm text-text-tertiary">© 2026 Turnve Career Simulator. All rights reserved.</p>
+          <p className="text-sm text-text-tertiary">© 2026 Turnve Organizations. All rights reserved.</p>
         </div>
       </div>
 
       <div className="flex flex-1 items-center justify-center bg-background p-8 lg:p-16">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="mb-2 text-3xl font-bold text-foreground">Create your profile</h2>
-            <p className="text-text-secondary">Start your professional journey today.</p>
-          </div>
-
-          <div className="mb-6 rounded-xl border border-border bg-surface/40 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#5e6ad2] text-white">
-                <User className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Individual account</p>
-                <p className="text-xs text-text-tertiary">For career growth and personal simulations</p>
-              </div>
-            </div>
+            <h2 className="mb-2 text-3xl font-bold text-foreground">Create your organization</h2>
+            <p className="text-text-secondary">Set up a dedicated workspace for team simulations.</p>
           </div>
 
           <button
@@ -163,19 +158,17 @@ export const SignUpPage = () => {
 
           <form onSubmit={handleSignUp} className="space-y-5">
             <div>
-              <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium text-text-secondary">
-                Full Name
+              <label htmlFor="orgName" className="mb-1.5 block text-sm font-medium text-text-secondary">
+                Organization Name
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <User className="h-5 w-5 text-text-quaternary" />
-                </div>
+                <Building2 className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-quaternary" />
                 <input
                   type="text"
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Alex Rivera"
+                  id="orgName"
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                  placeholder="Acme Corp"
                   className="w-full rounded-[6px] border border-border bg-input px-4 py-3 pl-11 text-foreground transition-shadow placeholder:text-text-quaternary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
                   required
                 />
@@ -184,18 +177,16 @@ export const SignUpPage = () => {
 
             <div>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text-secondary">
-                Professional Email
+                Work Email
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <Mail className="h-5 w-5 text-text-quaternary" />
-                </div>
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-quaternary" />
                 <input
                   type="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="alex.r@company.com"
+                  placeholder="admin@company.com"
                   className="w-full rounded-[6px] border border-border bg-input px-4 py-3 pl-11 text-foreground transition-shadow placeholder:text-text-quaternary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
                   required
                 />
@@ -207,9 +198,7 @@ export const SignUpPage = () => {
                 Create Password
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <Lock className="h-5 w-5 text-text-quaternary" />
-                </div>
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-quaternary" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
@@ -230,54 +219,98 @@ export const SignUpPage = () => {
               </div>
             </div>
 
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <label htmlFor="orgIndustry" className="block text-sm font-medium text-text-secondary">
+                  Industry
+                </label>
+                <div className="relative">
+                  <select
+                    id="orgIndustry"
+                    value={orgIndustry}
+                    onChange={(e) => setOrgIndustry(e.target.value)}
+                    className="w-full appearance-none rounded-[6px] border border-border bg-input px-4 py-3 pr-10 text-foreground transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
+                  >
+                    <option value="" disabled>Select industry</option>
+                    <option value="technology">Technology</option>
+                    <option value="finance">Finance & Banking</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="education">Education</option>
+                    <option value="retail">Retail & E-commerce</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-quaternary" />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="orgSize" className="block text-sm font-medium text-text-secondary">
+                  Team Size
+                </label>
+                <div className="relative">
+                  <select
+                    id="orgSize"
+                    value={orgSize}
+                    onChange={(e) => setOrgSize(e.target.value)}
+                    className="w-full appearance-none rounded-[6px] border border-border bg-input px-4 py-3 pr-10 text-foreground transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
+                  >
+                    <option value="" disabled>Select size</option>
+                    <option value="1-10">1-10</option>
+                    <option value="11-50">11-50</option>
+                    <option value="51-200">51-200</option>
+                    <option value="201-500">201-500</option>
+                    <option value="501+">501+</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-quaternary" />
+                </div>
+              </div>
+            </div>
+
             <div>
-              <label htmlFor="roleInterest" className="mb-1.5 block text-sm font-medium text-text-secondary">
-                Role Interest
+              <label htmlFor="orgWebsite" className="mb-1.5 block text-sm font-medium text-text-secondary">
+                Company Website
               </label>
               <div className="relative">
-                <select
-                  id="roleInterest"
-                  value={roleInterest}
-                  onChange={(e) => setRoleInterest(e.target.value)}
-                  className="w-full appearance-none rounded-[6px] border border-border bg-input px-4 py-3 pr-11 text-foreground transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
-                  required
-                >
-                  <option value="product-manager">Product Manager</option>
-                  <option value="engineering-manager">Engineering Manager</option>
-                  <option value="data-analytics">Data & Analytics</option>
-                  <option value="operations">Operations Manager</option>
-                  <option value="consulting">Consulting</option>
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-quaternary" />
+                <Globe className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-quaternary" />
+                <input
+                  type="url"
+                  id="orgWebsite"
+                  value={orgWebsite}
+                  onChange={(e) => setOrgWebsite(e.target.value)}
+                  placeholder="https://company.com"
+                  className="w-full rounded-[6px] border border-border bg-input px-4 py-3 pl-11 text-foreground transition-shadow placeholder:text-text-quaternary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
+                />
               </div>
+            </div>
+
+            <div className="rounded-[6px] border border-blue-500/20 bg-blue-500/10 p-4">
+              <p className="flex items-start gap-2 text-xs text-blue-300">
+                <ListChecks className="mt-0.5 h-4 w-4 shrink-0" />
+                Organization accounts create simulations, manage teams, and review analytics from a separate dashboard.
+              </p>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !orgName.trim()}
               className="w-full rounded-[6px] bg-[#5e6ad2] py-3.5 font-semibold text-white transition-colors hover:bg-[#828fff] focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? 'Creating Organization...' : 'Create Organization Account'}
             </button>
           </form>
 
           <p className="mt-6 text-center text-text-secondary">
-            Already have an account?{' '}
-            <a href={AUTH_ROUTES.SIGN_IN} className="font-medium text-[#7170ff] hover:text-[#828fff]">
+            Already have an organization account?{' '}
+            <a href={AUTH_ROUTES.ORG_SIGN_IN} className="font-medium text-[#7170ff] hover:text-[#828fff]">
               Log in
             </a>
           </p>
 
           <p className="mt-4 text-center text-sm text-text-secondary">
-            Joining as a company?{' '}
-            <a href={AUTH_ROUTES.ORG_SIGN_UP} className="font-medium text-[#7170ff] hover:text-[#828fff]">
-              Create an organization account
+            Creating a personal account?{' '}
+            <a href={AUTH_ROUTES.SIGN_UP} className="font-medium text-[#7170ff] hover:text-[#828fff]">
+              Individual sign up
             </a>
-          </p>
-
-          <p className="mt-8 text-center text-xs leading-relaxed text-text-tertiary">
-            By signing up, you agree to our <a href="#" className="text-[#7170ff] hover:underline">Terms of Service</a> and{' '}
-            <a href="#" className="text-[#7170ff] hover:underline">Privacy Policy</a>. Turnve is a professional simulator platform for career benchmarking.
           </p>
         </div>
       </div>
@@ -285,4 +318,4 @@ export const SignUpPage = () => {
   )
 }
 
-export default SignUpPage
+export default OrganizationSignUpPage

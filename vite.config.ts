@@ -19,6 +19,7 @@ export default defineConfig({
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-ui': ['lucide-react', 'framer-motion'],
+          'vendor-3d': ['three', '@react-three/fiber'],
           'vendor-radix': ['@radix-ui/react-avatar', '@radix-ui/react-slot'],
           'vendor-tailwind': ['tailwind-merge', 'clsx', 'class-variance-authority'],
         },

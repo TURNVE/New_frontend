@@ -98,23 +98,21 @@ export const playSound = (type: 'notification' | 'success' | 'warning' | 'error'
       break;
 
     case 'call':
-      // Distinctive strategy call ring
-      const frequencies = [480, 440];
+      // Subtle incoming call cue
+      const frequencies = [659, 523];
       frequencies.forEach((f, i) => {
         const o = AUDIO_CONTEXT.createOscillator();
         const g = AUDIO_CONTEXT.createGain();
         o.connect(g);
         g.connect(AUDIO_CONTEXT.destination);
-        o.frequency.setValueAtTime(f, now);
+        const start = now + i * 0.18;
+        o.frequency.setValueAtTime(f, start);
         o.type = 'sine';
-        g.gain.setValueAtTime(0.1, now);
-        // Create a double-ring pattern
-        g.gain.setValueAtTime(0.1, now + 0.1);
-        g.gain.linearRampToValueAtTime(0, now + 0.4);
-        g.gain.setValueAtTime(0.1, now + 0.6);
-        g.gain.linearRampToValueAtTime(0, now + 1.0);
-        o.start(now);
-        o.stop(now + 1.2);
+        g.gain.setValueAtTime(0.0001, start);
+        g.gain.exponentialRampToValueAtTime(0.035, start + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + 0.32);
+        o.start(start);
+        o.stop(start + 0.34);
       });
       break;
   }

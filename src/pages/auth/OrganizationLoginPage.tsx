@@ -67,7 +67,7 @@ function OrganizationLoginPage() {
         testimonials={[]}
         onEmailSignIn={handleEmailSignIn}
         onGoogleSignIn={handleGoogleSignIn}
-        onCreateAccount={() => navigate(`${AUTH_ROUTES.SIGN_UP}?type=organization`)}
+        onCreateAccount={() => navigate(AUTH_ROUTES.ORG_SIGN_UP)}
         onResetPassword={handleResetPassword}
       />
 

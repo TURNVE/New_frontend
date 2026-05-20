@@ -2,14 +2,16 @@
  * SimulationShell — Reusable Simulation Workspace
  * Uses SimulationConfig. Backlog tab is the main activity hub.
  */
-import { lazy, Suspense, useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useState, useCallback, useEffect, useMemo, useRef, type ComponentProps } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     ChevronRight, LayoutList, Map, Building2, FolderOpen,
     Bell, Play, Pause,
     Clock, CheckCircle, Trophy, AlertTriangle, FileText,
     PhoneCall, Video, Menu, Calendar, Sparkles, Mail, MonitorPlay,
     ClipboardCheck, PartyPopper, UserRound, MessageCircle, LockKeyhole, Rocket,
+    Target, Users, BookOpen, Lightbulb, BarChart3, ArrowLeft, ArrowRight, BadgeCheck, ListChecks,
+    X, Download,
 } from 'lucide-react';
 import useSimulationCore from './useSimulationCore';
 import type {
@@ -18,7 +20,6 @@ import type {
 } from './types';
 import { DocumentsPanel } from '../../components/simulation/DocumentsPanel';
 import { CompanyPanel } from '../../components/company/CompanyPanel';
-import { RoadmapPanel } from '../../components/pmtools/RoadmapPanel';
 import { NotificationCenter, useNotifications } from '../../components/communications/NotificationCenter';
 import { ToastContainer } from '../../components/communications/ToastContainer';
 import { WelcomeHint } from '../../components/overlay/WelcomeHint';
@@ -29,6 +30,7 @@ import SimRoadmapMindmap from './components/SimRoadmapMindmap';
 import { CalendarPanel } from '../../components/simulation/CalendarPanel';
 
 type ActiveTab = 'dashboard' | 'backlog' | 'roadmap' | 'documents' | 'company' | 'calendar';
+type DocumentsPanelArtifact = ComponentProps<typeof DocumentsPanel>['artifacts'][number];
 
 const InternThreeStage = lazy(() => import('./components/InternThreeStage'));
 
@@ -41,31 +43,58 @@ const InternThreeStage = lazy(() => import('./components/InternThreeStage'));
     };
 
 // ─── Severity dot ─────────────────────────────────────────────
-    const SEV_DOT: Record<string, string> = {
-        critical: 'bg-red-500',
-        warning: 'bg-primary',
-        info: 'bg-[#10b981]',
-        high: 'bg-red-500',
-        urgent: 'bg-red-500',
-        normal: 'bg-primary',
-        low: 'bg-[rgba(255,255,255,0.3)]',
-    };
-
 // ─── Metrics derivation ───────────────────────────────────────
-function deriveMetrics(gs: ReturnType<typeof useSimulationCore>['gameState'], _c: SimulationConfig) {
-    if (!gs) return [];
-    const bp = Math.round((gs.budget / gs.initialBudget) * 100);
-    const pp = Math.round(gs.progress);
-    const rp = Math.round(gs.riskLevel * 100);
-    return [
-        { label: 'Budget', value: `$${(gs.budget / 1000).toFixed(0)}K`, dot: bp > 30 ? 'bg-[#7170ff]' : 'bg-red-500', trendDir: bp > 30 ? 'up' as const : 'down' as const, trendVal: `${bp}% left`, trendColor: bp > 30 ? 'green' : 'red' as 'green' | 'red' },
-        { label: 'Progress', value: `${pp}%`, dot: pp > 70 ? 'bg-[#10b981]' : 'bg-[#7170ff]', trendDir: 'up' as const, trendVal: `Wk ${gs.week}/${gs.totalWeeks}`, trendColor: 'green' as const },
-        { label: 'Risk', value: `${rp}%`, dot: rp > 60 ? 'bg-red-500' : rp > 40 ? 'bg-primary' : 'bg-[#10b981]', trendDir: rp > 50 ? 'up' as const : 'down' as const, trendVal: rp > 60 ? 'Critical' : 'Managed', trendColor: rp > 60 ? 'red' : 'green' as 'red' | 'green' },
-        { label: 'Morale', value: `${Math.round(gs.teamMorale)}%`, dot: gs.teamMorale > 75 ? 'bg-[#10b981]' : 'bg-primary', trendDir: gs.teamMorale > 60 ? 'up' as const : 'down' as const, trendVal: gs.teamMorale > 75 ? 'High' : 'Low', trendColor: gs.teamMorale > 75 ? 'green' : 'yellow' as 'green' | 'yellow' },
-    ];
+const isInternConfig = (config: SimulationConfig) => config.id === 'sim-intern-001';
+const isProductManagementConfig = (config: SimulationConfig) =>
+    config.id.startsWith('sim-pm-') || config.promptEngine?.toLowerCase().includes('product management');
+
+function getArtifactLabel(action: WeeklyActionItem) {
+    if (action.artifactType === 'prd') return 'PRD / stories';
+    if (action.artifactType === 'roadmap') return 'Prioritization artifact';
+    if (action.artifactType === 'stakeholder_update') return 'Stakeholder update';
+    if (action.artifactType === 'user_research') return 'Research summary';
+    if (action.artifactType === 'metrics_report') return 'Metrics analysis';
+    if (action.artifactType === 'decision_log') return 'Problem framing';
+    if (action.artifactType === 'project_charter') return 'Portfolio case study';
+    return action.outputTemplate?.[0]?.label ?? action.prdTitle ?? 'Work submission';
 }
 
-const isInternConfig = (config: SimulationConfig) => config.id === 'sim-intern-001';
+function getSkillLabel(action: WeeklyActionItem) {
+    const title = action.title.toLowerCase();
+    if (title.includes('feedback') || title.includes('complaint')) return 'User evidence';
+    if (title.includes('impact') || title.includes('business')) return 'Business reasoning';
+    if (title.includes('problem statement') || title.includes('define')) return 'Problem framing';
+    if (title.includes('feature ideas') || title.includes('generate')) return 'Solution thinking';
+    if (title.includes('prioritize')) return 'Trade-off thinking';
+    if (title.includes('prd')) return 'Product documentation';
+    if (title.includes('stories') || title.includes('acceptance')) return 'Engineering handoff';
+    if (title.includes('stakeholder')) return 'Stakeholder communication';
+    if (title.includes('portfolio') || title.includes('case study')) return 'Portfolio storytelling';
+    return 'Product context';
+}
+
+function getActionPointTotal(action: WeeklyActionItem) {
+    return action.scoringRubric?.reduce((sum, criterion) => sum + criterion.points, 0) ?? 0;
+}
+
+function getActionMaterialCount(action: WeeklyActionItem) {
+    return action.workplaceMaterials?.length ?? 0;
+}
+
+function formatArtifactContent(content?: Record<string, unknown>) {
+    if (!content) return 'No saved content for this artifact yet.';
+    return Object.entries(content)
+        .map(([key, value]) => {
+            const label = key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+            if (value && typeof value === 'object') {
+                return `## ${label}\n${Object.entries(value as Record<string, unknown>)
+                    .map(([nestedKey, nestedValue]) => `- ${nestedKey.replace(/_/g, ' ')}: ${String(nestedValue)}`)
+                    .join('\n')}`;
+            }
+            return `## ${label}\n${String(value)}`;
+        })
+        .join('\n\n');
+}
 
 const INTERN_ACTION_STYLE: Record<string, { emoji: string; icon: React.ComponentType<{ className?: string }>; gradient: string; label: string }> = {
     'intern-action-offer-letter': {
@@ -197,7 +226,6 @@ function InternDashboardPanel({
     config,
     completedIds,
     availableActions,
-    advanceTime,
     onOpenAction,
     onOpenLegacy,
     setActiveTab,
@@ -207,7 +235,6 @@ function InternDashboardPanel({
     config: SimulationConfig;
     completedIds: Set<string>;
     availableActions: ScenarioAction[];
-    advanceTime: () => void;
     onOpenAction: (item: WeeklyActionItem) => void;
     onOpenLegacy: (item: ScenarioAction) => void;
     setActiveTab: (tab: ActiveTab) => void;
@@ -217,7 +244,10 @@ function InternDashboardPanel({
     const visibleActions = getVisibleInternActions(orderedActions, completedIds);
     const pendingVisibleActions = visibleActions.filter((action) => !completedIds.has(action.id));
     const lockedCount = Math.max(0, orderedActions.length - visibleActions.length);
-    const progress = Math.round((completedIds.size / Math.max(1, orderedActions.length)) * 100);
+    const weeks = Array.from({ length: gameState.totalWeeks }, (_, index) => index + 1);
+    const scrollToPanel = (id: string) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     return (
         <div className="relative flex-1 overflow-y-auto bg-[#fff7ed] p-4 text-slate-950 sm:p-6 lg:p-8 custom-scrollbar dark:bg-[#08090a] dark:text-white">
@@ -233,6 +263,23 @@ function InternDashboardPanel({
                         <div className="absolute right-6 top-6 rounded-full bg-yellow-300 px-3 py-1 text-xs font-black text-yellow-950 shadow-lg rotate-3">
                             Day 1 Quest
                         </div>
+                        <nav className="mb-5 flex max-w-full gap-2 overflow-x-auto rounded-3xl border border-white/70 bg-white/75 p-1.5 text-xs font-black uppercase tracking-widest shadow-sm dark:border-white/10 dark:bg-white/10" aria-label="Intern onboarding navigation">
+                            <button type="button" onClick={() => setActiveTab('dashboard')} className="shrink-0 rounded-2xl bg-slate-950 px-4 py-2 text-white shadow-sm dark:bg-white dark:text-slate-950">
+                                Welcome
+                            </button>
+                            <button type="button" onClick={() => scrollToPanel('intern-office-stage')} className="shrink-0 rounded-2xl px-4 py-2 text-slate-600 transition hover:bg-white hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
+                                Office
+                            </button>
+                            <button type="button" onClick={() => scrollToPanel('intern-mission-stream')} className="shrink-0 rounded-2xl px-4 py-2 text-slate-600 transition hover:bg-white hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
+                                Missions
+                            </button>
+                            <button type="button" onClick={() => setActiveTab('calendar')} className="shrink-0 rounded-2xl px-4 py-2 text-slate-600 transition hover:bg-white hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
+                                Calendar
+                            </button>
+                            <button type="button" onClick={() => setActiveTab('backlog')} className="shrink-0 rounded-2xl px-4 py-2 text-slate-600 transition hover:bg-white hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
+                                Task Board
+                            </button>
+                        </nav>
                         <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr] xl:items-center">
                             <div>
                                 <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-violet-700 dark:bg-violet-400/15 dark:text-violet-200">
@@ -263,7 +310,7 @@ function InternDashboardPanel({
                                 </div>
                             </div>
 
-                            <div className="relative min-h-[320px]">
+                            <div id="intern-office-stage" className="relative min-h-[320px] scroll-mt-6">
                                 <Suspense
                                     fallback={
                                         <div className="flex h-[340px] items-center justify-center rounded-[28px] bg-white/70 text-sm font-black text-slate-600 dark:bg-white/5 dark:text-slate-300">
@@ -284,15 +331,39 @@ function InternDashboardPanel({
                     <div className="rounded-[32px] border border-white/70 bg-slate-950 p-5 text-white shadow-2xl shadow-violet-300/30 dark:border-white/10 dark:bg-white/[0.07] dark:shadow-black/30">
                         <div className="mb-5 flex items-center justify-between">
                             <div>
-                                <p className="text-xs font-black uppercase tracking-widest text-cyan-300">Level progress</p>
-                                <h2 className="text-3xl font-black">{progress}%</h2>
+                                <p className="text-xs font-black uppercase tracking-widest text-cyan-300">Onboarding weeks</p>
+                                <h2 className="text-3xl font-black">Week {gameState.week}/{gameState.totalWeeks}</h2>
                             </div>
                             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-yellow-300 to-pink-400 text-3xl shadow-lg animate-floaty">
                                 🏆
                             </div>
                         </div>
-                        <div className="h-4 overflow-hidden rounded-full bg-white/10">
-                            <div className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-emerald-300 to-yellow-300 transition-all duration-700" style={{ width: `${progress}%` }} />
+                        <div className="grid gap-2">
+                            {weeks.map((week) => {
+                                const weekActions = (config.weeklyActions ?? []).filter((action) => action.week === week);
+                                const weekDone = weekActions.filter((action) => completedIds.has(action.id)).length;
+                                const status = week < gameState.week ? 'Completed' : week === gameState.week ? 'Current' : 'Upcoming';
+                                return (
+                                    <button
+                                        key={week}
+                                        type="button"
+                                        onClick={() => setActiveTab('calendar')}
+                                        className={`rounded-2xl border p-3 text-left transition hover:-translate-y-0.5 ${
+                                            week === gameState.week
+                                                ? 'border-cyan-300/70 bg-cyan-300/15'
+                                                : 'border-white/10 bg-white/5 hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div>
+                                                <p className="text-sm font-black">Week {week}</p>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">{weekDone}/{weekActions.length} activities</p>
+                                            </div>
+                                            <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-cyan-100">{status}</span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
                         </div>
                         <div className="mt-5 grid grid-cols-3 gap-2 text-center">
                             <div className="rounded-2xl bg-white/10 p-3">
@@ -309,21 +380,21 @@ function InternDashboardPanel({
                             </div>
                         </div>
                         <button
-                            onClick={advanceTime}
+                            onClick={() => setActiveTab('calendar')}
                             className="mt-5 w-full rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 disabled:opacity-50"
                             style={{ backgroundColor: pagePrimary }}
                         >
-                            Advance Timeline
+                            Open Calendar Plan
                         </button>
                     </div>
                 </section>
 
                 <section className="mt-6 grid gap-5 xl:grid-cols-[1fr_340px]">
-                    <div className="rounded-[32px] border border-white/70 bg-white/75 p-5 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.07] dark:shadow-black/20">
+                    <div id="intern-mission-stream" className="scroll-mt-6 rounded-[32px] border border-white/70 bg-white/75 p-5 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.07] dark:shadow-black/20">
                         <div className="mb-5 flex items-center justify-between gap-3">
                             <div>
                                 <p className="text-xs font-black uppercase tracking-widest text-violet-600">Action stream</p>
-                                <h2 className="text-2xl font-black text-slate-950 dark:text-white">Week 1 tasks arrive as missions</h2>
+                                <h2 className="text-2xl font-black text-slate-950 dark:text-white">Week {gameState.week} tasks arrive as missions</h2>
                             </div>
                             <button onClick={() => setActiveTab('backlog')} className="rounded-2xl bg-violet-100 px-4 py-2 text-xs font-black text-violet-700 dark:bg-violet-400/15 dark:text-violet-200">
                                 Full board
@@ -384,6 +455,362 @@ function InternDashboardPanel({
 }
 
 // ─── Backlog Panel ────────────────────────────────────────────
+function ProductActionCard({
+    action,
+    index,
+    isCompleted = false,
+    overdue = false,
+    onOpenAction,
+    primaryColor,
+}: {
+    action: WeeklyActionItem;
+    index: number;
+    isCompleted?: boolean;
+    overdue?: boolean;
+    onOpenAction: (item: WeeklyActionItem) => void;
+    primaryColor: string;
+}) {
+    const points = getActionPointTotal(action);
+    const materialCount = getActionMaterialCount(action);
+
+    return (
+        <button
+            type="button"
+            onClick={() => onOpenAction(action)}
+            className={`group w-full overflow-hidden rounded-lg border bg-white text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg dark:bg-[#111318] ${
+                overdue
+                    ? 'border-red-300 dark:border-red-500/40'
+                    : isCompleted
+                        ? 'border-emerald-200 opacity-80 dark:border-emerald-400/30'
+                        : 'border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20'
+            }`}
+            style={{
+                animation: `intern-card-pop 320ms ease-out ${index * 55}ms both`,
+                backgroundImage: isCompleted
+                    ? undefined
+                    : `linear-gradient(135deg, ${primaryColor}14 0%, transparent 48%)`,
+            }}
+        >
+            <div className="h-1 w-full" style={{ backgroundColor: isCompleted ? '#10b981' : overdue ? '#ef4444' : primaryColor }} />
+            <div className="p-4">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-widest text-white" style={{ backgroundColor: primaryColor }}>
+                        Module {action.week}
+                    </span>
+                    <span className={`rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-widest ${isCompleted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-200' : 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300'}`}>
+                        {isCompleted ? 'Completed' : action.priority}
+                    </span>
+                    {overdue && (
+                        <span className="rounded-full bg-red-100 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-red-700 dark:bg-red-500/15 dark:text-red-200">
+                            Overdue
+                        </span>
+                    )}
+                </div>
+
+                <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-sm" style={{ backgroundColor: isCompleted ? '#10b981' : primaryColor }}>
+                        {isCompleted ? <CheckCircle className="h-5 w-5" /> : <ClipboardCheck className="h-5 w-5" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <h4 className={`text-sm font-bold leading-snug ${isCompleted ? 'text-slate-600 line-through dark:text-slate-400' : 'text-slate-950 dark:text-white'}`}>
+                            {action.title}
+                        </h4>
+                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600 dark:text-slate-300">
+                            {action.description}
+                        </p>
+                    </div>
+                    <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" />
+                </div>
+
+                <div className="mt-4 grid gap-2 text-[11px] font-bold text-slate-600 dark:text-slate-300 sm:grid-cols-3">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1 dark:bg-white/[0.06]">
+                        <BadgeCheck className="h-3.5 w-3.5" style={{ color: primaryColor }} />
+                        {getArtifactLabel(action)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1 dark:bg-white/[0.06]">
+                        <BookOpen className="h-3.5 w-3.5" style={{ color: primaryColor }} />
+                        {materialCount} material{materialCount === 1 ? '' : 's'}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1 dark:bg-white/[0.06]">
+                        <Target className="h-3.5 w-3.5" style={{ color: primaryColor }} />
+                        {points || 10} pts
+                    </span>
+                </div>
+            </div>
+        </button>
+    );
+}
+
+function ProductManagementDashboardPanel({
+    gameState,
+    config,
+    completedIds,
+    availableActions,
+    advanceTime,
+    onOpenAction,
+    onOpenLegacy,
+    setActiveTab,
+    pagePrimary,
+}: {
+    gameState: NonNullable<ReturnType<typeof useSimulationCore>['gameState']>;
+    config: SimulationConfig;
+    completedIds: Set<string>;
+    availableActions: ScenarioAction[];
+    advanceTime: () => void;
+    onOpenAction: (item: WeeklyActionItem) => void;
+    onOpenLegacy: (item: ScenarioAction) => void;
+    setActiveTab: (tab: ActiveTab) => void;
+    pagePrimary: string;
+}) {
+    const allActions = config.weeklyActions ?? gameState.weeklyActionsForThisWeek;
+    const currentActions = gameState.weeklyActionsForThisWeek;
+    const pendingCurrentActions = currentActions.filter((action) => !completedIds.has(action.id));
+    const nextAction = pendingCurrentActions[0] ?? allActions.find((action) => !completedIds.has(action.id));
+    const completedTotal = allActions.filter((action) => completedIds.has(action.id)).length;
+    const progress = Math.round((completedTotal / Math.max(1, allActions.length)) * 100);
+    const artifactCount = gameState.artifacts?.length ?? 0;
+    const materialCount = allActions.reduce((sum, action) => sum + getActionMaterialCount(action), 0);
+    const currentModuleIndex = nextAction ? Math.max(0, allActions.findIndex((action) => action.id === nextAction.id)) : completedTotal;
+    const keyMetric = config.kpis[0]?.label ?? 'Key product metric';
+
+    return (
+        <div className="flex-1 overflow-y-auto bg-slate-50 p-4 text-slate-950 custom-scrollbar dark:bg-[#08090a] dark:text-white sm:p-6 lg:p-8">
+            <div className="mx-auto max-w-7xl space-y-6">
+                <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <article
+                            className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318] md:col-span-2"
+                            style={{ backgroundImage: `linear-gradient(135deg, ${pagePrimary}18 0%, transparent 48%)` }}
+                        >
+                            <div className="mb-4 flex flex-wrap items-center gap-2">
+                                <span className="rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest text-white" style={{ backgroundColor: pagePrimary }}>
+                                    Product Management Intern
+                                </span>
+                                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-white/10 dark:text-slate-200">
+                                    {config.industry}
+                                </span>
+                                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-white/10 dark:text-slate-200">
+                                    Module {gameState.week} of {gameState.totalWeeks}
+                                </span>
+                            </div>
+                            <h1 className="max-w-3xl text-2xl font-black tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+                                Solve a real product problem for {config.companyName}.
+                            </h1>
+                            <p className="mt-3 max-w-3xl text-sm font-medium leading-7 text-slate-600 dark:text-slate-300">
+                                {config.challengeDetails}
+                            </p>
+                        </article>
+
+                        {[
+                            { label: 'Product context', value: config.description, icon: Users },
+                            { label: 'Business goal', value: config.challenge, icon: Target },
+                            { label: 'Metric to improve', value: keyMetric, icon: BarChart3 },
+                            { label: 'Final evidence', value: 'Portfolio-ready PM case study', icon: FileText },
+                        ].map((item) => (
+                            <article key={item.label} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 dark:bg-white/[0.06]">
+                                    <item.icon className="h-5 w-5" style={{ color: pagePrimary }} />
+                                </div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{item.label}</p>
+                                <p className="mt-1 text-sm font-bold leading-6 text-slate-900 dark:text-white">{item.value}</p>
+                            </article>
+                        ))}
+                    </div>
+
+                    <aside className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                        <article className="rounded-lg border border-slate-200 bg-slate-950 p-5 text-white shadow-lg dark:border-white/10">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-black uppercase tracking-widest text-white/55">Internship progress</p>
+                                    <p className="mt-1 text-3xl font-black">{progress}%</p>
+                                </div>
+                                <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-white/10">
+                                    <ListChecks className="h-7 w-7" style={{ color: pagePrimary }} />
+                                </div>
+                            </div>
+                            <div className="mt-4 h-2 rounded-full bg-white/10">
+                                <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: pagePrimary }} />
+                            </div>
+                            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                                <div className="rounded-lg bg-white/10 p-3">
+                                    <p className="text-xl font-black">{completedTotal}</p>
+                                    <p className="text-[10px] font-bold uppercase text-white/55">Done</p>
+                                </div>
+                                <div className="rounded-lg bg-white/10 p-3">
+                                    <p className="text-xl font-black">{artifactCount}</p>
+                                    <p className="text-[10px] font-bold uppercase text-white/55">Artifacts</p>
+                                </div>
+                                <div className="rounded-lg bg-white/10 p-3">
+                                    <p className="text-xl font-black">{materialCount}</p>
+                                    <p className="text-[10px] font-bold uppercase text-white/55">Materials</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Next action</p>
+                            <h2 className="mt-2 text-lg font-black text-slate-950 dark:text-white">
+                                {nextAction?.title ?? 'Ready for final review'}
+                            </h2>
+                            <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                                {nextAction?.learnerInstruction ?? 'All visible module work is complete. Review your documents or move forward.'}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => nextAction ? onOpenAction(nextAction) : advanceTime()}
+                                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5"
+                                style={{ backgroundColor: pagePrimary }}
+                            >
+                                {nextAction ? 'Open Module' : `Advance to Module ${Math.min(gameState.week + 1, gameState.totalWeeks)}`}
+                                <ArrowRight className="h-4 w-4" />
+                            </button>
+                        </article>
+                    </aside>
+                </section>
+
+                <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
+                    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Project path</p>
+                                <h2 className="text-xl font-black text-slate-950 dark:text-white">10 modules from evidence to portfolio</h2>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('backlog')}
+                                className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/10"
+                            >
+                                Open task board
+                            </button>
+                        </div>
+
+                        <div className="grid gap-3 md:grid-cols-2">
+                            {allActions.map((action, index) => {
+                                const status = completedIds.has(action.id)
+                                    ? 'Done'
+                                    : index === currentModuleIndex
+                                        ? 'Active'
+                                        : index < currentModuleIndex
+                                            ? 'Review'
+                                            : 'Locked';
+                                const isClickable = status !== 'Locked';
+                                return (
+                                    <button
+                                        key={action.id}
+                                        type="button"
+                                        disabled={!isClickable}
+                                        onClick={() => isClickable && onOpenAction(action)}
+                                        className={`rounded-lg border p-3 text-left transition ${
+                                            status === 'Active'
+                                                ? 'border-transparent shadow-md'
+                                                : status === 'Done'
+                                                    ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-400/20 dark:bg-emerald-400/10'
+                                                    : 'border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/[0.04]'
+                                        } ${isClickable ? 'hover:-translate-y-0.5 hover:shadow-md' : 'cursor-not-allowed opacity-55'}`}
+                                        style={status === 'Active' ? { boxShadow: `0 16px 32px ${pagePrimary}1f`, borderColor: `${pagePrimary}55` } : undefined}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-white" style={{ backgroundColor: status === 'Done' ? '#10b981' : pagePrimary }}>
+                                                {status === 'Done' ? <CheckCircle className="h-4 w-4" /> : index + 1}
+                                            </span>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="mb-1 flex flex-wrap items-center gap-2">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: status === 'Active' ? pagePrimary : undefined }}>
+                                                        {status}
+                                                    </span>
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{getSkillLabel(action)}</span>
+                                                </div>
+                                                <p className="text-sm font-bold leading-snug text-slate-950 dark:text-white">{action.title}</p>
+                                                <p className="mt-1 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">{getArtifactLabel(action)}</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <aside className="space-y-4">
+                        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">How to work</p>
+                            <div className="mt-4 space-y-3">
+                                {[
+                                    { title: 'Read the messy docs', body: 'Use complaints, tickets, metrics, and stakeholder notes as evidence.', icon: BookOpen },
+                                    { title: 'Make a product call', body: 'Separate user pain from business impact before choosing a feature.', icon: Lightbulb },
+                                    { title: 'Ship a portfolio artifact', body: 'Every module creates proof you can show in a PM case study.', icon: FileText },
+                                ].map((item) => (
+                                    <div key={item.title} className="flex gap-3">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10">
+                                            <item.icon className="h-4 w-4" style={{ color: pagePrimary }} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-950 dark:text-white">{item.title}</p>
+                                            <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">{item.body}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Product signals</p>
+                            <div className="mt-4 grid gap-2">
+                                {config.kpis.slice(0, 3).map((kpi) => (
+                                    <div key={kpi.id} className="rounded-lg bg-slate-50 p-3 dark:bg-white/[0.06]">
+                                        <div className="mb-2 flex items-center justify-between gap-3">
+                                            <p className="text-xs font-bold text-slate-700 dark:text-slate-200">{kpi.label}</p>
+                                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase ${
+                                                kpi.status === 'critical'
+                                                    ? 'bg-red-500/10 text-red-600 dark:text-red-300'
+                                                    : kpi.status === 'warning'
+                                                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-200'
+                                                        : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-200'
+                                            }`}>
+                                                {kpi.status}
+                                            </span>
+                                        </div>
+                                        <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10">
+                                            <div className="h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, kpi.progress))}%`, backgroundColor: pagePrimary }} />
+                                        </div>
+                                        <p className="mt-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">{kpi.goal}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Stakeholder pressure</p>
+                            <div className="mt-4 space-y-3">
+                                {config.stakeholders.slice(0, 3).map((stakeholder) => (
+                                    <div key={stakeholder.id} className="flex gap-3 rounded-lg bg-slate-50 p-3 dark:bg-white/[0.06]">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-black text-white" style={{ backgroundColor: pagePrimary }}>
+                                            {stakeholder.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-bold text-slate-950 dark:text-white">{stakeholder.role}</p>
+                                            <p className="line-clamp-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{stakeholder.concerns[0] ?? stakeholder.priorities[0]}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {availableActions.map((action) => (
+                            <button
+                                key={action.id}
+                                onClick={() => onOpenLegacy(action)}
+                                className="w-full rounded-lg border border-amber-200 bg-amber-50 p-4 text-left text-sm font-bold text-amber-900 transition hover:-translate-y-0.5 dark:border-amber-300/20 dark:bg-amber-300/10 dark:text-amber-100"
+                            >
+                                Decision: {action.name}
+                            </button>
+                        ))}
+                    </aside>
+                </section>
+            </div>
+        </div>
+    );
+}
+
 interface BacklogPanelProps {
     gameState: ReturnType<typeof useSimulationCore>['gameState'];
     config: SimulationConfig;
@@ -392,11 +819,13 @@ interface BacklogPanelProps {
 }
 
 function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: BacklogPanelProps) {
-    const [filter, setFilter] = useState<'todo' | 'done'>('todo');
+    const [filter, setFilter] = useState<'all' | 'todo' | 'done'>(() => isProductManagementConfig(config) ? 'all' : 'todo');
 
     if (!gameState) return null;
 
     const internMode = isInternConfig(config);
+    const pmMode = isProductManagementConfig(config);
+    const effectiveFilter = filter === 'all' ? 'todo' : filter;
     const currentWeek = gameState.week;
     const overdueActions: BacklogActionItem[] = gameState.backlogActionItems ?? [];
     const overdueIds = new Set(overdueActions.map(o => o.id));
@@ -413,12 +842,265 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
     const lockedActionCount = Math.max(0, weekActions.length - visibleWeekActions.length);
 
     const todoItems = [...actionRequiredEvents, ...actionItems];
+    const allActions = config.weeklyActions ?? [];
+    const completedTotal = allActions.filter((action) => completedIds.has(action.id)).length;
+    const notCompletedTotal = allActions.length - completedTotal;
+    const projectProgress = Math.round((completedTotal / Math.max(1, allActions.length)) * 100);
+    const nextPmAction = actionItems[0] ?? allActions.find((action) => !completedIds.has(action.id));
+    const weekPointTotal = weekActions.reduce((sum, action) => sum + getActionPointTotal(action), 0);
+    const weekMaterialTotal = weekActions.reduce((sum, action) => sum + getActionMaterialCount(action), 0);
+    const boardTabs = pmMode
+        ? [
+            { id: 'all' as const, label: 'All weeks', count: allActions.length },
+            { id: 'todo' as const, label: 'Not completed', count: notCompletedTotal },
+            { id: 'done' as const, label: 'Completed', count: completedTotal },
+        ]
+        : [
+            { id: 'todo' as const, label: 'To Do', count: todoItems.length },
+            { id: 'done' as const, label: 'Done', count: completedActions.length },
+        ];
+
+    if (pmMode) {
+        const totalMaterialCount = allActions.reduce((sum, action) => sum + getActionMaterialCount(action), 0);
+        const totalPointCount = allActions.reduce((sum, action) => sum + getActionPointTotal(action), 0);
+        const nextAvailableAction = allActions.find((action) => !completedIds.has(action.id) && action.week <= currentWeek)
+            ?? allActions.find((action) => !completedIds.has(action.id));
+        const weeklyTaskGroups = Array.from({ length: config.totalWeeks }, (_, index) => {
+            const weekNumber = index + 1;
+            const actions = allActions.filter((action) => action.week === weekNumber);
+            const completed = actions.filter((action) => completedIds.has(action.id)).length;
+            const notCompleted = actions.length - completed;
+            const visibleActions = actions.filter((action) => {
+                if (filter === 'done') return completedIds.has(action.id);
+                if (filter === 'todo') return !completedIds.has(action.id);
+                return true;
+            });
+            const weekStatus = weekNumber > currentWeek
+                ? 'Locked'
+                : notCompleted === 0 && actions.length > 0
+                    ? 'Completed'
+                    : weekNumber === currentWeek
+                        ? 'Available'
+                        : 'Not completed';
+
+            return { weekNumber, actions, visibleActions, completed, notCompleted, weekStatus };
+        }).filter((group) => group.actions.length > 0 && group.visibleActions.length > 0);
+
+        return (
+            <div className="flex flex-1 flex-col overflow-hidden bg-slate-50 dark:bg-[#08090a]">
+                <div className="border-b border-slate-200 p-4 dark:border-white/10 sm:p-6">
+                    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                                <div className="mb-2 flex flex-wrap items-center gap-2">
+                                    <span className="rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white" style={{ backgroundColor: config.primaryColor }}>
+                                        PM Internship Board
+                                    </span>
+                                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:bg-white/10 dark:text-slate-300">
+                                        Week {currentWeek}/{config.totalWeeks}
+                                    </span>
+                                </div>
+                                <h2 className="text-lg font-black text-slate-950 dark:text-white">{config.companyName} product task board</h2>
+                                <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-500 dark:text-slate-400">
+                                    Track every module in the PM simulation: what is completed, what is not completed, and what unlocks by week.
+                                </p>
+                            </div>
+                            <div className="grid min-w-[260px] grid-cols-4 gap-2 text-center text-xs">
+                                <div className="rounded-lg bg-slate-50 p-2 dark:bg-white/[0.06]">
+                                    <p className="font-black text-slate-950 dark:text-white">{projectProgress}%</p>
+                                    <p className="font-bold uppercase text-slate-400">Progress</p>
+                                </div>
+                                <div className="rounded-lg bg-slate-50 p-2 dark:bg-white/[0.06]">
+                                    <p className="font-black text-slate-950 dark:text-white">{completedTotal}</p>
+                                    <p className="font-bold uppercase text-slate-400">Done</p>
+                                </div>
+                                <div className="rounded-lg bg-slate-50 p-2 dark:bg-white/[0.06]">
+                                    <p className="font-black text-slate-950 dark:text-white">{notCompletedTotal}</p>
+                                    <p className="font-bold uppercase text-slate-400">Open</p>
+                                </div>
+                                <div className="rounded-lg bg-slate-50 p-2 dark:bg-white/[0.06]">
+                                    <p className="font-black text-slate-950 dark:text-white">{totalMaterialCount}</p>
+                                    <p className="font-bold uppercase text-slate-400">Docs</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {nextAvailableAction && (
+                            <button
+                                type="button"
+                                onClick={() => nextAvailableAction.week <= currentWeek && onOpenAction(nextAvailableAction)}
+                                disabled={nextAvailableAction.week > currentWeek}
+                                className="mt-4 flex w-full items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:-translate-y-0.5 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.06]"
+                            >
+                                <span>
+                                    <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Next deliverable</span>
+                                    <span className="block text-sm font-bold text-slate-950 dark:text-white">{getArtifactLabel(nextAvailableAction)}</span>
+                                </span>
+                                <ArrowRight className="h-4 w-4" style={{ color: config.primaryColor }} />
+                            </button>
+                        )}
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {boardTabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    type="button"
+                                    onClick={() => setFilter(tab.id)}
+                                    className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-black transition ${filter === tab.id ? 'text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-white/15'}`}
+                                    style={filter === tab.id ? { backgroundColor: config.primaryColor } : undefined}
+                                >
+                                    {tab.label}
+                                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${filter === tab.id ? 'bg-white/20 text-white' : 'bg-white text-slate-500 dark:bg-black/20 dark:text-slate-300'}`}>{tab.count}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar sm:p-6">
+                    <div className="grid gap-4 xl:grid-cols-2">
+                        {weeklyTaskGroups.map(({ weekNumber, visibleActions, completed, notCompleted, weekStatus }) => (
+                            <section key={weekNumber} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Module {weekNumber}</p>
+                                        <h3 className="text-base font-black text-slate-950 dark:text-white">Week {weekNumber} task list</h3>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                                            weekStatus === 'Completed'
+                                                ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-200'
+                                                : weekStatus === 'Locked'
+                                                    ? 'bg-slate-500/10 text-slate-500 dark:text-slate-300'
+                                                    : weekStatus === 'Available'
+                                                        ? 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-200'
+                                                        : 'bg-amber-500/10 text-amber-700 dark:text-amber-200'
+                                        }`}>
+                                            {weekStatus}
+                                        </span>
+                                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:bg-white/10 dark:text-slate-300">
+                                            {completed} done / {notCompleted} open
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {visibleActions.map((action) => {
+                                        const isCompleted = completedIds.has(action.id);
+                                        const isLocked = action.week > currentWeek && !isCompleted;
+                                        const statusLabel = isCompleted ? 'Completed' : isLocked ? 'Locked' : 'Available';
+
+                                        return (
+                                            <button
+                                                key={action.id}
+                                                type="button"
+                                                disabled={isLocked}
+                                                onClick={() => !isLocked && onOpenAction(action)}
+                                                className={`w-full rounded-lg border p-3 text-left transition ${
+                                                    isCompleted
+                                                        ? 'border-emerald-200 bg-emerald-50/70 dark:border-emerald-400/20 dark:bg-emerald-400/10'
+                                                        : isLocked
+                                                            ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-70 dark:border-white/10 dark:bg-white/[0.03]'
+                                                            : 'border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:bg-white/[0.05] dark:hover:border-white/20'
+                                                }`}
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-black text-white" style={{ backgroundColor: isCompleted ? '#10b981' : isLocked ? '#64748b' : config.primaryColor }}>
+                                                        {isCompleted ? <CheckCircle className="h-4 w-4" /> : isLocked ? <LockKeyhole className="h-4 w-4" /> : action.week}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="mb-1 flex flex-wrap items-center gap-2">
+                                                            <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:bg-black/20 dark:text-slate-300">
+                                                                {statusLabel}
+                                                            </span>
+                                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{getSkillLabel(action)}</span>
+                                                        </div>
+                                                        <p className="text-sm font-black leading-snug text-slate-950 dark:text-white">{action.title}</p>
+                                                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{action.description}</p>
+                                                        <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">
+                                                            <span className="rounded-md bg-white px-2 py-1 dark:bg-black/20">{getArtifactLabel(action)}</span>
+                                                            <span className="rounded-md bg-white px-2 py-1 dark:bg-black/20">{getActionMaterialCount(action)} docs</span>
+                                                            <span className="rounded-md bg-white px-2 py-1 dark:bg-black/20">{getActionPointTotal(action) || 10} pts</span>
+                                                        </div>
+                                                    </div>
+                                                    <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-slate-400" />
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        ))}
+                    </div>
+
+                    {weeklyTaskGroups.length === 0 && (
+                        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white py-16 text-center dark:border-white/15 dark:bg-[#111318]">
+                            <CheckCircle className="mb-4 h-12 w-12 text-emerald-500/40" />
+                            <p className="text-sm font-black text-slate-950 dark:text-white">No tasks match this filter.</p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Switch to All weeks to see the complete PM task board.</p>
+                        </div>
+                    )}
+
+                    <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 text-xs font-bold text-slate-500 dark:border-white/10 dark:bg-[#111318] dark:text-slate-400">
+                        Track total PM workload: {allActions.length} modules, {totalPointCount || 100} scoring points, and {totalMaterialCount} workplace documents.
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 overflow-hidden flex flex-col">
             {/* Header */}
             <div className="p-4 sm:p-6 border-b border-border flex-shrink-0">
-                <div className="mb-4">
+                {pmMode && (
+                    <div className="mb-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                                <div className="mb-2 flex flex-wrap items-center gap-2">
+                                    <span className="rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white" style={{ backgroundColor: config.primaryColor }}>
+                                        PM Internship Board
+                                    </span>
+                                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:bg-white/10 dark:text-slate-300">
+                                        Module {currentWeek}
+                                    </span>
+                                </div>
+                                <h2 className="text-lg font-black text-slate-950 dark:text-white">{config.companyName} product workspace</h2>
+                                <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-500 dark:text-slate-400">
+                                    Work like a PM intern: read the messy workplace materials, write the deliverable, then unlock the next module.
+                                </p>
+                            </div>
+                            <div className="grid min-w-[220px] grid-cols-3 gap-2 text-center text-xs">
+                                <div className="rounded-lg bg-slate-50 p-2 dark:bg-white/[0.06]">
+                                    <p className="font-black text-slate-950 dark:text-white">{projectProgress}%</p>
+                                    <p className="font-bold uppercase text-slate-400">Progress</p>
+                                </div>
+                                <div className="rounded-lg bg-slate-50 p-2 dark:bg-white/[0.06]">
+                                    <p className="font-black text-slate-950 dark:text-white">{weekMaterialTotal}</p>
+                                    <p className="font-bold uppercase text-slate-400">Docs</p>
+                                </div>
+                                <div className="rounded-lg bg-slate-50 p-2 dark:bg-white/[0.06]">
+                                    <p className="font-black text-slate-950 dark:text-white">{weekPointTotal || 10}</p>
+                                    <p className="font-bold uppercase text-slate-400">Pts</p>
+                                </div>
+                            </div>
+                        </div>
+                        {nextPmAction && (
+                            <button
+                                type="button"
+                                onClick={() => onOpenAction(nextPmAction)}
+                                className="mt-4 flex w-full items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:-translate-y-0.5 hover:shadow-sm dark:border-white/10 dark:bg-white/[0.06]"
+                            >
+                                <span>
+                                    <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Next deliverable</span>
+                                    <span className="block text-sm font-bold text-slate-950 dark:text-white">{getArtifactLabel(nextPmAction)}</span>
+                                </span>
+                                <ArrowRight className="h-4 w-4" style={{ color: config.primaryColor }} />
+                            </button>
+                        )}
+                    </div>
+                )}
+                <div className={pmMode ? 'hidden' : 'mb-4'}>
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">All Tasks</h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Your main workspace — complete tasks to advance</p>
                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
@@ -437,7 +1119,8 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                         <button
                             key={t.id}
                             onClick={() => setFilter(t.id)}
-                            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${filter === t.id ? 'bg-[#5e6ad2] text-white' : 'bg-surface text-text-tertiary hover:bg-surface-secondary'}`}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${filter === t.id ? 'text-white' : 'bg-surface text-text-tertiary hover:bg-surface-secondary'}`}
+                            style={filter === t.id ? { backgroundColor: config.primaryColor } : undefined}
                         >
                             {t.label}
                             {t.count > 0 && (
@@ -454,7 +1137,7 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-6">
 
                 {/* TO DO Section */}
-                {filter === 'todo' && todoItems.length > 0 && (
+                {effectiveFilter === 'todo' && todoItems.length > 0 && (
                     <section>
                         <div className="space-y-3">
                             {/* Events requiring action */}
@@ -478,8 +1161,21 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                                             key={action.id}
                                             action={action}
                                             index={index}
+                                            isCompleted={false}
+                                            onOpenAction={onOpenAction}
+                                        />
+                                    );
+                                }
+
+                                if (pmMode) {
+                                    return (
+                                        <ProductActionCard
+                                            key={action.id}
+                                            action={action}
+                                            index={index}
                                             overdue={overdue}
-                                            onClick={() => onOpenAction(action)}
+                                            onOpenAction={onOpenAction}
+                                            primaryColor={config.primaryColor}
                                         />
                                     );
                                 }
@@ -521,15 +1217,25 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                 )}
 
                 {/* DONE Section */}
-                {filter === 'done' && completedActions.length > 0 && (
+                {effectiveFilter === 'done' && completedActions.length > 0 && (
                     <section>
                         <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3 flex items-center gap-2">
                             <CheckCircle className="w-3 h-3 text-emerald-500" />
                             Completed
                         </h3>
                         <div className="space-y-2">
-                            {completedActions.map(action => (
-                                <div key={action.id} className="bg-card rounded-xl p-4 border border-border opacity-60">
+                            {completedActions.map((action, index) => (
+                                pmMode ? (
+                                    <ProductActionCard
+                                        key={action.id}
+                                        action={action}
+                                        index={index}
+                                        isCompleted
+                                        onOpenAction={onOpenAction}
+                                        primaryColor={config.primaryColor}
+                                    />
+                                ) : (
+                                    <div key={action.id} className="bg-card rounded-xl p-4 border border-border opacity-60">
                                     <div className="flex items-start gap-3">
                                         <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
                                             <CheckCircle className="w-4 h-4 text-emerald-500" />
@@ -540,6 +1246,7 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
                                         </div>
                                     </div>
                                 </div>
+                                )
                             ))}
                         </div>
                     </section>
@@ -560,13 +1267,12 @@ function SimBacklogPanel({ gameState, config, completedIds, onOpenAction }: Back
 // ─── Main Component ───────────────────────────────────────────
 export default function SimulationShell({ config }: { config: SimulationConfig }) {
     const navigate = useNavigate();
-    const { subpage } = useParams();
     const { pathname } = useLocation();
 
     const {
         gameState, isRunning, isPaused, isCompleted, score,
         availableActions, weeklyActions, backlogCount,
-        sessionId, startSimulation, pauseSimulation, resumeSimulation,
+        startSimulation, pauseSimulation, resumeSimulation,
         restartSimulation, advanceTime, makeDecision, completeWeeklyAction, updateCustomState,
         respondToMeeting,
     } = useSimulationCore(config);
@@ -596,14 +1302,12 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
     const [openModal, setOpenModal] = useState<ModalAction | null>(null);
     const [feedback, setFeedback] = useState('');
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-    const [pagePrimary, setPagePrimary] = useState(config.primaryColor);
+    const [viewingArtifact, setViewingArtifact] = useState<DocumentsPanelArtifact | null>(null);
+    const pagePrimary = config.primaryColor;
     const internMode = isInternConfig(config);
+    const pmMode = isProductManagementConfig(config);
 
-    useEffect(() => {
-        setPagePrimary(config.primaryColor);
-    }, [config.primaryColor]);
-
-    const { notifications, markNotificationRead } = useNotifications();
+    const { notifications, markNotificationRead, addNotification } = useNotifications();
 
     const hasStartedRef = useRef(false);
 
@@ -618,8 +1322,61 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
         new Set((gameState?.completedActions ?? []).map(c => c.actionId)),
         [gameState?.completedActions]
     );
+    const completedActionIdList = useMemo(() => Array.from(completedIds), [completedIds]);
 
-    const metrics = useMemo(() => gameState ? deriveMetrics(gameState, config) : [], [gameState, config]);
+    const documentArtifacts = useMemo<DocumentsPanelArtifact[]>(
+        () => (gameState?.artifacts ?? []).map((artifact) => ({
+            ...artifact,
+            type: artifact.type as DocumentsPanelArtifact['type'],
+            createdAt: new Date(artifact.createdAt),
+            status: artifact.status ?? 'generated',
+        })),
+        [gameState?.artifacts]
+    );
+
+    const handleExportArtifact = useCallback((artifact: DocumentsPanelArtifact) => {
+        const review = artifact.metadata && typeof artifact.metadata === 'object'
+            ? (artifact.metadata as { review?: { score: number; maxScore: number; stakeholderReaction: string } }).review
+            : undefined;
+        const markdown = [
+            `# ${artifact.title}`,
+            '',
+            artifact.description,
+            '',
+            `- Week: ${artifact.week}`,
+            `- Type: ${artifact.type}`,
+            review ? `- PM review: ${review.score}/${review.maxScore} - ${review.stakeholderReaction}` : '',
+            '',
+            formatArtifactContent(artifact.content as Record<string, unknown> | undefined),
+        ].filter(Boolean).join('\n');
+        const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${artifact.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'turnve-artifact'}.md`;
+        link.click();
+        URL.revokeObjectURL(url);
+        if (gameState) {
+            updateCustomState('artifacts', gameState.artifacts.map((item) => item.id === artifact.id ? { ...item, status: 'exported' } : item));
+        }
+    }, [gameState, updateCustomState]);
+
+    const handleExportCaseStudy = useCallback(() => {
+        const projectCharters = documentArtifacts.filter((artifact) => artifact.type === 'project_charter');
+        const finalArtifact = projectCharters.find((artifact) => artifact.week === config.totalWeeks) ?? projectCharters[projectCharters.length - 1];
+        if (finalArtifact) {
+            handleExportArtifact(finalArtifact);
+            return;
+        }
+
+        const finalAction = (config.weeklyActions ?? [])
+            .slice()
+            .sort((a, b) => b.week - a.week)
+            .find((action) => action.artifactType === 'project_charter');
+        if (finalAction) {
+            setOpenModal({ kind: 'weekly', item: finalAction });
+        }
+    }, [config.totalWeeks, config.weeklyActions, documentArtifacts, handleExportArtifact]);
 
     // Week change notification logic
     const lastWeekRef = useRef<number>(1);
@@ -627,21 +1384,20 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
 
     useEffect(() => {
         if (gameState && gameState.week > lastWeekRef.current) {
-            setWeekChangeInfo({ week: gameState.week, total: gameState.totalWeeks });
+            const nextInfo = { week: gameState.week, total: gameState.totalWeeks };
             lastWeekRef.current = gameState.week;
-            setTimeout(() => setWeekChangeInfo(null), 8000);
+            queueMicrotask(() => {
+                setWeekChangeInfo(nextInfo);
+                setTimeout(() => setWeekChangeInfo(null), 8000);
+            });
         }
-    }, [gameState?.week]);
+    }, [gameState]);
 
     const activeMeeting = gameState?.activeMeeting;
     const [showMeetingContent, setShowMeetingContent] = useState(false);
 
     useEffect(() => {
-        if (activeMeeting) {
-            setShowMeetingContent(true);
-        } else {
-            setShowMeetingContent(false);
-        }
+        queueMicrotask(() => setShowMeetingContent(Boolean(activeMeeting)));
     }, [activeMeeting]);
 
     const handleLegacyDecision = useCallback((choice: ActionChoice) => {
@@ -658,11 +1414,12 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
     }, [completeWeeklyAction]);
 
     const NAV_ITEMS: { name: string; icon: React.ComponentType<{ className?: string }>; id: ActiveTab; badge?: number }[] = [
+        { name: pmMode ? 'Project overview' : 'Overview', icon: Rocket, id: 'dashboard' },
         { name: 'Tasks', icon: LayoutList, id: 'backlog', badge: weeklyActions.filter(a => !completedIds.has(a.id)).length > 0 
             ? weeklyActions.filter(a => !completedIds.has(a.id)).length 
             : undefined },
         { name: 'Roadmap', icon: Map, id: 'roadmap' },
-        { name: 'Documents', icon: FolderOpen, id: 'documents' },
+        { name: pmMode ? 'PM Work Documents' : 'Documents', icon: FolderOpen, id: 'documents' },
         { name: 'Company', icon: Building2, id: 'company' },
         { name: 'Calendar', icon: Calendar, id: 'calendar' },
     ];
@@ -731,10 +1488,10 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                         if (activeMeeting.actionId) {
                                             const allActions = [
                                                 ...(config.weeklyActions || []),
-                                                ...((gameState as any).backlogActionItems || [])
+                                                ...(gameState?.backlogActionItems || [])
                                             ];
                                             const action = allActions.find(a => a.id === activeMeeting.actionId);
-                                            if (action) setOpenModal({ kind: 'weekly', item: action as any });
+                                            if (action) setOpenModal({ kind: 'weekly', item: action });
                                         }
                                     }}
                                     className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
@@ -779,6 +1536,24 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                             <Building2 className="w-4 h-4" />
                         </div>
                         <span className={`font-semibold text-sm truncate ${internMode ? 'text-slate-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>{config.companyName}</span>
+                    </div>
+
+                    <div className="px-3 lg:px-4 pb-3">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                navigate('/simulations');
+                                setMobileSidebarOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs font-bold transition ${
+                                internMode
+                                    ? 'border-orange-100 bg-orange-50 text-slate-700 hover:bg-orange-100 dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-200 dark:hover:bg-white/10'
+                                    : 'border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:border-white/10 dark:bg-white/[0.05] dark:text-gray-300 dark:hover:bg-white/10'
+                            }`}
+                        >
+                            <ArrowLeft className="h-4 w-4 shrink-0" />
+                            <span className="min-w-0 flex-1 truncate">All simulations</span>
+                        </button>
                     </div>
 
                     <nav className="flex-1 px-3 lg:px-4 py-2 space-y-0.5">
@@ -881,15 +1656,25 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                     <div className="flex-1 overflow-hidden flex flex-col">
                         {activeTab === 'documents' ? (
                             <DocumentsPanel
-                                artifacts={(gameState as any).artifacts || []}
+                                artifacts={documentArtifacts}
                                 onGenerateArtifact={(type) => console.log('generate', type)}
-                                onViewArtifact={(a) => console.log('view', a)}
-                                onExportArtifact={(a, fmt) => console.log('export', a, fmt)}
-                                onDeleteArtifact={(a) => updateCustomState('artifacts', ((gameState as any).artifacts || []).filter((x: any) => x.id !== a.id))}
+                                onViewArtifact={(artifact) => setViewingArtifact(artifact)}
+                                onExportArtifact={(artifact) => handleExportArtifact(artifact)}
+                                onDeleteArtifact={(a) => updateCustomState('artifacts', gameState.artifacts.filter((artifact) => artifact.id !== a.id))}
                                 currentWeek={gameState.week}
+                                simulationMode={pmMode ? 'product_management' : 'default'}
+                                weeklyActions={config.weeklyActions ?? []}
+                                completedActionIds={completedActionIdList}
+                                primaryColor={pagePrimary}
+                                onOpenAction={(item) => setOpenModal({ kind: 'weekly', item })}
+                                onExportCaseStudy={handleExportCaseStudy}
                             />
                         ) : activeTab === 'company' ? (
-                            <CompanyPanel currentWeek={gameState.week} />
+                            <CompanyPanel
+                                currentWeek={gameState.week}
+                                config={config}
+                                stakeholderStates={gameState.stakeholders}
+                            />
                         ) : activeTab === 'backlog' ? (
                             <SimBacklogPanel
                                 gameState={gameState}
@@ -905,11 +1690,11 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                 onTriggerAction={(id) => {
                                     const allActions = [
                                         ...(config.weeklyActions || []),
-                                        ...((gameState as any).backlogActionItems || [])
+                                        ...(gameState.backlogActionItems || [])
                                     ];
                                     const action = allActions.find(a => a.id === id);
                                     if (action) {
-                                        setOpenModal({ kind: 'weekly', item: action as any });
+                                        setOpenModal({ kind: 'weekly', item: action });
                                     } else {
                                         const weekAction = (config.weeklyActions || []).find(a => a.week === gameState.week);
                                         if (weekAction) setOpenModal({ kind: 'weekly', item: weekAction });
@@ -918,12 +1703,38 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                             />
                         ) : activeTab === 'calendar' ? (
                             <CalendarPanel
-                                slots={[
-                                    { id: '1', title: 'CEO Welcome Meeting', with: 'Marcus Johnson (CEO)', time: '6:00 PM', duration: '30 min', available: true, description: 'Your first meeting with the CEO' },
-                                    { id: '2', title: 'Team Standup', with: 'Product Team', time: '10:00 AM', duration: '15 min', available: true, description: 'Daily team sync' },
-                                    { id: '3', title: '1:1 with PM', with: 'Sarah Chen', time: '2:00 PM', duration: '30 min', available: false, description: 'Weekly check-in' },
-                                ]}
+                                slots={(config.weeklyEvents ?? [])
+                                    .filter((event) => event.week === gameState.week)
+                                    .map((event, index) => ({
+                                        id: event.id,
+                                        title: event.title,
+                                        with: event.from,
+                                        time: `${10 + index}:00 AM`,
+                                        duration: event.type === 'meeting' ? '30 min' : '15 min',
+                                        available: !event.requiresAction,
+                                        description: event.description,
+                                    }))}
+                                weeklyActions={config.weeklyActions ?? []}
+                                weeklyEvents={config.weeklyEvents ?? []}
+                                currentWeek={gameState.week}
+                                totalWeeks={gameState.totalWeeks}
+                                timeLeft={gameState.timeLeft}
+                                completedActionIds={completedActionIdList}
+                                onNotify={(notification) => addNotification(notification)}
+                                onOpenAction={(item) => setOpenModal({ kind: 'weekly', item })}
                                 primaryColor={config.primaryColor}
+                            />
+                        ) : pmMode ? (
+                            <ProductManagementDashboardPanel
+                                gameState={gameState}
+                                config={config}
+                                completedIds={completedIds}
+                                availableActions={availableActions}
+                                advanceTime={advanceTime}
+                                onOpenAction={(item) => setOpenModal({ kind: 'weekly', item })}
+                                onOpenLegacy={(item) => setOpenModal({ kind: 'legacy', item })}
+                                setActiveTab={setActiveTab}
+                                pagePrimary={pagePrimary}
                             />
                         ) : internMode ? (
                             <InternDashboardPanel
@@ -1045,6 +1856,66 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                     </div>
                 </main>
             </div>
+
+            {viewingArtifact && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+                    <div className="flex max-h-[88vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#111318]">
+                        <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5 dark:border-white/10">
+                            <div>
+                                <div className="mb-2 inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white" style={{ backgroundColor: pagePrimary }}>
+                                    Portfolio artifact
+                                </div>
+                                <h2 className="text-xl font-black text-slate-950 dark:text-white">{viewingArtifact.title}</h2>
+                                <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">{viewingArtifact.description}</p>
+                            </div>
+                            <button
+                                type="button"
+                                aria-label="Close artifact viewer"
+                                onClick={() => setViewingArtifact(null)}
+                                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/10 dark:hover:text-white"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
+                            {(() => {
+                                const metadata = viewingArtifact.metadata as { review?: { score: number; maxScore: number; stakeholderReaction: string; strengths?: string[]; gaps?: string[] } } | undefined;
+                                const review = metadata?.review;
+                                return review ? (
+                                    <div className="mb-5 rounded-lg border border-emerald-500/20 bg-emerald-50 p-4 dark:bg-emerald-500/5">
+                                        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+                                            <p className="text-xs font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">PM review</p>
+                                            <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-black text-emerald-700 dark:text-emerald-200">{review.score}/{review.maxScore} pts</span>
+                                        </div>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{review.stakeholderReaction}</p>
+                                    </div>
+                                ) : null;
+                            })()}
+                            <pre className="whitespace-pre-wrap rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700 dark:border-white/10 dark:bg-black/20 dark:text-slate-300">
+                                {formatArtifactContent(viewingArtifact.content as Record<string, unknown> | undefined)}
+                            </pre>
+                        </div>
+                        <div className="flex gap-3 border-t border-slate-200 p-5 dark:border-white/10">
+                            <button
+                                type="button"
+                                onClick={() => setViewingArtifact(null)}
+                                className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10"
+                            >
+                                Close
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleExportArtifact(viewingArtifact)}
+                                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-black text-white transition"
+                                style={{ backgroundColor: pagePrimary }}
+                            >
+                                <Download className="h-4 w-4" />
+                                Export Markdown
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Action Modal */}
             {openModal && (

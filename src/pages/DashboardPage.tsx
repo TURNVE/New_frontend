@@ -133,14 +133,14 @@ const DashboardPage = () => {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5">
                 <Link
-                  to="/start-simulation"
+                  to="/simulations"
                   className="group inline-flex items-center justify-center gap-2 bg-white text-[#5e6ad2] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md shadow-white/20 tap-target"
                 >
                   Start Simulation
                   <ArrowRight className="h-3.5 w-3.5 opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                 </Link>
                 <Link
-                  to="/start-simulation"
+                  to="/simulations"
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] tap-target"
                 >
                   <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -157,7 +157,7 @@ const DashboardPage = () => {
         <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-foreground mb-3 sm:mb-4 lg:mb-5">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           <Link
-            to="/start-simulation"
+            to="/simulations"
             className={`flex flex-col items-center p-4 sm:p-5 lg:p-6 rounded-2xl transition-all duration-300 tap-target border group ${isFirstTimeUser ? 'bg-primary/5 border-primary/20 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary/40' : 'bg-card border-border shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg hover:-translate-y-1 hover:border-primary/30'}`}
           >
             <div className={`h-12 w-12 sm:h-14 sm:w-14 rounded-xl sm:rounded-[16px] flex items-center justify-center mb-3 sm:mb-4 transition-colors duration-300 ${isFirstTimeUser ? 'bg-primary text-primary-foreground group-hover:bg-primary/90 shadow-md' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'}`}>
@@ -199,7 +199,7 @@ const DashboardPage = () => {
                 </h2>
               </div>
               <div className="p-4 sm:p-6">
-                <Link to="/start-simulation" className="block group p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[rgba(94,106,210,0.1)] to-[rgba(113,112,255,0.1)] border border-[rgba(94,106,210,0.2)] hover:shadow-md transition-all duration-300 tap-target relative overflow-hidden">
+                <Link to="/simulations" className="block group p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[rgba(94,106,210,0.1)] to-[rgba(113,112,255,0.1)] border border-[rgba(94,106,210,0.2)] hover:shadow-md transition-all duration-300 tap-target relative overflow-hidden">
                   <div className="absolute right-0 top-0 w-24 h-24 sm:w-32 sm:h-32 bg-[#5e6ad2]/10 rounded-full blur-3xl group-hover:bg-[#5e6ad2]/20 transition-colors"></div>
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-2 sm:mb-3">
@@ -266,7 +266,7 @@ const DashboardPage = () => {
               <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">No active simulations</h3>
               <p className="text-sm sm:text-base text-muted-foreground mb-5 sm:mb-8 max-w-sm mx-auto">Start your first simulation journey today and build real-world experience!</p>
               <Link
-                to="/start-simulation"
+                to="/simulations"
                 className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-primary text-primary-foreground rounded-xl font-semibold text-sm sm:text-base hover:bg-primary/90 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 tap-target"
               >
                 <Play className="h-4 w-4 sm:h-5 sm:w-5 fill-primary-foreground" />
