@@ -1,8 +1,19 @@
-import { useState } from 'react'
-import { Building2, ChevronDown, Eye, EyeOff, Globe, ListChecks, Lock, Mail } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  ChevronDown,
+  Eye,
+  EyeOff,
+  Globe,
+  ListChecks,
+  Lock,
+  Mail,
+} from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { SUPABASE_CONFIG_ERROR, isSupabaseConfigured, supabase } from '../../lib/supabase'
 import { AUTH_ERRORS, AUTH_ROUTES } from '../../contexts/AuthContext'
 import { rememberAuthPortal } from '../../lib/auth'
 
@@ -15,9 +26,26 @@ const GoogleIcon = () => (
   </svg>
 )
 
+const WEBSITE_PROTOCOL = 'https://'
+
+const normalizeWebsiteDomain = (value: string): string =>
+  value
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, 'www.')
+    .replace(/\/+$/, '')
+
+const buildWebsiteUrl = (domain: string): string | undefined => {
+  const normalizedDomain = normalizeWebsiteDomain(domain)
+
+  return normalizedDomain ? `${WEBSITE_PROTOCOL}${normalizedDomain}` : undefined
+}
+
 function OrganizationSignUpPage() {
   const navigate = useNavigate()
-  const { signUp, signInWithOAuth, checkEmailExists } = useAuth()
+  const location = useLocation()
+  const { user, signUp, signInWithOAuth, checkEmailExists, refreshSession } = useAuth()
+  const isUpgradeFlow = new URLSearchParams(location.search).get('upgrade') === '1' && !!user
   const [showPassword, setShowPassword] = useState(false)
   const [orgName, setOrgName] = useState('')
   const [orgWebsite, setOrgWebsite] = useState('')
@@ -28,6 +56,23 @@ function OrganizationSignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isOAuthLoading, setIsOAuthLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isVerificationPromptOpen, setIsVerificationPromptOpen] = useState(false)
+  const [redirectCountdown, setRedirectCountdown] = useState(5)
+
+  useEffect(() => {
+    if (!isVerificationPromptOpen) return
+
+    if (redirectCountdown <= 0) {
+      navigate(AUTH_ROUTES.ORG_SIGN_IN)
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setRedirectCountdown((currentCountdown) => currentCountdown - 1)
+    }, 1000)
+
+    return () => window.clearTimeout(timer)
+  }, [isVerificationPromptOpen, navigate, redirectCountdown])
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -35,6 +80,35 @@ function OrganizationSignUpPage() {
     setIsLoading(true)
 
     try {
+      if (!isSupabaseConfigured) {
+        setError(SUPABASE_CONFIG_ERROR)
+        return
+      }
+
+      const websiteUrl = buildWebsiteUrl(orgWebsite)
+
+      if (isUpgradeFlow && user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            full_name: orgName.trim(),
+            role: 'COMPANY',
+            org_website: websiteUrl || null,
+            org_industry: orgIndustry || null,
+            org_size: orgSize || null,
+          })
+          .eq('id', user.id)
+
+        if (profileError) {
+          setError(profileError.message || 'Failed to save organization details.')
+          return
+        }
+
+        await refreshSession()
+        navigate(AUTH_ROUTES.COMPANY, { replace: true })
+        return
+      }
+
       const emailExists = await checkEmailExists(email)
       if (emailExists) {
         setError('Organization user already exists. Please log in with your details.')
@@ -45,7 +119,7 @@ function OrganizationSignUpPage() {
         data: {
           full_name: orgName.trim(),
           role: 'COMPANY',
-          org_website: orgWebsite || undefined,
+          org_website: websiteUrl,
           org_industry: orgIndustry || undefined,
           org_size: orgSize || undefined,
         },
@@ -59,15 +133,20 @@ function OrganizationSignUpPage() {
       if (data.user) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .update({ role: 'COMPANY' })
+          .update({
+            role: 'COMPANY',
+            org_website: websiteUrl || null,
+            org_industry: orgIndustry || null,
+            org_size: orgSize || null,
+          })
           .eq('id', data.user.id)
 
         if (profileError) {
           console.error('Error updating organization profile role:', profileError)
         }
 
-        setError('Please check your email to verify your organization account.')
-        setTimeout(() => navigate(AUTH_ROUTES.ORG_SIGN_IN), 3000)
+        setRedirectCountdown(5)
+        setIsVerificationPromptOpen(true)
       }
     } catch {
       setError(AUTH_ERRORS.GENERIC)
@@ -81,6 +160,12 @@ function OrganizationSignUpPage() {
     setError(null)
 
     try {
+      if (!isSupabaseConfigured) {
+        setError(SUPABASE_CONFIG_ERROR)
+        setIsOAuthLoading(false)
+        return
+      }
+
       rememberAuthPortal('organization')
       const { error: oauthError } = await signInWithOAuth('google')
       if (oauthError) {
@@ -95,6 +180,58 @@ function OrganizationSignUpPage() {
 
   return (
     <div className="min-h-screen flex bg-background">
+      {isVerificationPromptOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 px-6 backdrop-blur-xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="verification-title"
+        >
+          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-surface p-8 text-center shadow-2xl shadow-black/30">
+            <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+              <CheckCircle2 className="h-9 w-9 text-success" />
+            </div>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
+              Organization account created
+            </p>
+            <h2 id="verification-title" className="text-3xl font-bold text-foreground">
+              Check your email to verify your account.
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-text-secondary">
+              We sent a verification link to your work email. You can close this page after
+              checking your inbox, or continue to sign in when you are ready.
+            </p>
+
+            <div className="mt-8 rounded-xl border border-border bg-background/60 px-4 py-3">
+              <p className="text-sm font-medium text-text-secondary">
+                Redirecting to organization sign in in{' '}
+                <span className="font-bold text-foreground">{redirectCountdown}</span>
+                s
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <button
+                type="button"
+                onClick={() => navigate(AUTH_ROUTES.ORG_SIGN_IN)}
+                className="inline-flex items-center justify-center rounded-[6px] bg-[#5e6ad2] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#828fff]"
+              >
+                Go to sign in
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsVerificationPromptOpen(false)}
+                className="inline-flex items-center justify-center rounded-[6px] border border-border px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+              >
+                Stay on this page
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0f1011] via-[#191a1b] to-[#08090a] p-12 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-[#5e6ad2]/20 blur-3xl" />
@@ -102,7 +239,7 @@ function OrganizationSignUpPage() {
         </div>
 
         <div className="relative z-10">
-          <a href="/organization" className="mb-12 flex items-center gap-2">
+          <a href="/company/start" className="mb-12 flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#5e6ad2] to-[#7170ff]">
               <Building2 className="h-4 w-4 text-white" />
             </div>
@@ -127,28 +264,38 @@ function OrganizationSignUpPage() {
       <div className="flex flex-1 items-center justify-center bg-background p-8 lg:p-16">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="mb-2 text-3xl font-bold text-foreground">Create your organization</h2>
-            <p className="text-text-secondary">Set up a dedicated workspace for team simulations.</p>
+            <h2 className="mb-2 text-3xl font-bold text-foreground">
+              {isUpgradeFlow ? 'Add company details' : 'Create your organization'}
+            </h2>
+            <p className="text-text-secondary">
+              {isUpgradeFlow
+                ? 'Complete your organization profile to unlock the company dashboard.'
+                : 'Set up a dedicated workspace for team simulations.'}
+            </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            disabled={isOAuthLoading}
-            className="mb-6 flex w-full items-center justify-center gap-3 rounded-[6px] border border-border px-4 py-3 transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <GoogleIcon />
-            <span className="text-sm font-medium text-text-secondary">{isOAuthLoading ? 'Loading...' : 'Sign up with Google'}</span>
-          </button>
+          {!isUpgradeFlow && (
+            <>
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isOAuthLoading}
+                className="mb-6 flex w-full items-center justify-center gap-3 rounded-[6px] border border-border px-4 py-3 transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <GoogleIcon />
+                <span className="text-sm font-medium text-text-secondary">{isOAuthLoading ? 'Loading...' : 'Sign up with Google'}</span>
+              </button>
 
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-text-tertiary">or continue with</span>
-            </div>
-          </div>
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-text-tertiary">or continue with</span>
+                </div>
+              </div>
+            </>
+          )}
 
           {error && (
             <div className="mb-6 rounded-[6px] border border-red-500/20 bg-red-500/10 p-4">
@@ -175,6 +322,7 @@ function OrganizationSignUpPage() {
               </div>
             </div>
 
+            {!isUpgradeFlow && (
             <div>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text-secondary">
                 Work Email
@@ -192,7 +340,9 @@ function OrganizationSignUpPage() {
                 />
               </div>
             </div>
+            )}
 
+            {!isUpgradeFlow && (
             <div>
               <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-text-secondary">
                 Create Password
@@ -218,6 +368,7 @@ function OrganizationSignUpPage() {
                 </button>
               </div>
             </div>
+            )}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
@@ -270,17 +421,28 @@ function OrganizationSignUpPage() {
               <label htmlFor="orgWebsite" className="mb-1.5 block text-sm font-medium text-text-secondary">
                 Company Website
               </label>
-              <div className="relative">
-                <Globe className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-quaternary" />
+              <div className="group flex min-h-[50px] items-center overflow-hidden rounded-[6px] border border-border bg-input transition-shadow focus-within:border-transparent focus-within:ring-2 focus-within:ring-[#7170ff]">
+                <div className="flex h-full items-center gap-2 border-r border-border bg-surface/40 px-4 text-text-secondary">
+                  <Globe className="h-5 w-5 text-text-quaternary" />
+                  <span className="text-sm font-semibold" aria-hidden="true">
+                    https://
+                  </span>
+                </div>
                 <input
-                  type="url"
+                  type="text"
+                  inputMode="url"
                   id="orgWebsite"
                   value={orgWebsite}
-                  onChange={(e) => setOrgWebsite(e.target.value)}
-                  placeholder="https://company.com"
-                  className="w-full rounded-[6px] border border-border bg-input px-4 py-3 pl-11 text-foreground transition-shadow placeholder:text-text-quaternary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
+                  onChange={(e) => setOrgWebsite(normalizeWebsiteDomain(e.target.value))}
+                  onBlur={(e) => setOrgWebsite(normalizeWebsiteDomain(e.target.value))}
+                  placeholder="company.com"
+                  aria-describedby="orgWebsiteHelp"
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-foreground outline-none placeholder:text-text-quaternary"
                 />
               </div>
+              <p id="orgWebsiteHelp" className="mt-1.5 text-xs text-text-tertiary">
+                Enter your domain only. We will add https:// automatically.
+              </p>
             </div>
 
             <div className="rounded-[6px] border border-blue-500/20 bg-blue-500/10 p-4">
@@ -295,7 +457,9 @@ function OrganizationSignUpPage() {
               disabled={isLoading || !orgName.trim()}
               className="w-full rounded-[6px] bg-[#5e6ad2] py-3.5 font-semibold text-white transition-colors hover:bg-[#828fff] focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isLoading ? 'Creating Organization...' : 'Create Organization Account'}
+              {isLoading
+                ? isUpgradeFlow ? 'Saving Company Details...' : 'Creating Organization...'
+                : isUpgradeFlow ? 'Save Company Details' : 'Create Organization Account'}
             </button>
           </form>
 

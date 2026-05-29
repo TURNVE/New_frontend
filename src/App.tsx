@@ -1,5 +1,5 @@
 import { Footer7 } from './components/ui/footer-7';
-import { Facebook, Instagram, Linkedin, Twitter, ArrowRight, Users, Award, Zap, Sparkles, CheckCircle2, PlayCircle, Briefcase, Target, Calendar, Globe, Rocket, LineChart, Clock, TrendingUp, Star, HelpCircle, Mail, Building2, Layers, BarChart3, ChevronDown } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Twitter, ArrowRight, Users, Award, Zap, Sparkles, CheckCircle2, PlayCircle, Briefcase, Target, Calendar, Globe, Rocket, Clock, TrendingUp, Star, HelpCircle, Mail, Building2, ChevronDown } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedGroup } from './components/ui/animated-group';
@@ -190,23 +190,21 @@ function CompanySection() {
           >
             <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
               <Building2 className="h-3 w-3 mr-1" />
-              For Organizations
+              Company Simulation Studio
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Empower Your Team with Practical Skills
+              Build Custom Simulations for Your Users
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground mb-6 leading-relaxed">
-              Upskill your workforce with AI-powered simulations designed for teams. 
-              Create custom scenarios, track progress, and accelerate your employees' 
-              career growth with real-world experience.
+              Give your company a dedicated dashboard for creating scenario-based simulations, publishing live links, and tracking how users perform across each experience.
             </p>
             
             <div className="space-y-3 mb-8">
               {[
-                'Custom simulations for your industry',
-                'Team dashboards and analytics',
-                'Dedicated success manager',
-                'Volume pricing discounts'
+                'Create simulations from scratch',
+                'Publish shareable links for your users',
+                'Track learner starts, completions, and scores',
+                'Manage company branding and scenario details'
               ].map((item, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
@@ -217,17 +215,17 @@ function CompanySection() {
             
             <div className="flex flex-col sm:flex-row gap-3">
               <Link 
-                to="/organization" 
+                to="/company/start" 
                 className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
               >
-                Learn More
+                  Go to Company
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link 
-                to="/contact" 
+                to="/company/sign-up" 
                 className="inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground text-sm font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
               >
-                Contact Sales
+                  Sign Up as a Company
               </Link>
             </div>
           </motion.div>
@@ -564,7 +562,7 @@ function Hero() {
             </div>
             <h1 className="mt-8 max-w-3xl text-balance text-5xl font-bold md:text-6xl lg:mt-16 text-foreground mx-auto tracking-tight">
               Theory Gets You Noticed.<br/>
-              <span className="text-primary">Practice Gets You Hired.</span>
+              <span className="text-primary">Experience Gets You Hired.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-pretty text-lg text-muted-foreground mx-auto">
               Turn your career knowledge into demonstrable management experience with AI-guided simulations and real projects.
@@ -578,11 +576,11 @@ function Hero() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
               <a 
-                href="#how-it-works"
+                href="/company/sign-up"
                 className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
               >
                 <PlayCircle className="mr-2 h-5 w-5" />
-                See How It Works
+                Join as an Organization
               </a>
             </div>
           </AnimatedGroup>
@@ -933,30 +931,6 @@ function CompactFeatureCard({ icon, title, description, accent }: { icon: React.
   );
 }
 
-function FeatureCard({ icon, title, description, accent }: { icon: React.ReactNode; title: string; description: string; accent?: 'coral' | 'teal' | 'orange' }) {
-  const accentColors = {
-    coral: 'bg-[#ffc6c6]/50 dark:bg-[#600000]/30 border-[#ffc6c6] dark:border-[#600000]/50 hover:shadow-[#ffc6c6]/25 dark:hover:shadow-[#600000]/25',
-    teal: 'bg-[#c3faf5]/50 dark:bg-[#187574]/30 border-[#c3faf5] dark:border-[#187574]/50 hover:shadow-[#c3faf5]/25 dark:hover:shadow-[#187574]/25',
-    orange: 'bg-[#ffe6cd]/50 dark:bg-[#746019]/30 border-[#ffe6cd] dark:border-[#746019]/50 hover:shadow-[#ffe6cd]/25 dark:hover:shadow-[#746019]/25',
-  };
-  
-  const iconColors = {
-    coral: 'bg-[#ffc6c6] dark:bg-[#600000] text-[#600000] dark:text-[#ffc6c6]',
-    teal: 'bg-[#c3faf5] dark:bg-[#187574] text-[#187574] dark:text-[#c3faf5]',
-    orange: 'bg-[#ffe6cd] dark:bg-[#746019] text-[#746019] dark:text-[#ffe6cd]',
-  };
-
-  return (
-    <div className={`group p-8 rounded-2xl border hover:border-primary/50 hover:shadow-xl transition-all duration-300 ${accent ? accentColors[accent] : 'bg-card border-border hover:shadow-primary/25'}`}>
-      <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${accent ? iconColors[accent] : 'bg-primary/10 text-primary'}`}>
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold text-foreground mb-3">{title}</h3>
-      <p className="text-muted-foreground leading-relaxed">{description}</p>
-    </div>
-  );
-}
-
 function Testimonials() {
   const testimonials = [
     { text: "Turnve transformed my career. The AI simulations gave me real-world experience that helped me land my first PM role.", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop", name: "Sarah Chen", role: "Product Manager @ TechCorp" },
@@ -992,7 +966,14 @@ function Testimonials() {
   );
 }
 
-function TestimonialsColumn({ testimonials, duration, className }: { testimonials: any[]; duration?: number; className?: string }) {
+type TestimonialItem = {
+  text: string;
+  image: string;
+  name: string;
+  role: string;
+};
+
+function TestimonialsColumn({ testimonials, duration, className }: { testimonials: TestimonialItem[]; duration?: number; className?: string }) {
   return (
     <div className={className}>
       <motion.div animate={{ translateY: "-50%" }} transition={{ duration: duration || 10, repeat: Infinity, ease: "linear", repeatType: "loop" }} className="flex flex-col gap-6 pb-6">

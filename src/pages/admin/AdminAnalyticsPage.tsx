@@ -21,38 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  getAdminAnalytics,
+  getEmptyAdminAnalytics,
+  type AdminAnalyticsData,
+  type AdminAnalyticsTimeRange,
+} from '@/lib/adminStats'
 
-interface AnalyticsData {
-  overview: {
-    totalUsers: number
-    activeUsers: number
-    totalSimulations: number
-    totalSessions: number
-    avgCompletionRate: number
-    avgSessionDuration: number
-  }
-  dailyStats: Array<{
-    date: string
-    newUsers: number
-    activeUsers: number
-    sessions: number
-    completions: number
-  }>
-  topSimulations: Array<{
-    id: string
-    name: string
-    starts: number
-    completions: number
-    avgScore: number
-  }>
-  userEngagement: {
-    daily: number
-    weekly: number
-    monthly: number
-  }
-}
-
-const TIME_RANGES = [
+const TIME_RANGES: Array<{ value: AdminAnalyticsTimeRange; label: string }> = [
   { value: '7d', label: 'Last 7 Days' },
   { value: '30d', label: 'Last 30 Days' },
   { value: '90d', label: 'Last 90 Days' },
@@ -60,61 +36,32 @@ const TIME_RANGES = [
 ]
 
 export function AdminAnalyticsPage() {
-  const [timeRange, setTimeRange] = useState('30d')
+  const [timeRange, setTimeRange] = useState<AdminAnalyticsTimeRange>('30d')
   const [isLoading, setIsLoading] = useState(true)
-  const [data, setData] = useState<AnalyticsData | null>(null)
+  const [data, setData] = useState<AdminAnalyticsData | null>(null)
 
   useEffect(() => {
+    let isMounted = true
+
     const loadAnalytics = async () => {
       setIsLoading(true)
       try {
-        // TODO: Replace with actual API call
-        // const { data } = await adminApi.getAnalytics(timeRange)
-        
-        // Mock data
-        const mockData: AnalyticsData = {
-          overview: {
-            totalUsers: 2453,
-            activeUsers: 892,
-            totalSimulations: 15420,
-            totalSessions: 8765,
-            avgCompletionRate: 68.5,
-            avgSessionDuration: 28,
-          },
-          dailyStats: Array.from({ length: 30 }, (_, i) => {
-            const date = new Date()
-            date.setDate(date.getDate() - (29 - i))
-            return {
-              date: date.toISOString().split('T')[0],
-              newUsers: Math.floor(Math.random() * 50) + 10,
-              activeUsers: Math.floor(Math.random() * 300) + 500,
-              sessions: Math.floor(Math.random() * 200) + 100,
-              completions: Math.floor(Math.random() * 80) + 40,
-            }
-          }),
-          topSimulations: [
-            { id: '1', name: '72-Hour Launch Crisis', starts: 1245, completions: 892, avgScore: 78.5 },
-            { id: '2', name: 'Checkout Performance Under Fire', starts: 987, completions: 654, avgScore: 72.3 },
-            { id: '3', name: 'The Growth Bet', starts: 876, completions: 543, avgScore: 81.2 },
-            { id: '4', name: 'Brand Identity Refresh', starts: 654, completions: 432, avgScore: 85.1 },
-            { id: '5', name: 'The Core Rebuild', starts: 543, completions: 321, avgScore: 69.8 },
-          ],
-          userEngagement: {
-            daily: 892,
-            weekly: 1456,
-            monthly: 2134,
-          },
-        }
-
-        setData(mockData)
+        const { data: analyticsData, error } = await getAdminAnalytics(timeRange)
+        if (error) console.error('Failed to load analytics:', error)
+        if (isMounted) setData(analyticsData)
       } catch (error) {
         console.error('Failed to load analytics:', error)
+        if (isMounted) setData(getEmptyAdminAnalytics())
       } finally {
-        setIsLoading(false)
+        if (isMounted) setIsLoading(false)
       }
     }
 
     loadAnalytics()
+
+    return () => {
+      isMounted = false
+    }
   }, [timeRange])
 
   const handleExport = () => {
@@ -163,7 +110,10 @@ export function AdminAnalyticsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          <Select
+            value={timeRange}
+            onValueChange={(value) => setTimeRange(value as AdminAnalyticsTimeRange)}
+          >
             <SelectTrigger className="w-[160px] bg-[#111418] border-[#23252a] text-[#f7f8f8]">
               <SelectValue />
             </SelectTrigger>
@@ -197,7 +147,7 @@ export function AdminAnalyticsPage() {
               </p>
               <p className="text-xs text-green-500 mt-2 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                +12% from last period
+                {data.overview.activeUsers.toLocaleString()} active profiles
               </p>
             </div>
             <div className="w-10 h-10 rounded-lg bg-[#5e6ad2]/10 flex items-center justify-center">
@@ -214,7 +164,9 @@ export function AdminAnalyticsPage() {
                 {data.overview.activeUsers.toLocaleString()}
               </p>
               <p className="text-xs text-[#8a8f98] mt-2">
-                {((data.overview.activeUsers / data.overview.totalUsers) * 100).toFixed(1)}% of total
+                {data.overview.totalUsers > 0
+                  ? ((data.overview.activeUsers / data.overview.totalUsers) * 100).toFixed(1)
+                  : '0.0'}% of total
               </p>
             </div>
             <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
@@ -232,7 +184,7 @@ export function AdminAnalyticsPage() {
               </p>
               <p className="text-xs text-green-500 mt-2 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                +8% from last period
+                {data.overview.avgCompletionRate}% completion rate
               </p>
             </div>
             <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
@@ -249,7 +201,7 @@ export function AdminAnalyticsPage() {
                 {data.overview.totalSimulations.toLocaleString()}
               </p>
               <p className="text-xs text-[#8a8f98] mt-2">
-                Across 6 scenarios
+                {data.overview.activeSimulations.toLocaleString()} active scenarios
               </p>
             </div>
             <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
@@ -338,8 +290,8 @@ export function AdminAnalyticsPage() {
         <Card className="bg-[#111418] border-[#23252a] p-6 lg:col-span-2">
           <h3 className="text-lg font-medium text-[#f7f8f8] mb-4">Daily Activity</h3>
           <div className="h-64 flex items-end gap-1">
-            {data.dailyStats.map((day, index) => {
-              const maxValue = Math.max(...data.dailyStats.map(d => d.activeUsers))
+            {data.dailyStats.map((day) => {
+              const maxValue = Math.max(1, ...data.dailyStats.map(d => d.activeUsers))
               const height = (day.activeUsers / maxValue) * 100
               return (
                 <div
@@ -390,7 +342,7 @@ export function AdminAnalyticsPage() {
                   <div className="text-right">
                     <p className="text-xs text-[#8a8f98]">Completion Rate</p>
                     <p className="text-sm font-medium text-[#f7f8f8]">
-                      {((sim.completions / sim.starts) * 100).toFixed(1)}%
+                      {sim.starts > 0 ? ((sim.completions / sim.starts) * 100).toFixed(1) : '0.0'}%
                     </p>
                   </div>
                   <div className="text-right">

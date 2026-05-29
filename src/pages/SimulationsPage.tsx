@@ -121,7 +121,7 @@ const SimulationsPage = () => {
             currentPhase: isCompleted ? 'Completed' : `Week ${session.current_week} - ${currentPhase}`
           };
         });
-        const publicOrgSimulations: Simulation[] = companySimulations.listPublic().map((simulation) => ({
+        const publicOrgSimulations: Simulation[] = (await companySimulations.listPublicAsync()).map((simulation) => ({
           id: simulation.id,
           title: simulation.title,
           industry: simulation.industry,

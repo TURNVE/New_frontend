@@ -14,135 +14,52 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Link } from 'react-router-dom'
-
-interface DashboardStats {
-  totalSimulations: number
-  activeSimulations: number
-  totalUsers: number
-  activeUsers: number
-  totalSessions: number
-  completionRate: number
-}
-
-interface RecentSimulation {
-  id: string
-  name: string
-  companyName: string
-  industry: string
-  difficulty: string
-  isActive: boolean
-  createdAt: string
-}
-
-interface RecentActivity {
-  id: string
-  type: 'simulation_created' | 'simulation_updated' | 'user_registered' | 'session_completed'
-  description: string
-  timestamp: string
-}
+import {
+  getAdminDashboardStats,
+  getEmptyAdminDashboardStats,
+  type AdminDashboardStats,
+  type AdminRecentActivity,
+  type AdminRecentSimulation,
+} from '@/lib/adminStats'
 
 export function AdminDashboardPage() {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalSimulations: 0,
-    activeSimulations: 0,
-    totalUsers: 0,
-    activeUsers: 0,
-    totalSessions: 0,
-    completionRate: 0,
-  })
-  const [recentSimulations, setRecentSimulations] = useState<RecentSimulation[]>([])
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
+  const [stats, setStats] = useState<AdminDashboardStats>(
+    () => getEmptyAdminDashboardStats().stats
+  )
+  const [recentSimulations, setRecentSimulations] = useState<AdminRecentSimulation[]>([])
+  const [recentActivity, setRecentActivity] = useState<AdminRecentActivity[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // TODO: Fetch real data from API
-    // For now, using mock data
+    let isMounted = true
+
     const fetchDashboardData = async () => {
       setIsLoading(true)
       try {
-        // Mock stats
-        setStats({
-          totalSimulations: 12,
-          activeSimulations: 8,
-          totalUsers: 2453,
-          activeUsers: 892,
-          totalSessions: 15420,
-          completionRate: 68.5,
-        })
+        const { data, error } = await getAdminDashboardStats()
+        if (error) console.error('Failed to load dashboard data:', error)
+        if (!isMounted) return
 
-        // Mock recent simulations
-        setRecentSimulations([
-          {
-            id: 'sim-pm-001',
-            name: '72-Hour Launch Crisis',
-            companyName: 'PayLink',
-            industry: 'Fintech/Payments',
-            difficulty: 'advanced',
-            isActive: true,
-            createdAt: '2026-04-20T10:30:00Z',
-          },
-          {
-            id: 'sim-pm-002',
-            name: 'The Growth Bet',
-            companyName: 'ShopEase',
-            industry: 'E-commerce',
-            difficulty: 'intermediate',
-            isActive: true,
-            createdAt: '2026-04-18T14:22:00Z',
-          },
-          {
-            id: 'web-dev-01',
-            name: 'Checkout Performance Under Fire',
-            companyName: 'TurnVe Commerce',
-            industry: 'E-commerce / Technology',
-            difficulty: 'advanced',
-            isActive: true,
-            createdAt: '2026-04-15T09:15:00Z',
-          },
-          {
-            id: 'brand-01',
-            name: 'Brand Identity Refresh',
-            companyName: 'Nike Vision',
-            industry: 'Technology/Sports',
-            difficulty: 'advanced',
-            isActive: true,
-            createdAt: '2026-04-10T16:45:00Z',
-          },
-        ])
-
-        // Mock recent activity
-        setRecentActivity([
-          {
-            id: '1',
-            type: 'simulation_created',
-            description: 'New simulation "AI Product Launch" was created',
-            timestamp: '2026-04-22T12:30:00Z',
-          },
-          {
-            id: '2',
-            type: 'session_completed',
-            description: 'User completed "72-Hour Launch Crisis" with score 85%',
-            timestamp: '2026-04-22T11:45:00Z',
-          },
-          {
-            id: '3',
-            type: 'user_registered',
-            description: 'New user registered: john.doe@example.com',
-            timestamp: '2026-04-22T10:20:00Z',
-          },
-          {
-            id: '4',
-            type: 'simulation_updated',
-            description: 'Simulation "The Growth Bet" was updated',
-            timestamp: '2026-04-21T18:00:00Z',
-          },
-        ])
+        setStats(data.stats)
+        setRecentSimulations(data.recentSimulations)
+        setRecentActivity(data.recentActivity)
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error)
+        if (!isMounted) return
+        const fallback = getEmptyAdminDashboardStats()
+        setStats(fallback.stats)
+        setRecentSimulations(fallback.recentSimulations)
+        setRecentActivity(fallback.recentActivity)
       } finally {
-        setIsLoading(false)
+        if (isMounted) setIsLoading(false)
       }
     }
 
     fetchDashboardData()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const getDifficultyColor = (difficulty: string) => {
@@ -178,7 +95,7 @@ export function AdminDashboardPage() {
     return formatDate(dateString)
   }
 
-  const getActivityIcon = (type: RecentActivity['type']) => {
+  const getActivityIcon = (type: AdminRecentActivity['type']) => {
     switch (type) {
       case 'simulation_created':
         return <Plus className="w-4 h-4 text-green-500" />
@@ -250,7 +167,7 @@ export function AdminDashboardPage() {
               </p>
               <p className="text-xs text-green-500 mt-2 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                {stats.activeUsers} active today
+                {stats.activeUsers} active profiles
               </p>
             </div>
             <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">

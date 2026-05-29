@@ -12,17 +12,17 @@ export function CompanySimulationsPage() {
 
   useEffect(() => {
     if (!user) return;
-    setItems(companySimulations.listForOwner(user.id));
+    void companySimulations.listForOwnerAsync(user.id).then(setItems);
   }, [user]);
 
   const refresh = () => {
     if (!user) return;
-    setItems(companySimulations.listForOwner(user.id));
+    void companySimulations.listForOwnerAsync(user.id).then(setItems);
   };
 
-  const togglePublic = (simulation: CompanySimulation) => {
+  const togglePublic = async (simulation: CompanySimulation) => {
     if (!user) return;
-    companySimulations.updateVisibility(simulation.id, user.id, !simulation.isPublic);
+    await companySimulations.updateVisibilityAsync(simulation.id, user.id, !simulation.isPublic);
     refresh();
   };
 

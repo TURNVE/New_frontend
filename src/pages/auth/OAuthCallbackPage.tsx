@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { AUTH_ROUTES } from '@/contexts/AuthContext'
-import { consumeAuthPortal, getPortalLoginPath, getProfileForUser, validatePortalAccess } from '@/lib/auth'
+import { consumeAuthPortal, getPortalLoginPath, getProfileForUser, normalizeRole, validatePortalAccess } from '@/lib/auth'
 
 function OAuthCallbackPage() {
   const navigate = useNavigate()
@@ -42,6 +42,11 @@ function OAuthCallbackPage() {
         } = await supabase.auth.getUser()
 
         const { profile } = user ? await getProfileForUser(user.id) : { profile: null }
+        if (authPortal === 'organization' && normalizeRole(profile?.role) !== 'COMPANY') {
+          navigate(`${AUTH_ROUTES.ORG_SIGN_UP}?upgrade=1`, { replace: true })
+          return
+        }
+
         const access = validatePortalAccess(profile, authPortal)
 
         if (access.error) {

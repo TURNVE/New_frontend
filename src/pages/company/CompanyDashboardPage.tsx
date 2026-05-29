@@ -12,23 +12,79 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { companySimulations } from '../../lib/companySimulations';
+import {
+  buildCompanyDashboardStats,
+  getCompanyDashboardStats,
+  type CompanyDashboardStats,
+} from '../../lib/companyStats';
+
+const emptyCompanyDashboardStats = buildCompanyDashboardStats({ localSimulations: [] });
 
 export function CompanyDashboardPage() {
   const { user, profile } = useAuth();
-  const [stats, setStats] = useState({ total: 0, live: 0, public: 0 });
+  const [loadedStats, setLoadedStats] = useState<CompanyDashboardStats>(emptyCompanyDashboardStats);
 
   const orgName = profile?.full_name || user?.email?.split('@')[0] || 'Organization';
+  const stats = user ? loadedStats : emptyCompanyDashboardStats;
 
   useEffect(() => {
     if (!user) return;
-    const simulations = companySimulations.listForOwner(user.id);
-    setStats({
-      total: simulations.length,
-      live: simulations.filter((simulation) => simulation.status === 'live').length,
-      public: simulations.filter((simulation) => simulation.isPublic).length,
+
+    let isCurrent = true;
+
+    void getCompanyDashboardStats(user.id).then((nextStats) => {
+      if (isCurrent) setLoadedStats(nextStats);
     });
+
+    return () => {
+      isCurrent = false;
+    };
   }, [user]);
+
+  const statCards = [
+    {
+      label: 'Owned simulations',
+      value: stats.totalSimulations,
+      icon: Gamepad2,
+      iconClassName: 'text-[#7170ff]',
+      iconContainerClassName: 'bg-[#5e6ad2]/10',
+    },
+    {
+      label: 'Public links',
+      value: stats.publicSimulations,
+      icon: CheckCircle,
+      iconClassName: 'text-emerald-400',
+      iconContainerClassName: 'bg-emerald-500/10',
+    },
+    {
+      label: 'Live simulations',
+      value: stats.liveSimulations,
+      icon: Clock,
+      iconClassName: 'text-primary',
+      iconContainerClassName: 'bg-primary/10',
+    },
+    {
+      label: 'Learners reached',
+      value: stats.learnersReached,
+      icon: BarChart3,
+      iconClassName: 'text-blue-400',
+      iconContainerClassName: 'bg-blue-500/10',
+    },
+    {
+      label: 'Completion rate',
+      value: `${stats.completionRate}%`,
+      icon: TrendingUp,
+      iconClassName: 'text-amber-300',
+      iconContainerClassName: 'bg-amber-500/10',
+    },
+    {
+      label: 'Team Members',
+      value: stats.teamMembers,
+      icon: Users,
+      iconClassName: 'text-cyan-300',
+      iconContainerClassName: 'bg-cyan-500/10',
+    },
+  ];
 
   return (
     <div className="p-8">
@@ -39,43 +95,22 @@ export function CompanyDashboardPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-[#5e6ad2]/10 rounded-lg flex items-center justify-center">
-              <Gamepad2 className="h-5 w-5 text-[#7170ff]" />
+      <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+        {statCards.map((card) => {
+          const Icon = card.icon;
+
+          return (
+            <div key={card.label} className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.iconContainerClassName}`}>
+                  <Icon className={`h-5 w-5 ${card.iconClassName}`} />
+                </div>
+                <span className="text-sm text-[#8a8f98]">{card.label}</span>
+              </div>
+              <p className="text-3xl font-bold text-white">{card.value}</p>
             </div>
-            <span className="text-sm text-[#8a8f98]">Total Simulations</span>
-          </div>
-          <p className="text-3xl font-bold text-white">{stats.total}</p>
-        </div>
-        <div className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-              <CheckCircle className="h-5 w-5 text-emerald-400" />
-            </div>
-            <span className="text-sm text-[#8a8f98]">Public</span>
-          </div>
-          <p className="text-3xl font-bold text-white">{stats.public}</p>
-        </div>
-        <div className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Clock className="h-5 w-5 text-primary" />
-            </div>
-            <span className="text-sm text-[#8a8f98]">Active</span>
-          </div>
-          <p className="text-3xl font-bold text-white">{stats.live}</p>
-        </div>
-        <div className="bg-[#111418] border border-[#23252a] rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-              <Users className="h-5 w-5 text-blue-400" />
-            </div>
-            <span className="text-sm text-[#8a8f98]">Team Members</span>
-          </div>
-          <p className="text-3xl font-bold text-white">0</p>
-        </div>
+          );
+        })}
       </div>
 
       {/* Quick Actions */}

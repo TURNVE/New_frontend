@@ -6,7 +6,6 @@ import {
   BarChart3, 
   Target, 
   Shield, 
-  Zap,
   CheckCircle2,
   ArrowRight,
   Mail,
@@ -16,15 +15,11 @@ import {
   Clock,
   LineChart,
   Layers,
-  Sparkles,
-  TrendingUp,
-  Lock,
   UsersRound,
   BrainCircuit,
   BadgeCheck
 } from 'lucide-react';
 import { Header } from '../../components/layout/Header';
-import { AnimatedGroup } from '../../components/ui/animated-group';
 
 const features = [
   {
@@ -95,6 +90,62 @@ const enterpriseFeatures = [
   'Priority support'
 ];
 
+const featureCardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.98 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.45,
+      delay: index * 0.06,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+};
+
+interface FeatureCardProps {
+  feature: (typeof features)[number];
+  index: number;
+}
+
+function FeatureCard({ feature, index }: FeatureCardProps) {
+  return (
+    <motion.article
+      custom={index}
+      variants={featureCardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.35 }}
+      whileHover={{ y: -6, scale: 1.01 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+      className="group relative min-h-[220px] overflow-hidden rounded-2xl border border-border bg-card p-5 transition-colors duration-300 hover:border-primary/35 sm:min-h-[240px] sm:p-6"
+    >
+      <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 transition-opacity duration-500 group-hover:opacity-100`} />
+      <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="relative z-10 flex h-full flex-col">
+        <motion.div
+          className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl ${feature.iconBg} sm:h-14 sm:w-14`}
+          whileHover={{ rotate: -4, scale: 1.08 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 16 }}
+        >
+          <feature.icon className={`h-6 w-6 ${feature.iconColor} sm:h-7 sm:w-7`} />
+        </motion.div>
+        <h3 className="text-lg font-bold leading-tight text-foreground transition-colors duration-300 group-hover:text-primary sm:text-xl">
+          {feature.title}
+        </h3>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground transition-colors duration-300 group-hover:text-foreground/85 sm:text-base">
+          {feature.description}
+        </p>
+        <div className="mt-auto flex translate-y-2 items-center gap-2 pt-5 text-sm font-semibold text-primary opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <CheckCircle2 className="h-4 w-4" />
+          <span>Included</span>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
 export default function OrganizationPage() {
   return (
     <div className="min-h-screen bg-background">
@@ -125,14 +176,14 @@ export default function OrganizationPage() {
               </p>
               <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
                 <Link 
-                  to="/organization/sign-up"
+                  to="/company/sign-up"
                   className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link 
-                  to="/organization/login"
+                  to="/company/login"
                   className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
                 >
                   Organization Login
@@ -144,9 +195,9 @@ export default function OrganizationPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 border-y border-border">
+      <section className="border-y border-border py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-4 items-stretch gap-2 sm:gap-4 lg:gap-6">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -154,13 +205,17 @@ export default function OrganizationPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="text-center"
+                className="flex min-w-0 flex-col items-center justify-center rounded-xl border border-border/60 bg-card/40 px-2 py-3 text-center sm:px-4 sm:py-5"
               >
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 mb-3">
-                  <stat.icon className="h-6 w-6 text-primary" />
+                <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 sm:h-10 sm:w-10 lg:h-12 lg:w-12">
+                  <stat.icon className="h-4 w-4 text-primary sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
                 </div>
-                <div className="text-3xl font-bold text-foreground">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-xl font-bold leading-none text-foreground sm:text-2xl lg:text-3xl">
+                  {stat.value}
+                </div>
+                <div className="mt-1 max-w-full text-[10px] font-medium leading-tight text-muted-foreground sm:text-xs lg:text-sm">
+                  {stat.label}
+                </div>
               </motion.div>
             ))}
           </div>
@@ -168,9 +223,9 @@ export default function OrganizationPage() {
       </section>
 
       {/* Features Section - Built for Enterprise Scale */}
-      <section id="features" className="py-20 lg:py-32">
+      <section id="features" className="py-16 sm:py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
             <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
               Features
             </div>
@@ -182,110 +237,65 @@ export default function OrganizationPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3 xl:gap-6">
             {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="group relative p-6 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 transition-all duration-500 overflow-hidden"
-              >
-                {/* Animated gradient background */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                
-                {/* Animated border glow */}
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-primary/20 via-purple-500/20 to-primary/20 blur-sm" />
-                
-                <div className="relative z-10">
-                  {/* Icon with animation */}
-                  <motion.div 
-                    className={`w-14 h-14 rounded-2xl ${feature.iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-500`}
-                    whileHover={{ rotate: [0, -10, 10, 0], transition: { duration: 0.5 } }}
-                  >
-                    <feature.icon className={`h-7 w-7 ${feature.iconColor} group-hover:animate-pulse`} />
-                  </motion.div>
-                  
-                  {/* Title with slide animation */}
-                  <motion.h3 
-                    className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300"
-                    initial={false}
-                  >
-                    {feature.title}
-                  </motion.h3>
-                  
-                  {/* Description with fade animation */}
-                  <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
-                    {feature.description}
-                  </p>
-                  
-                  {/* Animated check indicator */}
-                  <div className="mt-4 flex items-center gap-2 text-sm text-primary opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Learn more</span>
-                    <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform duration-300" />
-                  </div>
-                </div>
-                
-                {/* Corner decoration */}
-                <div className="absolute -bottom-2 -right-2 w-24 h-24 bg-gradient-to-br from-primary/5 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
-              </motion.div>
+              <FeatureCard key={feature.title} feature={feature} index={index} />
             ))}
           </div>
         </div>
       </section>
 
       {/* Enterprise Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
+      <section className="py-16 sm:py-20 lg:py-28 bg-gradient-to-b from-secondary/20 to-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="overflow-hidden rounded-3xl border border-border bg-card/60">
+            <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
+              className="p-6 sm:p-8 lg:p-10"
             >
               <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
                 Enterprise Plan
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              <h2 className="max-w-xl text-3xl sm:text-4xl font-bold text-foreground mb-4">
                 Custom Solutions for Large Organizations
               </h2>
-              <p className="text-lg text-muted-foreground mb-8">
+              <p className="max-w-xl text-base sm:text-lg text-muted-foreground mb-8">
                 Get a tailored program designed specifically for your industry, 
                 company culture, and learning objectives.
               </p>
               
-              <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {enterpriseFeatures.map((feature, index) => (
                   <motion.div 
                     key={index} 
-                    className="flex items-center gap-3"
+                    className="flex items-start gap-3 rounded-xl border border-border/70 bg-background/35 p-3"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                     viewport={{ once: true }}
                   >
-                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
                     </div>
-                    <span className="text-muted-foreground">{feature}</span>
+                    <span className="text-sm leading-5 text-muted-foreground">{feature}</span>
                   </motion.div>
                 ))}
               </div>
               
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Link 
-                  to="/organization/sign-up"
+                  to="/company/sign-up"
                   className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
                 <Link 
-                  to="/organization/login" 
+                  to="/company/login" 
                   className="inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground text-sm font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
                 >
                   Organization Login
@@ -298,13 +308,23 @@ export default function OrganizationPage() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               viewport={{ once: true }}
-              className="relative"
+              className="relative border-t border-border bg-background/45 p-6 sm:p-8 lg:border-l lg:border-t-0 lg:p-10"
             >
-              <div className="rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-8">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4 group">
+              <div className="mb-6 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-wider text-primary">Delivery model</p>
+                  <h3 className="mt-2 text-2xl font-bold text-foreground">Launch with a guided rollout</h3>
+                </div>
+                <div className="hidden rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary sm:block">
+                  5 weeks
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                  <div className="group rounded-2xl border border-border bg-card p-5">
+                    <div className="flex items-center gap-4">
                     <motion.div 
-                      className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center"
+                      className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center"
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >
@@ -314,11 +334,13 @@ export default function OrganizationPage() {
                       <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">Custom Content</h3>
                       <p className="text-sm text-muted-foreground">Simulations tailored to your industry</p>
                     </div>
+                    </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 group">
+                  <div className="group rounded-2xl border border-border bg-card p-5">
+                    <div className="flex items-center gap-4">
                     <motion.div 
-                      className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center"
+                      className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center"
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >
@@ -328,11 +350,13 @@ export default function OrganizationPage() {
                       <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">Dedicated Support</h3>
                       <p className="text-sm text-muted-foreground">Success manager assigned to your account</p>
                     </div>
+                    </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 group">
+                  <div className="group rounded-2xl border border-border bg-card p-5">
+                    <div className="flex items-center gap-4">
                     <motion.div 
-                      className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center"
+                      className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center"
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >
@@ -342,10 +366,11 @@ export default function OrganizationPage() {
                       <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">Advanced Analytics</h3>
                       <p className="text-sm text-muted-foreground">Detailed reporting on team progress</p>
                     </div>
+                    </div>
                   </div>
-                </div>
               </div>
             </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -368,14 +393,14 @@ export default function OrganizationPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
-                  to="/organization/sign-up"
+                  to="/company/sign-up"
                   className="inline-flex items-center justify-center px-8 py-4 bg-primary-foreground text-primary text-base font-semibold rounded-xl hover:bg-primary-foreground/90 transition-all hover:shadow-lg whitespace-nowrap"
                 >
                   Get Started
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link 
-                  to="/organization/login" 
+                  to="/company/login" 
                   className="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-white text-base font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all whitespace-nowrap"
                 >
                   Organization Login

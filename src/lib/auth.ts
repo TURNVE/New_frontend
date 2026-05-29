@@ -21,8 +21,8 @@ export const AUTH_ERRORS = {
 
 export const AUTH_ROUTES = {
   SIGN_IN: '/sign-in',
-  ORG_SIGN_IN: '/organization/login',
-  ORG_SIGN_UP: '/organization/sign-up',
+  ORG_SIGN_IN: '/company/login',
+  ORG_SIGN_UP: '/company/sign-up',
   ADMIN_SIGN_IN: '/admin/login',
   SIGN_UP: '/sign-up',
   CALLBACK: '/auth/callback',

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
@@ -27,7 +27,14 @@ import { TasksSection } from '../admin/simulations/components/TasksSection';
 import { WeeklyContentSection } from '../admin/simulations/components/WeeklyContentSection';
 import { EvaluationSection } from '../admin/simulations/components/EvaluationSection';
 
-const FORM_SECTIONS: { id: string; label: string; description: string; component: React.ComponentType<any> }[] = [
+interface FormSectionDef {
+  id: string;
+  label: string;
+  description: string;
+  component: ComponentType;
+}
+
+const FORM_SECTIONS: FormSectionDef[] = [
   { id: 'basic', label: 'Basic Info', description: 'Simulation key, name, and configuration', component: BasicInfoSection },
   { id: 'branding', label: 'Company Branding', description: 'Company details and visual identity', component: CompanyBrandingSection },
   { id: 'challenge', label: 'Challenge & Context', description: 'Simulation scenario and context', component: ChallengeConfigSection },
@@ -67,7 +74,7 @@ function CompanySimulationCreatorContent() {
     if (!user) return;
     setIsSaving(true);
     try {
-      companySimulations.saveDraft(user.id, formData);
+      await companySimulations.saveDraftAsync(user.id, formData);
       setIsDirty(false);
       setLastSaved(new Date());
     } finally {
@@ -107,8 +114,8 @@ function CompanySimulationCreatorContent() {
     }
 
     if (allValid && user) {
-      const simulation = companySimulations.saveDraft(user.id, formData);
-      companySimulations.publish(simulation.id, user.id);
+      const simulation = await companySimulations.saveDraftAsync(user.id, formData);
+      await companySimulations.publishAsync(simulation.id, user.id);
       resetForm();
       navigate('/company/simulations');
     } else {

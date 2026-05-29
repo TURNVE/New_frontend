@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 const menuItems = [
   { name: 'Features', href: '/features' },
   { name: 'Programs', href: '/programs' },
+  { name: 'Companies', href: '/company/start' },
   { name: 'Blog', href: '/blog' },
   { name: 'About', href: '/about' },
 ];
@@ -26,8 +27,12 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <a href="/" className="flex items-center gap-3 group">
-              <img src="/logo.png" alt="TURNVE" className="h-10 w-auto group-hover:scale-105 transition-transform" />
+            <a href="/" className="flex h-10 items-center group" aria-label="TURNVE home">
+              <img
+                src="/logo.svg"
+                alt="TURNVE"
+                className="block h-8 w-auto max-w-[132px] object-contain transition-transform group-hover:scale-105 sm:h-9"
+              />
             </a>
 
             {/* Desktop Navigation - Centered */}

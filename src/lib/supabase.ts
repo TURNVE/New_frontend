@@ -4,8 +4,12 @@ import type { User, Session } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+export const SUPABASE_CONFIG_ERROR =
+  'Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to Turnve_Frontend/.env.local, then restart npm run dev.'
+
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.')
+  console.warn(SUPABASE_CONFIG_ERROR)
 }
 
 export const supabase = createClient(
@@ -19,6 +23,9 @@ export type Profile = {
   full_name?: string
   avatar_url?: string
   website?: string
+  org_website?: string
+  org_industry?: string
+  org_size?: string
   role: 'USER' | 'RECRUITER' | 'COMPANY' | 'MENTOR' | 'ADMIN'
   is_active: boolean
   is_verified: boolean

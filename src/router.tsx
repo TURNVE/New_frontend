@@ -56,6 +56,7 @@ const CompanyLayout = lazy(() => import('./pages/company/CompanyLayout'));
 const CompanyDashboardPage = lazy(() => import('./pages/company/CompanyDashboardPage'));
 const CompanySimulationsPage = lazy(() => import('./pages/company/CompanySimulationsPage'));
 const CompanySimulationCreator = lazy(() => import('./pages/company/CompanySimulationCreator'));
+const CompanySimulationRoute = lazy(() => import('./features/simulations/CompanySimulationRoute'));
 
 // ── Simulations ───────────────────────────────────────────────
 const PayLinkSimulation = lazy(() => import('./features/sim-pm-001-paylink/PayLinkSimulation'));
@@ -90,13 +91,16 @@ function Router() {
             <Route path="/developers" element={<DevelopersPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/organization" element={<OrganizationPage />} />
+            <Route path="/organization" element={<Navigate to="/company/start" replace />} />
+            <Route path="/company/start" element={<OrganizationPage />} />
 
             {/* ── Auth ────────────────────────────────────────────────── */}
             <Route path="/login" element={<Navigate to="/sign-in" replace />} />
             <Route path="/sign-in" element={<AuthPage />} />
-            <Route path="/organization/login" element={<OrganizationLoginPage />} />
-            <Route path="/organization/sign-up" element={<OrganizationSignUpPage />} />
+            <Route path="/organization/login" element={<Navigate to="/company/login" replace />} />
+            <Route path="/organization/sign-up" element={<Navigate to="/company/sign-up" replace />} />
+            <Route path="/company/login" element={<OrganizationLoginPage />} />
+            <Route path="/company/sign-up" element={<OrganizationSignUpPage />} />
             <Route path="/sign-up" element={<SignUpPage />} />
             <Route path="/auth/callback" element={<OAuthCallbackPage />} />
 
@@ -130,6 +134,7 @@ function Router() {
             <Route path="/simulation/sim-pm-fintech-001/*" element={<ProtectedRoute><PayLoopFirstTransactionSimulation /></ProtectedRoute>} />
             <Route path="/simulation/sim-pm-fintech-002/*" element={<ProtectedRoute><VeriCashKycSimulation /></ProtectedRoute>} />
             <Route path="/simulation/sim-pm-fintech-003/*" element={<ProtectedRoute><SwiftPayFailedTransferSimulation /></ProtectedRoute>} />
+            <Route path="/simulation/company/:companySimulationId/*" element={<ProtectedRoute><CompanySimulationRoute /></ProtectedRoute>} />
             <Route path="/simulation/:simulationId/*" element={<ProtectedRoute><RegisteredSimulationRoute /></ProtectedRoute>} />
 
             {/* ── First Product Management Simulation ── */}
@@ -142,7 +147,7 @@ function Router() {
             <Route
               path="/company/*"
               element={
-                <ProtectedRoleRoute allowedRoles={['COMPANY']} loginPath="/organization/login">
+                <ProtectedRoleRoute allowedRoles={['COMPANY']} loginPath="/company/login">
                   <CompanyLayout />
                 </ProtectedRoleRoute>
               }

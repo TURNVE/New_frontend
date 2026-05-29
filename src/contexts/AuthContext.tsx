@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react'
-import { supabase } from '../lib/supabase'
+import { SUPABASE_CONFIG_ERROR, isSupabaseConfigured, supabase } from '../lib/supabase'
 import type { Profile } from '../lib/supabase'
 import {
     AUTH_ERRORS,
@@ -93,6 +93,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signUp = useCallback(
         async (email: string, password: string, options?: { data?: Record<string, unknown> }): Promise<AuthResponse> => {
+            if (!isSupabaseConfigured) {
+                return {
+                    data: { user: null, session: null },
+                    error: new Error(SUPABASE_CONFIG_ERROR),
+                } as AuthResponse
+            }
+
             return await supabase.auth.signUp({
                 email,
                 password,
@@ -107,6 +114,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signIn = useCallback(
         async (email: string, password: string): Promise<AuthResponse> => {
+            if (!isSupabaseConfigured) {
+                return {
+                    data: { user: null, session: null },
+                    error: new Error(SUPABASE_CONFIG_ERROR),
+                } as AuthResponse
+            }
+
             return await supabase.auth.signInWithPassword({ email, password })
         },
         []
@@ -114,6 +128,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signInWithOAuth = useCallback(
         async (provider: OAuthProvider): Promise<OAuthResponse> => {
+            if (!isSupabaseConfigured) {
+                return {
+                    data: { provider, url: null },
+                    error: new Error(SUPABASE_CONFIG_ERROR),
+                } as OAuthResponse
+            }
+
             return await supabase.auth.signInWithOAuth({
                 provider,
                 options: {
@@ -145,12 +166,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [applySession])
 
     const checkEmailExists = useCallback(async (email: string) => {
-        const { data, error } = await supabase.rpc('is_email_registered', { email_address: email })
-        if (error) {
-            console.error('Error checking email:', error)
+        if (!isSupabaseConfigured) return false
+
+        try {
+            const { data, error } = await supabase.rpc('is_email_registered', { email_address: email })
+            if (error) {
+                console.warn('Email precheck unavailable; continuing with Supabase Auth signup.', error)
+                return false
+            }
+            return !!data
+        } catch (error) {
+            console.warn('Email precheck failed; continuing with Supabase Auth signup.', error)
             return false
         }
-        return !!data
     }, [])
 
     const isAuthenticated = useMemo(() => !!user && !!session, [user, session])
