@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { TurnveLogo } from '../brand/TurnveLogo';
 
 const menuItems = [
   { name: 'Features', href: '/features' },
@@ -28,11 +29,7 @@ export function Header() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <a href="/" className="flex h-10 items-center group" aria-label="TURNVE home">
-              <img
-                src="/logo.svg"
-                alt="TURNVE"
-                className="block h-8 w-auto max-w-[132px] object-contain transition-transform group-hover:scale-105 sm:h-9"
-              />
+              <TurnveLogo className="h-8 w-auto max-w-[132px] transition-transform group-hover:scale-105 sm:h-9" />
             </a>
 
             {/* Desktop Navigation - Centered */}

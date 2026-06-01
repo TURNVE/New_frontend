@@ -5,7 +5,7 @@
 import { lazy, Suspense, useState, useCallback, useEffect, useMemo, useRef, type ComponentProps } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-    ChevronRight, LayoutList, Map, Building2, FolderOpen,
+    ChevronRight, LayoutList, Building2,
     Bell, Play, Pause,
     Clock, CheckCircle, Trophy, AlertTriangle, FileText,
     PhoneCall, Video, Menu, Calendar, Sparkles, Mail, MonitorPlay,
@@ -79,6 +79,94 @@ function getActionPointTotal(action: WeeklyActionItem) {
 
 function getActionMaterialCount(action: WeeklyActionItem) {
     return action.workplaceMaterials?.length ?? 0;
+}
+
+function DetailedProjectBrief({
+    config,
+    pagePrimary,
+}: {
+    config: SimulationConfig;
+    pagePrimary: string;
+}) {
+    const briefItems = [
+        { label: 'Company', value: config.companyName },
+        { label: 'Industry', value: config.industry },
+        { label: 'Project type', value: config.projectType },
+        { label: 'Team size', value: config.teamSize },
+    ].filter((item) => item.value);
+
+    const successCriteria = config.successCriteria ?? [];
+
+    return (
+        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318]">
+            <div className="mb-5">
+                <div className="min-w-0 flex-1">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        Detailed project brief
+                    </p>
+                    <h2 className="mt-1 text-xl font-black text-slate-950 dark:text-white">
+                        {config.challenge}
+                    </h2>
+                    <p className="mt-3 max-w-4xl text-sm font-medium leading-7 text-slate-600 dark:text-slate-300">
+                        {config.challengeDetails || config.description}
+                    </p>
+                </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {briefItems.map((item) => (
+                    <div key={item.label} className="rounded-lg bg-slate-50 p-3 dark:bg-white/[0.06]">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            {item.label}
+                        </p>
+                        <p className="mt-1 text-sm font-bold leading-5 text-slate-950 dark:text-white">
+                            {item.value}
+                        </p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                <div className="rounded-lg bg-slate-50 p-4 dark:bg-white/[0.06]">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        Project overview
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                        {config.description}
+                    </p>
+                </div>
+
+                <div className="rounded-lg bg-slate-50 p-4 dark:bg-white/[0.06]">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        Company context
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                        {config.marketContext || config.technicalStack || `${config.companyName} is the workplace context for this simulation.`}
+                    </p>
+                </div>
+            </div>
+
+            {successCriteria.length > 0 && (
+                <div className="mt-5">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        What success looks like
+                    </p>
+                    <div className="mt-3 grid gap-2 md:grid-cols-2">
+                        {successCriteria.slice(0, 4).map((criterion, index) => (
+                            <div key={criterion.id} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 dark:border-white/10 dark:bg-black/20">
+                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black text-white" style={{ backgroundColor: pagePrimary }}>
+                                    {index + 1}
+                                </span>
+                                <p className="text-sm font-medium leading-5 text-slate-700 dark:text-slate-200">
+                                    {criterion.description}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </section>
+    );
 }
 
 function formatArtifactContent(content?: Record<string, unknown>) {
@@ -389,6 +477,8 @@ function InternDashboardPanel({
                     </div>
                 </section>
 
+                <DetailedProjectBrief config={config} pagePrimary={pagePrimary} />
+
                 <section className="mt-6 grid gap-5 xl:grid-cols-[1fr_340px]">
                     <div id="intern-mission-stream" className="scroll-mt-6 rounded-[32px] border border-white/70 bg-white/75 p-5 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.07] dark:shadow-black/20">
                         <div className="mb-5 flex items-center justify-between gap-3">
@@ -667,6 +757,8 @@ function ProductManagementDashboardPanel({
                         </article>
                     </aside>
                 </section>
+
+                <DetailedProjectBrief config={config} pagePrimary={pagePrimary} />
 
                 <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
                     <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111318]">
@@ -1418,10 +1510,7 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
         { name: 'Tasks', icon: LayoutList, id: 'backlog', badge: weeklyActions.filter(a => !completedIds.has(a.id)).length > 0 
             ? weeklyActions.filter(a => !completedIds.has(a.id)).length 
             : undefined },
-        { name: 'Roadmap', icon: Map, id: 'roadmap' },
-        { name: pmMode ? 'PM Work Documents' : 'Documents', icon: FolderOpen, id: 'documents' },
         { name: 'Company', icon: Building2, id: 'company' },
-        { name: 'Calendar', icon: Calendar, id: 'calendar' },
     ];
 
     if (!gameState) {
@@ -1587,17 +1676,6 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                         ))}
                     </nav>
 
-                    <div className={`border-t mx-3 mt-2 ${internMode ? 'border-orange-100 dark:border-white/10' : 'border-gray-200 dark:border-gray-800'}`} />
-
-                    <div className="px-4 py-3">
-                        <div className={`flex items-center justify-between text-xs mb-1.5 ${internMode ? 'font-bold text-slate-600 dark:text-slate-300' : 'text-gray-500 dark:text-gray-400'}`}>
-                            <span>Week {gameState.week}/{gameState.totalWeeks}</span>
-                            <span>{Math.round(gameState.progress)}%</span>
-                        </div>
-                        <div className={`h-1.5 rounded-full overflow-hidden ${internMode ? 'bg-orange-100 dark:bg-white/10' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                            <div className="h-full rounded-full transition-all" style={{ width: `${gameState.progress}%`, backgroundColor: config.primaryColor }} />
-                        </div>
-                    </div>
                 </aside>
 
                 {/* ── Main ─────────────────────────────────── */}
@@ -1612,9 +1690,6 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                                 <Menu className={`h-5 w-5 ${internMode ? 'text-slate-600 dark:text-slate-300' : 'text-gray-500 dark:text-gray-400'}`} />
                             </button>
                             <TypingText text={config.companyName} speed={35} className={`text-sm lg:text-base font-semibold ${internMode ? 'text-slate-950 dark:text-white' : 'dark:text-white'}`} />
-                            <span className="inline-flex text-xs font-bold px-2 py-1 rounded border" style={{ backgroundColor: `${config.primaryColor}20`, color: config.primaryColor, borderColor: `${config.primaryColor}30` }}>
-                                WEEK {String(gameState.week).padStart(2, '0')} / {gameState.totalWeeks}
-                            </span>
                             {isPaused && (
                                 <span className="hidden sm:inline-flex bg-yellow-500/10 text-yellow-500 text-xs font-bold px-2 py-1 rounded border border-yellow-500/20 flex items-center gap-1">
                                     <Pause className="w-3 h-3" /> PAUSED
@@ -1645,6 +1720,12 @@ export default function SimulationShell({ config }: { config: SimulationConfig }
                             )}
                         </div>
                     </header>
+
+                    {activeTab === 'dashboard' && !pmMode && !internMode && (
+                        <div className="border-b border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-[#121212] sm:p-6">
+                            <DetailedProjectBrief config={config} pagePrimary={pagePrimary} />
+                        </div>
+                    )}
 
                     {feedback && (
                         <div className="bg-emerald-500/10 border-b border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-6 py-3 text-sm flex-shrink-0">

@@ -20,6 +20,7 @@ import {
   BadgeCheck
 } from 'lucide-react';
 import { Header } from '../../components/layout/Header';
+import { TurnveLogo } from '../../components/brand/TurnveLogo';
 
 const features = [
   {
@@ -417,7 +418,7 @@ export default function OrganizationPage() {
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-10 sm:mb-12">
             <div className="col-span-2 sm:col-span-2 lg:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <img src="/logo.png" alt="TURNVE" className="h-8 sm:h-10 w-auto" />
+                <TurnveLogo className="h-8 w-auto max-w-[132px] sm:h-10" />
               </div>
               <p className="text-text-tertiary text-sm leading-relaxed mb-4">
                 Empowering organizations to build practical skills through AI-powered simulations.

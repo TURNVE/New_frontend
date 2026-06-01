@@ -5,7 +5,6 @@ import {
   Users,
   BarChart3,
   Settings,
-  Shield,
   LogOut,
   ChevronRight,
   Plus,
@@ -15,6 +14,7 @@ import {
   CreditCard,
   SlidersHorizontal,
 } from 'lucide-react'
+import { TurnveLogo } from '@/components/brand/TurnveLogo'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
@@ -90,12 +90,9 @@ export function AdminLayout() {
       <aside className="w-64 bg-[#111418] border-r border-[#23252a] flex flex-col fixed h-full">
         {/* Logo */}
         <div className="p-6 border-b border-[#23252a]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
+          <div className="flex flex-col items-start gap-1">
+            <TurnveLogo className="h-8 w-auto max-w-[140px]" />
             <div>
-              <h1 className="text-lg font-semibold text-[#f7f8f8]">TURNVE</h1>
               <p className="text-xs text-[#8a8f98]">Admin Panel</p>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Header } from '../components/layout/Header';
+import { TurnveLogo } from '../components/brand/TurnveLogo';
 import { Footer7 } from '../components/ui/footer-7';
 import { Facebook, Instagram, Linkedin, Twitter, Users, Award, Zap, Brain, LineChart, Target, Briefcase, Sparkles, Rocket, Workflow, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -212,7 +213,7 @@ export default function FeaturesPage() {
               </div>
 
               <div className="p-8 rounded-2xl border border-primary bg-primary/10">
-                <h3 className="text-lg font-bold text-primary mb-6">TURNVE</h3>
+                <TurnveLogo className="mb-6 h-7 w-auto" />
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3 text-foreground">
                     <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { usePageSetup } from '../hooks/usePageSetup';
+import { TurnveLogo } from '../components/brand/TurnveLogo';
 import IntegrationsSection from '../components/ui/integrations-section';
 import { Hero } from '../components/ui/animated-hero';
 import Testimonials from '../components/ui/testimonials-columns';
@@ -76,11 +77,7 @@ const LandingPage = () => {
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 group">
-              <img 
-                src="/logo.png" 
-                alt="TURNVE" 
-                className="h-8 sm:h-10 w-auto transform group-hover:scale-105 transition-transform" 
-              />
+              <TurnveLogo className="h-8 w-auto max-w-[132px] transform transition-transform group-hover:scale-105 sm:h-10" />
             </Link>
             
             {/* Desktop Navigation */}
@@ -345,7 +342,7 @@ const LandingPage = () => {
             {/* Company Info */}
             <div className="col-span-2 sm:col-span-2 lg:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <img src="/logo.png" alt="TURNVE" className="h-8 sm:h-10 w-auto" />
+                <TurnveLogo className="h-8 w-auto max-w-[132px] sm:h-10" />
               </div>
               <p className="text-text-tertiary text-sm leading-relaxed mb-4">
                 Empowering professionals to gain real-world experience through AI-powered simulations.

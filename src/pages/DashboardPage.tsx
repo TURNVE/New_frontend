@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ComponentType } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Play,
@@ -16,18 +16,39 @@ import {
 import { usePageSetup } from '../hooks/usePageSetup';
 import { simulations, supabase, profiles } from '../lib/supabase';
 
+interface DashboardActivity {
+  id: string;
+  title: string;
+  desc: string;
+  time: string;
+  icon: string;
+}
+
+interface DashboardSimulation {
+  id: string;
+  title: string;
+  industry: string;
+  progress: number;
+  dueDate: string;
+  status: string;
+  color: string;
+}
+
+interface SessionStateData {
+  project?: {
+    title?: string;
+  };
+  industry?: string;
+}
+
 const DashboardPage = () => {
   usePageSetup();
-  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
-
-  useEffect(() => {
-    const hasCompletedOnboarding = localStorage.getItem('turnve_onboarding_complete');
-    setIsFirstTimeUser(!hasCompletedOnboarding);
-  }, []);
-
+  const [isFirstTimeUser] = useState(
+    () => !localStorage.getItem('turnve_onboarding_complete')
+  );
   const [userName, setUserName] = useState('User');
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
-  const [ongoingSimulations, setOngoingSimulations] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<DashboardActivity[]>([]);
+  const [ongoingSimulations, setOngoingSimulations] = useState<DashboardSimulation[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -42,7 +63,7 @@ const DashboardPage = () => {
 
         if (sessions) {
           const sims = sessions.map(session => {
-            const stateData: any = session.state || {};
+            const stateData = (session.state || {}) as SessionStateData;
             return {
               id: session.id,
               title: stateData.project?.title || session.scenario_key || 'Simulation Project',
@@ -55,7 +76,7 @@ const DashboardPage = () => {
           });
           setOngoingSimulations(sims.slice(0, 3));
 
-          let activities: any[] = [];
+          const activities: DashboardActivity[] = [];
           scores?.slice(0, 2).forEach(sc => {
             activities.push({
               id: sc.id, title: 'Simulation Completed', desc: `Finished with a score of ${sc.overall_score}%`, time: new Date(sc.completed_at).toLocaleDateString(), icon: 'briefcase'
@@ -74,7 +95,7 @@ const DashboardPage = () => {
   }, []);
 
   const IconComponent = ({ iconName, className = "h-5 w-5" }: { iconName: string, className?: string }) => {
-    const icons: Record<string, any> = {
+    const icons: Record<string, ComponentType<{ className?: string }>> = {
       briefcase: Briefcase,
       trend: TrendingUp,
       zap: Zap,
@@ -131,19 +152,19 @@ const DashboardPage = () => {
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   to="/simulations"
-                  className="group inline-flex items-center justify-center gap-2 bg-white text-[#5e6ad2] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md shadow-white/20 tap-target"
+                  className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#5e6ad2] shadow-md shadow-white/20 transition-all duration-300 hover:scale-[1.02] hover:bg-white/90 active:scale-[0.98] sm:w-auto sm:px-6"
                 >
                   Start Simulation
-                  <ArrowRight className="h-3.5 w-3.5 opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                  <ArrowRight className="h-4 w-4 opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                 </Link>
                 <Link
                   to="/simulations"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] tap-target"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:bg-white/20 active:scale-[0.98] sm:w-auto sm:px-6"
                 >
-                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <TrendingUp className="h-4 w-4" />
                   Explore Tracks
                 </Link>
               </div>

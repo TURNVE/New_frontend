@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { SignInPage, type Testimonial } from '../components/ui/sign-in';
 import { usePageSetup } from '../hooks/usePageSetup';
+import { TurnveLogo } from '../components/brand/TurnveLogo';
 
 const sampleTestimonials: Testimonial[] = [
   {
@@ -50,7 +51,7 @@ const LoginPage = () => {
       <SignInPage
         title={
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="TURNVE" className="h-10 w-auto" />
+            <TurnveLogo className="h-10 w-auto max-w-[150px]" />
           </div>
         }
         description="Sign in to continue your journey with TURNVE"

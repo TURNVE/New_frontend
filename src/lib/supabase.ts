@@ -23,6 +23,7 @@ export type Profile = {
   full_name?: string
   avatar_url?: string
   website?: string
+  role_interest?: string
   org_website?: string
   org_industry?: string
   org_size?: string

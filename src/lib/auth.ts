@@ -42,7 +42,21 @@ export interface PortalValidationResult {
 }
 
 export function getAuthRedirectUrl(path = AUTH_ROUTES.CALLBACK) {
+  if (typeof window === 'undefined') return path
+
   return `${window.location.origin}${path}`
+}
+
+export function normalizeAuthEmail(email: string) {
+  return email.trim().toLowerCase()
+}
+
+export function getAuthProviderScopes(provider: OAuthProvider) {
+  if (provider === AUTH_PROVIDERS.GOOGLE) {
+    return 'openid email profile'
+  }
+
+  return undefined
 }
 
 export function normalizeRole(role?: string | null): UserRole {

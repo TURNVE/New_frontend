@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 function ProgramPreview() {
   return (
-    <section id="program" className="py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
+    <section id="program" className="scroll-mt-24 py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
@@ -25,7 +25,7 @@ function ProgramPreview() {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-5 auto-rows-fr">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 auto-rows-auto lg:auto-rows-[minmax(152px,auto)]">
           
           {/* Large Community Card */}
           <motion.div
@@ -33,24 +33,24 @@ function ProgramPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="col-span-2 lg:col-span-2 lg:row-span-2 relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-3 sm:p-6 lg:p-8 group"
+            className="sm:col-span-2 lg:row-span-2 relative min-h-[260px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-5 sm:p-6 lg:p-8 group"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50" />
-            <div className="relative z-10 h-full flex flex-col">
-              <div className="flex items-center gap-2 sm:gap-3 mb-1">
-                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
-                  <Users className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
+            <div className="relative z-10 flex h-full flex-col">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/20">
+                  <Users className="h-6 w-6 text-primary" />
                 </div>
-                <span className="text-[10px] sm:text-sm font-medium text-primary uppercase tracking-wider">Community</span>
+                <span className="text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">Community</span>
               </div>
-              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-0">50K+</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">Active Learners</p>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md flex-grow hidden sm:block">
-                Join a thriving community of professionals. Get support through live sessions, peer collaboration, and dedicated mentorship from industry experts.
+              <h3 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground">50K+</h3>
+              <p className="mt-1 text-sm font-semibold text-foreground/80">Active learners building job-ready proof</p>
+              <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl flex-1">
+                Practice with peers, join live mentor reviews, and turn each weekly challenge into portfolio evidence employers can inspect.
               </p>
-              <div className="mt-1 sm:mt-4 flex flex-wrap gap-1.5">
-                {['Live Sessions', 'Peer Groups', 'Mentorship'].map((tag) => (
-                  <span key={tag} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">
+              <div className="mt-5 flex flex-wrap gap-2">
+                {['Live reviews', 'Peer squads', 'Mentor feedback'].map((tag) => (
+                  <span key={tag} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                     {tag}
                   </span>
                 ))}
@@ -64,11 +64,14 @@ function ProgramPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             viewport={{ once: true }}
-            className="relative h-auto sm:h-full overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-[#ffc6c6]/30 to-[#ffc6c6]/10 border border-[#ffc6c6]/30 p-2 sm:p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#ffc6c6]/20 transition-all"
+            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#ffc6c6]/30 to-[#ffc6c6]/10 border border-[#ffc6c6]/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#ffc6c6]/20 transition-all"
           >
-            <Clock className="h-3 w-3 text-[#600000] dark:text-[#ffc6c6] mb-0.5" />
-            <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-0">5</h3>
-            <p className="text-xs text-muted-foreground">Weeks Intensive</p>
+            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/30 dark:bg-white/10">
+              <Clock className="h-5 w-5 text-[#600000] dark:text-[#ffc6c6]" />
+            </div>
+            <h3 className="text-4xl font-bold text-foreground">5</h3>
+            <p className="mt-1 text-sm font-semibold text-foreground/80">Weeks intensive</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Weekly briefs, deadlines, and mentor checkpoints.</p>
           </motion.div>
 
           {/* Tracks Card */}
@@ -77,11 +80,14 @@ function ProgramPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
             viewport={{ once: true }}
-            className="relative h-auto sm:h-full overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-[#c3faf5]/30 to-[#c3faf5]/10 border border-[#c3faf5]/30 p-2 sm:p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#c3faf5]/20 transition-all"
+            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#c3faf5]/30 to-[#c3faf5]/10 border border-[#c3faf5]/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#c3faf5]/20 transition-all"
           >
-            <Briefcase className="h-3 w-3 text-[#187574] mb-0.5" />
-            <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-0">4</h3>
-            <p className="text-xs text-muted-foreground">Career Tracks</p>
+            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/30 dark:bg-white/10">
+              <Briefcase className="h-5 w-5 text-[#187574]" />
+            </div>
+            <h3 className="text-4xl font-bold text-foreground">4</h3>
+            <p className="mt-1 text-sm font-semibold text-foreground/80">Career tracks</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Product, operations, marketing, and strategy paths.</p>
           </motion.div>
 
           {/* Mentorship Card */}
@@ -90,15 +96,17 @@ function ProgramPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
-            className="col-span-2 lg:col-span-2 relative overflow-hidden rounded-xl sm:rounded-3xl bg-card border border-border p-2 sm:p-5 lg:p-6 group hover:border-primary/30 hover:shadow-lg transition-all"
+            className="sm:col-span-2 relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-card border border-border p-5 lg:p-6 group hover:border-primary/30 hover:shadow-lg transition-all"
           >
-            <div className="flex items-center gap-2 sm:gap-4">
-              <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
-                <Award className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
+            <div className="flex h-full items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5">
+                <Award className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm sm:text-lg lg:text-xl font-bold text-foreground mb-0">1:1 Mentorship</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">Personal guidance from industry leaders</p>
+                <h3 className="text-lg lg:text-xl font-bold text-foreground">1:1 Mentorship</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  Review decisions with senior operators and leave with cleaner artifacts each week.
+                </p>
               </div>
             </div>
           </motion.div>
@@ -109,11 +117,14 @@ function ProgramPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
             viewport={{ once: true }}
-            className="relative h-auto sm:h-full overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-[#ffe6cd]/30 to-[#ffe6cd]/10 border border-[#ffe6cd]/30 p-2 sm:p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#ffe6cd]/20 transition-all"
+            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#ffe6cd]/30 to-[#ffe6cd]/10 border border-[#ffe6cd]/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#ffe6cd]/20 transition-all"
           >
-            <PlayCircle className="h-3 w-3 text-[#746019] mb-0.5" />
-            <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-0">200+</h3>
-            <p className="text-xs text-muted-foreground">AI Simulations</p>
+            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/30 dark:bg-white/10">
+              <PlayCircle className="h-5 w-5 text-[#746019]" />
+            </div>
+            <h3 className="text-4xl font-bold text-foreground">200+</h3>
+            <p className="mt-1 text-sm font-semibold text-foreground/80">AI simulations</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Role-play launches, incidents, tradeoffs, and stakeholder calls.</p>
           </motion.div>
 
           {/* Success Rate Card */}
@@ -122,11 +133,14 @@ function ProgramPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
-            className="relative h-auto sm:h-full overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/30 p-2 sm:p-5 lg:p-6 group hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
           >
-            <TrendingUp className="h-3 w-3 text-emerald-600 mb-0.5" />
-            <h3 className="text-2xl sm:text-3xl font-bold text-emerald-600 mb-0">92%</h3>
-            <p className="text-xs text-muted-foreground">Job Success Rate</p>
+            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/15">
+              <TrendingUp className="h-5 w-5 text-emerald-600" />
+            </div>
+            <h3 className="text-4xl font-bold text-emerald-600">92%</h3>
+            <p className="mt-1 text-sm font-semibold text-foreground/80">Portfolio completion</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Learners finish with case studies, briefs, and decision logs.</p>
           </motion.div>
 
           {/* Rating & CTA Combined */}
@@ -135,33 +149,32 @@ function ProgramPreview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.35 }}
             viewport={{ once: true }}
-            className="col-span-2 relative overflow-hidden rounded-xl sm:rounded-3xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-amber-500/30 p-2 sm:p-5 lg:p-6 group hover:shadow-lg hover:shadow-amber-500/20 transition-all"
+            className="sm:col-span-2 relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-amber-500/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-amber-500/20 transition-all"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+            <div className="flex h-full flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex-1">
-                <Star className="h-3 w-3 text-amber-500 fill-amber-500 mb-0.5" />
-                <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-0">4.9</h3>
-                <p className="text-xs text-muted-foreground mb-1">User Rating</p>
-                <div className="flex items-center gap-0.5">
+                <div className="mb-3 flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-3 w-3 text-amber-500 fill-amber-500" />
+                    <Star key={star} className="h-4 w-4 text-amber-500 fill-amber-500" />
                   ))}
                 </div>
+                <h3 className="text-4xl font-bold text-foreground">4.9</h3>
+                <p className="mt-1 text-sm font-semibold text-foreground/80">Learner rating</p>
               </div>
               
               <div className="hidden sm:block w-px h-12 bg-amber-500/20" />
               <div className="sm:hidden w-full h-px bg-amber-500/20" />
               
               <div className="flex-1 flex flex-col justify-center">
-                <h4 className="text-sm sm:text-base font-bold text-foreground mb-0.5">
+                <h4 className="text-base font-bold text-foreground mb-1">
                   Ready to start?
                 </h4>
-                <p className="text-xs text-muted-foreground mb-2">
+                <p className="text-sm text-muted-foreground mb-3">
                   Join the next cohort April 2026
                 </p>
                 <Link
                   to="/bootcamp"
-                  className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
+                  className="inline-flex items-center justify-center px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
                 >
                   Learn More
                   <ArrowRight className="ml-2 h-3 w-3" />
@@ -502,28 +515,28 @@ function App() {
           {
             title: "Product",
             links: [
-              { name: "Overview", href: "#" },
-              { name: "Pricing", href: "#" },
-              { name: "Features", href: "#" },
-              { name: "PM Simulator", href: "#" },
+              { name: "Features", href: "/features" },
+              { name: "Programs", href: "/programs" },
+              { name: "Pricing", href: "/pricing" },
+              { name: "PM Simulator", href: "/simulations" },
             ],
           },
           {
             title: "Company",
             links: [
-              { name: "About Us", href: "#" },
-              { name: "Team", href: "#" },
-              { name: "Blog", href: "#" },
-              { name: "Careers", href: "#" },
+              { name: "About Us", href: "/about" },
+              { name: "Organizations", href: "/company/start" },
+              { name: "Blog", href: "/blog" },
+              { name: "Contact", href: "/contact" },
             ],
           },
           {
             title: "Resources",
             links: [
-              { name: "Help Center", href: "#" },
-              { name: "Documentation", href: "#" },
-              { name: "API", href: "#" },
-              { name: "Contact", href: "#" },
+              { name: "FAQ", href: "/faq" },
+              { name: "Developers", href: "/developers" },
+              { name: "Simulations", href: "/simulations" },
+              { name: "Dashboard", href: "/dashboard" },
             ],
           },
         ]}
@@ -536,8 +549,7 @@ function App() {
         ]}
         copyright="© 2026 TURNVE. All rights reserved."
         legalLinks={[
-          { name: "Terms and Conditions", href: "#" },
-          { name: "Privacy Policy", href: "#" },
+          { name: "Privacy & Terms", href: "/privacy" },
         ]}
       />
     </div>
@@ -691,12 +703,14 @@ function HowItWorks() {
                 </div>
                 
                 {/* Step Number Badge */}
-                <div className={`absolute -top-3 left-5 sm:left-6 px-3 py-1 rounded-full ${step.iconBg} border ${step.borderColor} ${step.iconColor} text-sm font-bold z-10`}>
-                  Step {step.number}
+                <div className="relative z-10 mb-4 flex">
+                  <div className={`inline-flex h-7 min-w-[76px] items-center justify-center rounded-full ${step.iconBg} border ${step.borderColor} px-3 text-xs font-bold uppercase tracking-wide ${step.iconColor}`}>
+                    Step {step.number}
+                  </div>
                 </div>
                 
                 {/* Icon */}
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${step.iconBg} flex items-center justify-center mb-4 sm:mb-5 mt-2 group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 z-10`}>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${step.iconBg} flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 z-10`}>
                   <step.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${step.iconColor}`} />
                 </div>
                 

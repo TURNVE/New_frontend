@@ -4,6 +4,7 @@ import {
   Briefcase, Clock,
   Play, Users, DollarSign, Flag, Star, ChevronRight, Rocket, Lock, Sparkles, BookOpen, Target, CheckCircle2
 } from 'lucide-react';
+import { TurnveLogo } from '../components/brand/TurnveLogo';
 import { simulations, supabase, type SimulationSession } from '../lib/supabase';
 import { usePageSetup } from '../hooks/usePageSetup';
 import { companySimulations } from '../lib/companySimulations';
@@ -166,7 +167,9 @@ const SimulationsPage = () => {
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link to="/dashboard" className="text-xl font-bold tracking-tighter text-primary">TURNVE</Link>
+            <Link to="/dashboard" className="flex h-10 items-center" aria-label="TURNVE dashboard">
+              <TurnveLogo className="h-8 w-auto" />
+            </Link>
             <div className="flex gap-2">
               {(['all', 'ongoing', 'completed'] as const).map((f) => (
                 <button

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  ArrowRight,
   Building2,
   CheckCircle2,
   ChevronDown,
@@ -11,20 +10,12 @@ import {
   Lock,
   Mail,
 } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { Header } from '../../components/layout/Header'
 import { useAuth } from '../../hooks/useAuth'
 import { SUPABASE_CONFIG_ERROR, isSupabaseConfigured, supabase } from '../../lib/supabase'
 import { AUTH_ERRORS, AUTH_ROUTES } from '../../contexts/AuthContext'
-import { rememberAuthPortal } from '../../lib/auth'
-
-const GoogleIcon = () => (
-  <svg className="h-5 w-5" viewBox="0 0 24 24">
-    <path fill="#FFC107" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-    <path fill="#FF3D00" d="M5.26 10.59l2.88 2.11C8.87 10.62 10.72 9 13.5 9c1.45 0 2.77.52 3.8 1.38l2.84-2.84C18.24 5.72 16.03 4.5 13.5 4.5c-3.62 0-6.75 2.08-8.24 5.09z" />
-    <path fill="#4CAF50" d="M13.5 19.5c-2.17 0-4.14-.81-5.65-2.15l-2.92 2.26C6.55 21.47 9.79 23 13.5 23c2.85 0 5.56-1.04 7.66-2.92l-3.31-2.55c-1.17.79-2.68 1.97-4.35 1.97z" />
-    <path fill="#1976D2" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-  </svg>
-)
+import { normalizeAuthEmail } from '../../lib/auth'
 
 const WEBSITE_PROTOCOL = 'https://'
 
@@ -43,9 +34,9 @@ const buildWebsiteUrl = (domain: string): string | undefined => {
 
 function OrganizationSignUpPage() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const { user, signUp, signInWithOAuth, checkEmailExists, refreshSession } = useAuth()
-  const isUpgradeFlow = new URLSearchParams(location.search).get('upgrade') === '1' && !!user
+  const { user, signUp, checkEmailExists, refreshSession } = useAuth()
+  const isUpgradeFlow = !!user
+  const [currentStep, setCurrentStep] = useState<'organization' | 'account'>('organization')
   const [showPassword, setShowPassword] = useState(false)
   const [orgName, setOrgName] = useState('')
   const [orgWebsite, setOrgWebsite] = useState('')
@@ -54,7 +45,6 @@ function OrganizationSignUpPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isOAuthLoading, setIsOAuthLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isVerificationPromptOpen, setIsVerificationPromptOpen] = useState(false)
   const [redirectCountdown, setRedirectCountdown] = useState(5)
@@ -77,6 +67,12 @@ function OrganizationSignUpPage() {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+
+    if (!isUpgradeFlow && currentStep === 'organization') {
+      setCurrentStep('account')
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -109,15 +105,16 @@ function OrganizationSignUpPage() {
         return
       }
 
-      const emailExists = await checkEmailExists(email)
+      const normalizedEmail = normalizeAuthEmail(email)
+      const emailExists = await checkEmailExists(normalizedEmail)
       if (emailExists) {
         setError('Organization user already exists. Please log in with your details.')
         return
       }
 
-      const { data, error: signUpError } = await signUp(email.trim(), password, {
+      const { data, error: signUpError } = await signUp(normalizedEmail, password, {
         data: {
-          full_name: orgName.trim(),
+            full_name: orgName.trim(),
           role: 'COMPANY',
           org_website: websiteUrl,
           org_industry: orgIndustry || undefined,
@@ -131,18 +128,29 @@ function OrganizationSignUpPage() {
       }
 
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            role: 'COMPANY',
-            org_website: websiteUrl || null,
-            org_industry: orgIndustry || null,
-            org_size: orgSize || null,
-          })
-          .eq('id', data.user.id)
+        if (data.session) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert(
+              {
+                id: data.user.id,
+                full_name: orgName.trim(),
+                role: 'COMPANY',
+                org_website: websiteUrl || null,
+                org_industry: orgIndustry || null,
+                org_size: orgSize || null,
+              },
+              { onConflict: 'id' }
+            )
 
-        if (profileError) {
-          console.error('Error updating organization profile role:', profileError)
+          if (profileError) {
+            setError(profileError.message || 'Failed to save organization details.')
+            return
+          }
+
+          await refreshSession()
+          navigate(AUTH_ROUTES.COMPANY, { replace: true })
+          return
         }
 
         setRedirectCountdown(5)
@@ -155,31 +163,13 @@ function OrganizationSignUpPage() {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setIsOAuthLoading(true)
-    setError(null)
-
-    try {
-      if (!isSupabaseConfigured) {
-        setError(SUPABASE_CONFIG_ERROR)
-        setIsOAuthLoading(false)
-        return
-      }
-
-      rememberAuthPortal('organization')
-      const { error: oauthError } = await signInWithOAuth('google')
-      if (oauthError) {
-        setError(oauthError.message || AUTH_ERRORS.OAUTH_FAILED)
-        setIsOAuthLoading(false)
-      }
-    } catch {
-      setError(AUTH_ERRORS.GENERIC)
-      setIsOAuthLoading(false)
-    }
-  }
+  const canContinueOrganization = Boolean(orgName.trim() && orgIndustry && orgSize)
+  const isAccountStep = !isUpgradeFlow && currentStep === 'account'
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="px-4 pb-16 pt-28 sm:px-6 lg:px-8">
       {isVerificationPromptOpen && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 px-6 backdrop-blur-xl"
@@ -218,7 +208,6 @@ function OrganizationSignUpPage() {
                 className="inline-flex items-center justify-center rounded-[6px] bg-[#5e6ad2] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#828fff]"
               >
                 Go to sign in
-                <ArrowRight className="ml-2 h-4 w-4" />
               </button>
               <button
                 type="button"
@@ -232,70 +221,51 @@ function OrganizationSignUpPage() {
         </div>
       )}
 
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0f1011] via-[#191a1b] to-[#08090a] p-12 flex-col justify-between relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-[#5e6ad2]/20 blur-3xl" />
-          <div className="absolute bottom-20 left-20 h-80 w-80 rounded-full bg-[#7170ff]/20 blur-3xl" />
-        </div>
-
-        <div className="relative z-10">
-          <a href="/company/start" className="mb-12 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#5e6ad2] to-[#7170ff]">
-              <Building2 className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Turnve Organizations</span>
-          </a>
-
-          <div className="max-w-md">
-            <h1 className="mb-6 text-4xl font-bold leading-tight text-foreground lg:text-5xl">
-              Build simulations for your team.
-            </h1>
-            <p className="mb-8 text-lg leading-relaxed text-text-secondary">
-              Create an organization workspace to design simulations, manage training cohorts, and track team performance.
-            </p>
-          </div>
-        </div>
-
-        <div className="relative z-10">
-          <p className="text-sm text-text-tertiary">© 2026 Turnve Organizations. All rights reserved.</p>
-        </div>
-      </div>
-
-      <div className="flex flex-1 items-center justify-center bg-background p-8 lg:p-16">
-        <div className="w-full max-w-md">
+      <div className="mx-auto flex max-w-3xl items-center justify-center rounded-2xl border border-border bg-card/50 p-6 shadow-2xl shadow-black/20 sm:p-8">
+        <div className="w-full max-w-2xl">
           <div className="mb-8">
+            {!isUpgradeFlow && (
+              <div className="mb-6 grid grid-cols-2 gap-2 rounded-[6px] border border-border bg-background/60 p-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep('organization')}
+                  className={`rounded-[5px] px-4 py-2 text-sm font-semibold transition-colors ${
+                    currentStep === 'organization'
+                      ? 'bg-[#5e6ad2] text-white'
+                      : 'text-text-secondary hover:bg-surface'
+                  }`}
+                >
+                  Organization
+                </button>
+                <button
+                  type="button"
+                  onClick={() => canContinueOrganization && setCurrentStep('account')}
+                  className={`rounded-[5px] px-4 py-2 text-sm font-semibold transition-colors ${
+                    currentStep === 'account'
+                      ? 'bg-[#5e6ad2] text-white'
+                      : 'text-text-secondary hover:bg-surface'
+                  }`}
+                >
+                  Account
+                </button>
+              </div>
+            )}
+
             <h2 className="mb-2 text-3xl font-bold text-foreground">
-              {isUpgradeFlow ? 'Add company details' : 'Create your organization'}
+              {isUpgradeFlow
+                ? 'Create your organization'
+                : currentStep === 'organization'
+                  ? 'Tell us about your organization'
+                  : 'Create your admin account'}
             </h2>
             <p className="text-text-secondary">
               {isUpgradeFlow
-                ? 'Complete your organization profile to unlock the company dashboard.'
-                : 'Set up a dedicated workspace for team simulations.'}
+                ? 'Your current account will become the owner of this organization workspace.'
+                : currentStep === 'organization'
+                  ? 'Set up the workspace your team will use for simulations.'
+                  : 'Use a work email and password to manage the organization dashboard.'}
             </p>
           </div>
-
-          {!isUpgradeFlow && (
-            <>
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={isOAuthLoading}
-                className="mb-6 flex w-full items-center justify-center gap-3 rounded-[6px] border border-border px-4 py-3 transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <GoogleIcon />
-                <span className="text-sm font-medium text-text-secondary">{isOAuthLoading ? 'Loading...' : 'Sign up with Google'}</span>
-              </button>
-
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-text-tertiary">or continue with</span>
-                </div>
-              </div>
-            </>
-          )}
 
           {error && (
             <div className="mb-6 rounded-[6px] border border-red-500/20 bg-red-500/10 p-4">
@@ -322,7 +292,7 @@ function OrganizationSignUpPage() {
               </div>
             </div>
 
-            {!isUpgradeFlow && (
+            {isAccountStep && (
             <div>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text-secondary">
                 Work Email
@@ -342,7 +312,7 @@ function OrganizationSignUpPage() {
             </div>
             )}
 
-            {!isUpgradeFlow && (
+            {isAccountStep && (
             <div>
               <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-text-secondary">
                 Create Password
@@ -381,6 +351,7 @@ function OrganizationSignUpPage() {
                     value={orgIndustry}
                     onChange={(e) => setOrgIndustry(e.target.value)}
                     className="w-full appearance-none rounded-[6px] border border-border bg-input px-4 py-3 pr-10 text-foreground transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
+                    required
                   >
                     <option value="" disabled>Select industry</option>
                     <option value="technology">Technology</option>
@@ -404,6 +375,7 @@ function OrganizationSignUpPage() {
                     value={orgSize}
                     onChange={(e) => setOrgSize(e.target.value)}
                     className="w-full appearance-none rounded-[6px] border border-border bg-input px-4 py-3 pr-10 text-foreground transition-shadow focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#7170ff]"
+                    required
                   >
                     <option value="" disabled>Select size</option>
                     <option value="1-10">1-10</option>
@@ -454,12 +426,20 @@ function OrganizationSignUpPage() {
 
             <button
               type="submit"
-              disabled={isLoading || !orgName.trim()}
+              disabled={
+                isLoading ||
+                !canContinueOrganization ||
+                (isAccountStep && (!email.trim() || password.length < 6))
+              }
               className="w-full rounded-[6px] bg-[#5e6ad2] py-3.5 font-semibold text-white transition-colors hover:bg-[#828fff] focus:outline-none focus:ring-2 focus:ring-[#7170ff] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading
-                ? isUpgradeFlow ? 'Saving Company Details...' : 'Creating Organization...'
-                : isUpgradeFlow ? 'Save Company Details' : 'Create Organization Account'}
+                ? isUpgradeFlow ? 'Creating Organization...' : 'Creating Organization...'
+                : isUpgradeFlow
+                  ? 'Create Organization'
+                  : currentStep === 'organization'
+                    ? 'Continue to Account'
+                    : 'Create Organization Account'}
             </button>
           </form>
 
@@ -478,6 +458,7 @@ function OrganizationSignUpPage() {
           </p>
         </div>
       </div>
+      </main>
     </div>
   )
 }

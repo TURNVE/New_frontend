@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Header } from '../components/layout/Header';
 import { Footer7 } from '../components/ui/footer-7';
-import { Facebook, Instagram, Linkedin, Twitter, Calendar, Clock, User, ArrowRight, Tag, Search } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Twitter, Calendar, Clock, User, ArrowRight, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -32,7 +32,7 @@ const blogPosts = [
     date: 'March 5, 2026',
     readTime: '6 min',
     category: 'Success Stories',
-    image: 'https://images.unsplash.com/photo-1522202176128-8834bd1cb3d8?w=800&q=80'
+    image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&q=80'
   },
   {
     title: '5 Decision-Making Frameworks Every PM Should Know',

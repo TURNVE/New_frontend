@@ -14,6 +14,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Header } from '../../components/layout/Header';
+import { TurnveLogo } from '../../components/brand/TurnveLogo';
 import { AnimatedGroup } from '../../components/ui/animated-group';
 import WarpShaderHero from '../../components/ui/wrap-shader';
 import IntegrationHero from '../../components/ui/integration-hero';
@@ -443,7 +444,7 @@ function Program1Page() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-12">
             <div className="flex flex-col items-center md:items-start gap-4">
-              <span className="text-2xl font-bold text-gray-950 tracking-tighter">Turnve</span>
+              <TurnveLogo className="h-9 w-auto" />
               <p className="font-medium text-gray-400 text-sm">The Practical Career Platform.</p>
             </div>
             

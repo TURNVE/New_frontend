@@ -88,7 +88,7 @@ const mockBlogPosts: BlogPost[] = [
     date: '2026-03-05',
     readTime: '6 min',
     category: 'Success Stories',
-    image: 'https://images.unsplash.com/photo-1522202176128-8834bd1cb3d8?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&q=80',
     featured: false,
     published: true,
     slug: 'bootcamp-to-pm-journey'

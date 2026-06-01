@@ -6,10 +6,10 @@ import {
   Plus,
   LogOut,
   ChevronRight,
-  Building2,
   BarChart3,
   Settings,
 } from 'lucide-react';
+import { TurnveLogo } from '../../components/brand/TurnveLogo';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -47,12 +47,9 @@ export function CompanyLayout() {
     <div className="min-h-screen bg-[#0d0f11] flex">
       <aside className="w-64 bg-[#111418] border-r border-[#23252a] flex flex-col fixed h-full">
         <div className="p-6 border-b border-[#23252a]">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
+          <Link to="/" className="flex items-center gap-3" aria-label="TURNVE home">
+            <TurnveLogo className="h-8 w-auto max-w-[128px]" />
             <div>
-              <h1 className="text-lg font-semibold text-[#f7f8f8]">TURNVE</h1>
               <p className="text-xs text-[#8a8f98]">Organization</p>
             </div>
           </Link>

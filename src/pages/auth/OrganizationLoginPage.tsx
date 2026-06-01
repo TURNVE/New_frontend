@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, UserRound } from 'lucide-react';
+import { ArrowRight, UserRound } from 'lucide-react';
+import { TurnveLogo } from '../../components/brand/TurnveLogo';
 import { SignInPage } from '../../components/ui/sign-in';
 import { AUTH_ERRORS, AUTH_ROUTES } from '../../contexts/AuthContext';
 import { useAuth } from '../../hooks/useAuth';
@@ -107,11 +108,8 @@ function OrganizationLoginPage() {
       )}
 
       <div className="absolute top-8 left-8 z-10">
-        <a href="/company/start" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] rounded-xl flex items-center justify-center">
-            <Building2 className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-foreground">Turnve Organizations</span>
+        <a href="/company/start" className="flex h-10 items-center" aria-label="TURNVE home">
+          <TurnveLogo className="h-8 w-auto sm:h-9" />
         </a>
       </div>
 

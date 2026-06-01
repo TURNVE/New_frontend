@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Rocket, Calendar, Users, Target, AlertTriangle,
-  CheckCircle2, ArrowRight, Lightbulb, Info, Sun, Moon,
+  CheckCircle2, Lightbulb, Info, Sun, Moon,
   PlayCircle, FileText, Award, TrendingUp, ChevronDown, ChevronUp, X
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { TurnveLogo } from '../components/brand/TurnveLogo';
 import { usePageTheme } from '../hooks/usePageTheme';
 import { simulationTemplates } from '../config/simulationTemplates';
 
@@ -260,11 +261,8 @@ const ProjectBriefingPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${pageTheme.gradientFrom}, ${pageTheme.gradientTo})` }}>
-              <span className="text-white font-bold text-base sm:text-lg">T</span>
-            </div>
             <div>
-              <h1 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">Turnve</h1>
+              <TurnveLogo className="h-7 w-auto sm:h-8" />
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 hidden xs:block">Project Management Simulation</p>
             </div>
           </div>

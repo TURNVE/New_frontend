@@ -7,7 +7,9 @@ import {
     AUTH_PROVIDERS,
     AUTH_ROUTES,
     getAuthRedirectUrl,
+    getAuthProviderScopes,
     getProfileForUser,
+    normalizeAuthEmail,
     normalizeRole,
     type AuthResponse,
     type OAuthProvider,
@@ -100,16 +102,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 } as AuthResponse
             }
 
-            return await supabase.auth.signUp({
-                email,
+            const response = await supabase.auth.signUp({
+                email: normalizeAuthEmail(email),
                 password,
                 options: {
                     data: options?.data,
                     emailRedirectTo: getAuthRedirectUrl(),
                 },
             })
+
+            if (!response.error && response.data.session?.user) {
+                const metadata = options?.data ?? {}
+                const { error: profileUpsertError } = await supabase
+                    .from('profiles')
+                    .upsert(
+                        {
+                            id: response.data.session.user.id,
+                            full_name: typeof metadata.full_name === 'string' ? metadata.full_name : null,
+                            role: typeof metadata.role === 'string' ? metadata.role : 'USER',
+                            org_website: typeof metadata.org_website === 'string' ? metadata.org_website : null,
+                            org_industry: typeof metadata.org_industry === 'string' ? metadata.org_industry : null,
+                            org_size: typeof metadata.org_size === 'string' ? metadata.org_size : null,
+                        },
+                        { onConflict: 'id' }
+                    )
+
+                if (profileUpsertError) {
+                    return {
+                        ...response,
+                        error: profileUpsertError,
+                    } as AuthResponse
+                }
+
+                await applySession(response.data.session)
+            }
+
+            return response
         },
-        []
+        [applySession]
     )
 
     const signIn = useCallback(
@@ -121,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 } as AuthResponse
             }
 
-            return await supabase.auth.signInWithPassword({ email, password })
+            return await supabase.auth.signInWithPassword({ email: normalizeAuthEmail(email), password })
         },
         []
     )
@@ -139,6 +169,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 provider,
                 options: {
                     redirectTo: getAuthRedirectUrl(),
+                    scopes: getAuthProviderScopes(provider),
+                    queryParams: {
+                        prompt: 'select_account',
+                    },
                 },
             })
         },

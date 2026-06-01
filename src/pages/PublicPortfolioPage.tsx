@@ -6,6 +6,7 @@ import {
   Users
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { TurnveLogo } from '../components/brand/TurnveLogo';
 import type { Portfolio, PortfolioItem, SimulationScore } from '../lib/supabase';
 import { getRandomColor } from '../lib/portfolio-utils';
 
@@ -263,8 +264,10 @@ const PublicPortfolioPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className={`flex items-center gap-2 text-sm ${themeText.muted} mb-2`}>
-                <span>TURNVE</span>
+              <div className={`flex items-center gap-2 text-sm ${themeText.muted} mb-3`}>
+                <a href={appUrl} aria-label="TURNVE home">
+                  <TurnveLogo className="h-6 w-auto" />
+                </a>
                 <ChevronRight className="h-4 w-4" />
                 <span>Portfolio</span>
               </div>

@@ -21,6 +21,7 @@ const ProgramsPage = lazy(() => import('./pages/ProgramsPage'));
 const DevelopersPage = lazy(() => import('./pages/DevelopersPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const OrganizationPage = lazy(() => import('./pages/organization/OrganizationPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const SimulationsPage = lazy(() => import('./pages/SimulationsPage'));
@@ -91,6 +92,7 @@ function Router() {
             <Route path="/developers" element={<DevelopersPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/organization" element={<Navigate to="/company/start" replace />} />
             <Route path="/company/start" element={<OrganizationPage />} />
 

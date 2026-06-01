@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { TurnveLogo } from '../brand/TurnveLogo';
 import { profiles, supabase } from '../../lib/supabase';
 
 interface DashboardLayoutProps {
@@ -102,8 +103,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             style={{ animation: 'slideInLeft 0.3s ease-out forwards' }}
           >
             <div className="flex items-center justify-between h-16 px-4 border-b border-border shrink-0">
-              <Link to="/" className="flex items-center space-x-2" onClick={() => setSidebarOpen(false)}>
-                <img src="/logo.png" alt="TURNVE" className="h-8 w-auto" />
+              <Link to="/" className="flex h-10 items-center" onClick={() => setSidebarOpen(false)} aria-label="TURNVE home">
+                <TurnveLogo className="h-8 w-auto max-w-[132px]" />
               </Link>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -150,8 +151,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 lg:w-72 md:flex-col z-40">
         <div className="flex flex-col flex-grow bg-card border-r border-border overflow-y-auto">
           <div className="flex items-center h-16 px-6 border-b border-border">
-            <Link to="/" className="flex items-center space-x-2">
-              <img src="/logo.png" alt="TURNVE" className="h-8 w-auto" />
+            <Link to="/" className="flex h-10 items-center" aria-label="TURNVE home">
+              <TurnveLogo className="h-8 w-auto max-w-[132px]" />
             </Link>
           </div>
           <nav className="flex-1 px-4 py-4 space-y-1">
@@ -207,8 +208,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               >
                 <Menu className="h-6 w-6" />
               </button>
-              <Link to="/dashboard" className="flex items-center space-x-2">
-                <img src="/logo.png" alt="TURNVE" className="h-7 w-auto sm:h-8" />
+              <Link to="/dashboard" className="flex h-10 items-center" aria-label="TURNVE dashboard">
+                <TurnveLogo className="h-7 w-auto max-w-[124px] sm:h-8" />
               </Link>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { ChevronDown, Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { TurnveLogo } from '../../components/brand/TurnveLogo'
 import { useAuth } from '../../hooks/useAuth'
 import { AUTH_ERRORS, AUTH_ROUTES } from '../../contexts/AuthContext'
-import { rememberAuthPortal } from '../../lib/auth'
+import { getPostAuthRedirectPath, normalizeAuthEmail, rememberAuthPortal } from '../../lib/auth'
 
 const GoogleIcon = () => (
   <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -39,13 +40,14 @@ export const SignUpPage = () => {
     setIsLoading(true)
 
     try {
-      const emailExists = await checkEmailExists(email)
+      const normalizedEmail = normalizeAuthEmail(email)
+      const emailExists = await checkEmailExists(normalizedEmail)
       if (emailExists) {
         setError('User already exists. Please log in with your details.')
         return
       }
 
-      const { data, error: signUpError } = await signUp(email.trim(), password, {
+      const { data, error: signUpError } = await signUp(normalizedEmail, password, {
         data: {
           full_name: fullName.trim(),
           role: 'USER',
@@ -55,6 +57,11 @@ export const SignUpPage = () => {
 
       if (signUpError) {
         setError(signUpError.message || AUTH_ERRORS.SIGN_UP_FAILED)
+        return
+      }
+
+      if (data.session) {
+        navigate(getPostAuthRedirectPath('USER'), { replace: true })
         return
       }
 
@@ -87,7 +94,11 @@ export const SignUpPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="relative min-h-screen flex bg-background">
+      <a href="/" className="absolute left-6 top-6 z-20 flex h-10 items-center lg:hidden" aria-label="TURNVE home">
+        <TurnveLogo className="h-8 w-auto" />
+      </a>
+
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0f1011] via-[#191a1b] to-[#08090a] p-12 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 right-20 h-64 w-64 rounded-full bg-[#5e6ad2]/20 blur-3xl" />
@@ -95,12 +106,9 @@ export const SignUpPage = () => {
         </div>
 
         <div className="relative z-10">
-          <div className="mb-12 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#5e6ad2] to-[#7170ff]">
-              <span className="text-sm font-bold text-white">T</span>
-            </div>
-            <span className="text-xl font-bold text-foreground">Turnve</span>
-          </div>
+          <a href="/" className="mb-12 flex h-10 items-center" aria-label="TURNVE home">
+            <TurnveLogo className="h-8 w-auto sm:h-9" />
+          </a>
 
           <div className="max-w-md">
             <h1 className="mb-6 text-4xl font-bold leading-tight text-foreground lg:text-5xl">
