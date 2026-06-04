@@ -45,17 +45,17 @@ function CompanySection() {
             
             <div className="flex flex-col sm:flex-row gap-3">
               <Link 
-                to="/company/start" 
+                to="/contact" 
                 className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
               >
-                  Go to Company
+                  Request a Demo
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link 
-                to="/company/sign-up" 
+                to="/contact" 
                 className="inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground text-sm font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
               >
-                  Sign Up as a Company
+                  Talk to Sales
               </Link>
             </div>
           </motion.div>
@@ -119,9 +119,6 @@ function App() {
         
         {/* How It Works Section */}
         <HowItWorks />
-
-        {/* Integrations Section */}
-        <IntegrationsSection />
 
         {/* Features Section - Horizontal Marquee */}
         <section id="features" className="py-16 lg:py-24 bg-gradient-to-b from-background to-secondary/30 overflow-hidden">
@@ -264,11 +261,6 @@ function App() {
         {/* Company/Organization Section */}
         <CompanySection />
 
-        {/* Testimonials Section */}
-        <section id="testimonials">
-          <Testimonials />
-        </section>
-
         {/* FAQ Section */}
         <FAQSection />
 
@@ -283,35 +275,21 @@ function App() {
               
               <div className="relative z-10">
                 <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">
-                  Ready to transform your career?
+                  Ready to gain real-world experience?
                 </h2>
                 <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-                  Join thousands of professionals who have accelerated their careers with TURNVE. Start your free trial today.
+                  Start Program 2 and build portfolio proof through practical simulations designed for early-career, junior, and career-switching talent.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a 
                     href="/sign-up" 
                     className="inline-flex items-center justify-center px-8 py-4 bg-primary-foreground text-primary text-base font-semibold rounded-xl hover:bg-primary-foreground/90 transition-all hover:shadow-lg whitespace-nowrap"
                   >
-                    Get Started Free
+                    Start a Simulation
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                 </div>
                 
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-primary-foreground/60">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span>No credit card required</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span>14-day free trial</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span>Cancel anytime</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -384,29 +362,39 @@ function Hero() {
           <AnimatedGroup preset="fade">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
               <Sparkles className="h-4 w-4" />
-              AI-Powered Career Platform
+              Built for early-career, junior, and switching talent
             </div>
             <h1 className="mt-8 max-w-3xl text-balance text-5xl font-bold md:text-6xl lg:mt-16 text-foreground mx-auto tracking-tight">
-              Theory Gets You Noticed.<br/>
-              <span className="text-primary">Experience Gets You Hired.</span>
+              Gain Real-World Experience<br/>
+              <span className="text-primary">Before You Get Hired.</span>
             </h1>
             <p className="mt-8 max-w-2xl text-pretty text-lg text-muted-foreground mx-auto">
-              Turn your career knowledge into demonstrable management experience with AI-guided simulations and real projects.
+              Program 2 helps early-career talent, junior professionals, and career switchers practice workplace decisions, receive AI feedback, and build portfolio proof employers can inspect.
             </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              {['Early-career talent', 'Junior-level talent', 'Career switchers'].map((audience) => (
+                <span
+                  key={audience}
+                  className="rounded-full border border-border bg-card/70 px-4 py-2 text-sm font-semibold text-foreground"
+                >
+                  {audience}
+                </span>
+              ))}
+            </div>
             <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
               <a 
                 href="/sign-up" 
                 className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
               >
-                Get Started
+                Start Program 2
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
               <a 
-                href="/company/sign-up"
+                href="/contact"
                 className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
               >
                 <PlayCircle className="mr-2 h-5 w-5" />
-                Join as an Organization
+                Request Organization Demo
               </a>
             </div>
           </AnimatedGroup>
@@ -488,10 +476,10 @@ function HowItWorks() {
             How It Works
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            From zero to hired in 5 steps
+            Build experience in 5 steps
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground">
-            Transform knowledge into skills employers value
+            Turn knowledge into real-world practice, feedback, and portfolio proof.
           </p>
         </div>
 
@@ -559,7 +547,7 @@ function HowItWorks() {
             to="/start-simulation"
             className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
           >
-            Start Your Journey
+            Start Program 2
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
@@ -684,53 +672,6 @@ function FAQSection() {
 
 
 
-function IntegrationsSection() {
-  const integrations = [
-    { name: "Google", url: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
-    { name: "LinkedIn", url: "https://cdn-icons-png.flaticon.com/512/174/174857.png" },
-    { name: "Slack", url: "https://cdn-icons-png.flaticon.com/512/2111/2111615.png" },
-    { name: "Microsoft", url: "https://cdn-icons-png.flaticon.com/512/174/174872.png" },
-    { name: "Facebook", url: "https://cdn-icons-png.flaticon.com/512/733/733547.png" },
-    { name: "Stripe", url: "https://cdn-icons-png.flaticon.com/512/5968/5968381.png" },
-    { name: "Dropbox", url: "https://cdn-icons-png.flaticon.com/512/888/888853.png" },
-    { name: "Jira", url: "https://cdn-icons-png.flaticon.com/512/906/906324.png" },
-    { name: "Netflix", url: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" },
-    { name: "Square", url: "https://cdn-icons-png.flaticon.com/512/5968/5968705.png" },
-    { name: "Shopify", url: "https://cdn-icons-png.flaticon.com/512/732/732218.png" },
-    { name: "Zapier", url: "https://cdn-icons-png.flaticon.com/512/5968/5968755.png" },
-    { name: "Google Drive", url: "https://cdn-icons-png.flaticon.com/512/5968/5968520.png" },
-    { name: "YouTube", url: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png" },
-    { name: "Airtable", url: "https://cdn-icons-png.flaticon.com/512/5968/5968885.png" },
-    { name: "Discord", url: "https://cdn-icons-png.flaticon.com/512/2111/2111370.png" },
-  ];
-
-  return (
-    <section className="max-w-7xl mx-auto my-16 px-6">
-      <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-white dark:bg-white/5">
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-4">Learn from top organizations</h2>
-            <p className="text-muted-foreground mb-5 text-sm sm:text-base leading-relaxed">
-              Turnve provides AI-powered simulations that mirror real-world scenarios used by top companies. 
-              Gain practical experience in project management, team collaboration, and strategic decision-making.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <a href="#" className="inline-flex items-center px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-all whitespace-nowrap text-sm">Start Learning</a>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-4 gap-3">
-            {integrations.map((integration, idx) => (
-              <div key={idx} className="w-12 h-12 sm:w-14 sm:h-14 p-2.5 bg-white dark:bg-white/90 rounded-xl flex items-center justify-center hover:scale-110 transition-all duration-300">
-                <img src={integration.url} alt={integration.name} className="w-full h-full object-contain" loading="lazy" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function CompactFeatureCard({ icon, title, description, accent }: { icon: React.ReactNode; title: string; description: string; accent?: 'coral' | 'teal' | 'orange' }) {
   const accentColors = {
     coral: 'bg-[#ffc6c6]/30 dark:bg-[#600000]/20 border-[#ffc6c6]/50 dark:border-[#600000]/30',
@@ -755,73 +696,6 @@ function CompactFeatureCard({ icon, title, description, accent }: { icon: React.
           <p className="text-xs text-muted-foreground leading-snug">{description}</p>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Testimonials() {
-  const testimonials = [
-    { text: "Turnve transformed my career. The AI simulations gave me real-world experience that helped me land my first PM role.", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop", name: "Sarah Chen", role: "Product Manager @ TechCorp" },
-    { text: "The hands-on projects are incredibly realistic. I learned more in 4 weeks than months of online courses.", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop", name: "Marcus Johnson", role: "UX Designer @ StartupXYZ" },
-    { text: "Best investment in my career. The portfolio I built through Turnve was the key differentiator.", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop", name: "Emily Rodriguez", role: "Marketing Lead @ BrandCo" },
-    { text: "As a career transitioner, Turnve gave me the confidence and practical skills I needed.", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop", name: "David Park", role: "Data Analyst @ FinTech Inc" },
-    { text: "The simulations mirror real workplace scenarios. I walked into my new role feeling prepared.", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop", name: "Priya Sharma", role: "Project Coordinator @ GlobalCorp" },
-    { text: "Turnve's AI coach helped me identify my strengths and accelerate my growth.", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop", name: "James Wilson", role: "Business Analyst @ Consulting" },
-    { text: "I went from zero experience to landing my dream job in 3 months.", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop", name: "Aisha Mohammed", role: "Operations Manager @ Logistics Co" },
-    { text: "The team collaboration features helped me build my network. I met my co-founder here!", image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop", name: "Alex Thompson", role: "Co-Founder @ NewVenture" },
-    { text: "Practical, relevant, and career-changing. Better than any certification.", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop", name: "Lisa Chang", role: "Strategy Consultant" },
-  ];
-
-  const firstColumn = testimonials.slice(0, 3);
-  const secondColumn = testimonials.slice(3, 6);
-  const thirdColumn = testimonials.slice(6, 9);
-
-  return (
-    <section className="py-20 lg:py-32 bg-gradient-to-b from-background to-secondary/30">
-      <div className="container mx-auto px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="flex flex-col items-center justify-center max-w-[540px] mx-auto mb-16">
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">Testimonials</div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-center text-foreground">What our users say</h2>
-          <p className="text-center mt-4 text-lg text-muted-foreground">See what our customers have to say about their Turnve experience.</p>
-        </motion.div>
-        <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
-          <TestimonialsColumn testimonials={firstColumn} duration={15} />
-          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={19} />
-          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={17} />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-type TestimonialItem = {
-  text: string;
-  image: string;
-  name: string;
-  role: string;
-};
-
-function TestimonialsColumn({ testimonials, duration, className }: { testimonials: TestimonialItem[]; duration?: number; className?: string }) {
-  return (
-    <div className={className}>
-      <motion.div animate={{ translateY: "-50%" }} transition={{ duration: duration || 10, repeat: Infinity, ease: "linear", repeatType: "loop" }} className="flex flex-col gap-6 pb-6">
-        {[...new Array(2).fill(0).map((_, index) => (
-          <React.Fragment key={index}>
-            {testimonials.map(({ text, image, name, role }, i) => (
-              <div className="p-6 rounded-2xl border border-border bg-card shadow-lg max-w-xs w-full" key={i}>
-                <div className="text-muted-foreground leading-relaxed">{text}</div>
-                <div className="flex items-center gap-3 mt-5">
-                  <img width={40} height={40} src={image} alt={name} className="h-10 w-10 rounded-full object-cover" />
-                  <div className="flex flex-col">
-                    <div className="font-semibold text-foreground tracking-tight text-sm">{name}</div>
-                    <div className="text-muted-foreground text-sm tracking-tight">{role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </React.Fragment>
-        ))]}
-      </motion.div>
     </div>
   );
 }

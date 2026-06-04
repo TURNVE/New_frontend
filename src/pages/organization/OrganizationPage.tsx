@@ -177,17 +177,17 @@ export default function OrganizationPage() {
               </p>
               <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
                 <Link 
-                  to="/company/sign-up"
+                  to="/contact"
                   className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
                 >
-                  Get Started
+                  Request a Demo
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link 
-                  to="/company/login"
+                  to="/contact"
                   className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
                 >
-                  Organization Login
+                  Talk to Sales
                 </Link>
               </div>
             </motion.div>
@@ -289,17 +289,17 @@ export default function OrganizationPage() {
               
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Link 
-                  to="/company/sign-up"
+                  to="/contact"
                   className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
                 >
-                  Get Started
+                  Request a Demo
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
                 <Link 
-                  to="/company/login" 
+                  to="/contact" 
                   className="inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground text-sm font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
                 >
-                  Organization Login
+                  Talk to Sales
                 </Link>
               </div>
             </motion.div>
@@ -390,21 +390,21 @@ export default function OrganizationPage() {
                 Ready to transform your team?
               </h2>
               <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-                Start your organization account today or schedule a demo with our enterprise team.
+                Request a demo or talk to sales to plan an organization rollout with our team.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
-                  to="/company/sign-up"
+                  to="/contact"
                   className="inline-flex items-center justify-center px-8 py-4 bg-primary-foreground text-primary text-base font-semibold rounded-xl hover:bg-primary-foreground/90 transition-all hover:shadow-lg whitespace-nowrap"
                 >
-                  Get Started
+                  Request a Demo
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link 
-                  to="/company/login" 
+                  to="/contact" 
                   className="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-white text-base font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all whitespace-nowrap"
                 >
-                  Organization Login
+                  Talk to Sales
                 </Link>
               </div>
             </div>
