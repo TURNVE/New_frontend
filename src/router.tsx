@@ -12,7 +12,6 @@ import SignUpPage from './pages/auth/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
 
 // ── Lazy loaded pages (to improve dev server performance) ─────
-const Program1Page = lazy(() => import('./pages/program1/Program1Page'));
 const FeaturesPage = lazy(() => import('./pages/FeaturesPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
@@ -83,7 +82,6 @@ function Router() {
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<App />} />
-            <Route path="/bootcamp" element={<Program1Page />} />
             <Route path="/features" element={<FeaturesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/about" element={<AboutPage />} />

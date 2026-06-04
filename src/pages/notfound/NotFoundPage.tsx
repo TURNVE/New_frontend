@@ -50,7 +50,7 @@ function NotFoundPage() {
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-500">
             Need help?{' '}
-            <a href="/program1" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+            <a href="/programs" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
               Browse our programs
             </a>
           </p>

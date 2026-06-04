@@ -25,7 +25,7 @@ const faqCategories = [
       },
       {
         question: 'Do I need prior experience to use TURNVE?',
-        answer: 'For self-paced simulations (Program 2), basic domain knowledge is recommended but not required. For the intensive bootcamp (Program 1), you should have foundational skills in your chosen track. This isn\'t an intro course—it\'s practice for the job itself.'
+        answer: 'Basic domain knowledge is helpful but not required. TURNVE is designed to help you practice realistic workplace decisions, learn through feedback, and build experience even if you are still early in your career.'
       }
     ]
   },
@@ -40,7 +40,7 @@ const faqCategories = [
       },
       {
         question: 'How long does a simulation take?',
-        answer: 'Most simulations take 30-60 minutes to complete, but complex scenarios can span multiple sessions. Program 1 simulations run over 5 weeks with weekly checkpoints. You can pause and resume anytime in self-paced mode.'
+        answer: 'Most simulations take 30-60 minutes to complete, but complex scenarios can span multiple sessions. You can pause and resume anytime, so the experience fits around your schedule.'
       },
       {
         question: 'What happens when I make a "wrong" decision?',
@@ -89,24 +89,20 @@ const faqCategories = [
     color: 'bg-[#ffe6cd]/50 dark:bg-[#746019]/30 text-[#746019]',
     questions: [
       {
-        question: 'What is Program 1?',
-        answer: 'Program 1 is our 5-week intensive bootcamp where you operate inside a structured startup lifecycle. You work on real projects with actual stakeholders, receive 1:1 mentorship, and build defensible portfolio pieces. Limited cohorts with rolling admissions.'
+        question: 'What program is available now?',
+        answer: 'TURNVE currently focuses on flexible, self-paced career simulations. You choose a role, complete realistic workplace scenarios, receive AI coaching, and build portfolio artifacts from your work.'
       },
       {
-        question: 'What\'s the difference between Program 1 and Program 2?',
-        answer: 'Program 1 is live, cohort-based, with weekly workshops and mentorship—best for intensive learning. Program 2 is self-paced with access to all simulations—ideal for flexible learning. Both produce portfolio artifacts, but Program 1 offers more personalized guidance.'
+        question: 'How do self-paced simulations work?',
+        answer: 'You can start a simulation when you are ready, pause between sessions, and return to your work later. Each scenario gives you practical decisions to make, then turns the outcome into feedback and portfolio-ready evidence.'
       },
       {
-        question: 'When does Program 1 start?',
-        answer: 'New cohorts start quarterly. Next cohort begins April 2025. Applications are reviewed on a rolling basis, and spots are limited to ensure quality 1:1 interaction. Apply early to secure your spot.'
+        question: 'Can I choose a career track?',
+        answer: 'Yes. Simulations cover multiple roles and industries, including product, operations, marketing, finance, healthcare, consulting, retail, education, and manufacturing.'
       },
       {
-        question: 'What tracks are available in Program 1?',
-        answer: 'Program 1 offers four tracks: Business (Product Management), Technical (Software Engineering), Creative (UI/UX & Brand Design), and Operations (Project Management). Choose the track aligned with your career goals.'
-      },
-      {
-        question: 'What happens after completing Program 1?',
-        answer: 'You receive a certificate of completion, a high-fidelity portfolio piece you can defend in interviews, and structured narratives for explaining your experience to employers. Many graduates land roles within 3 months.'
+        question: 'What happens after completing simulations?',
+        answer: 'You receive structured feedback and portfolio artifacts that help you explain your decisions, show practical experience, and prepare stronger interview examples.'
       }
     ]
   },
@@ -133,7 +129,7 @@ const faqCategories = [
       },
       {
         question: 'Do you offer job placement?',
-        answer: 'Program 3 (Career Accelerator, launching June 2025) will include job placement support. Currently, we provide interview preparation, resume review, and portfolio optimization, but we don\'t directly place candidates.'
+        answer: 'We provide interview preparation, resume review, and portfolio optimization, but we do not directly place candidates.'
       }
     ]
   },

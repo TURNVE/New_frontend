@@ -1,193 +1,10 @@
 import { Footer7 } from './components/ui/footer-7';
-import { Facebook, Instagram, Linkedin, Twitter, ArrowRight, Users, Award, Zap, Sparkles, CheckCircle2, PlayCircle, Briefcase, Target, Calendar, Globe, Rocket, Clock, TrendingUp, Star, HelpCircle, Mail, Building2, ChevronDown } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Twitter, ArrowRight, Users, Award, Zap, Sparkles, CheckCircle2, PlayCircle, Briefcase, Target, Globe, Rocket, Star, HelpCircle, Mail, Building2, ChevronDown } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedGroup } from './components/ui/animated-group';
 import { Header } from './components/layout/Header';
 import { Link } from 'react-router-dom';
-
-function ProgramPreview() {
-  return (
-    <section id="program" className="scroll-mt-24 py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-            <Calendar className="h-3 w-3 mr-1" />
-            Next Cohort: April 2026
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            5-Week Practical Bootcamp
-          </h2>
-          <p className="text-base sm:text-lg text-muted-foreground">
-            Experience the job before you land it. Operate inside a structured startup lifecycle with real deadlines, stakeholder feedback, and senior mentorship.
-          </p>
-        </div>
-
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 auto-rows-auto lg:auto-rows-[minmax(152px,auto)]">
-          
-          {/* Large Community Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="sm:col-span-2 lg:row-span-2 relative min-h-[260px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 p-5 sm:p-6 lg:p-8 group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50" />
-            <div className="relative z-10 flex h-full flex-col">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/20">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
-                <span className="text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">Community</span>
-              </div>
-              <h3 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground">50K+</h3>
-              <p className="mt-1 text-sm font-semibold text-foreground/80">Active learners building job-ready proof</p>
-              <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl flex-1">
-                Practice with peers, join live mentor reviews, and turn each weekly challenge into portfolio evidence employers can inspect.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {['Live reviews', 'Peer squads', 'Mentor feedback'].map((tag) => (
-                  <span key={tag} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Duration Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#ffc6c6]/30 to-[#ffc6c6]/10 border border-[#ffc6c6]/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#ffc6c6]/20 transition-all"
-          >
-            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/30 dark:bg-white/10">
-              <Clock className="h-5 w-5 text-[#600000] dark:text-[#ffc6c6]" />
-            </div>
-            <h3 className="text-4xl font-bold text-foreground">5</h3>
-            <p className="mt-1 text-sm font-semibold text-foreground/80">Weeks intensive</p>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Weekly briefs, deadlines, and mentor checkpoints.</p>
-          </motion.div>
-
-          {/* Tracks Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            viewport={{ once: true }}
-            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#c3faf5]/30 to-[#c3faf5]/10 border border-[#c3faf5]/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#c3faf5]/20 transition-all"
-          >
-            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/30 dark:bg-white/10">
-              <Briefcase className="h-5 w-5 text-[#187574]" />
-            </div>
-            <h3 className="text-4xl font-bold text-foreground">4</h3>
-            <p className="mt-1 text-sm font-semibold text-foreground/80">Career tracks</p>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Product, operations, marketing, and strategy paths.</p>
-          </motion.div>
-
-          {/* Mentorship Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="sm:col-span-2 relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-card border border-border p-5 lg:p-6 group hover:border-primary/30 hover:shadow-lg transition-all"
-          >
-            <div className="flex h-full items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5">
-                <Award className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-lg lg:text-xl font-bold text-foreground">1:1 Mentorship</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Review decisions with senior operators and leave with cleaner artifacts each week.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Simulations Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            viewport={{ once: true }}
-            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#ffe6cd]/30 to-[#ffe6cd]/10 border border-[#ffe6cd]/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-[#ffe6cd]/20 transition-all"
-          >
-            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/30 dark:bg-white/10">
-              <PlayCircle className="h-5 w-5 text-[#746019]" />
-            </div>
-            <h3 className="text-4xl font-bold text-foreground">200+</h3>
-            <p className="mt-1 text-sm font-semibold text-foreground/80">AI simulations</p>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Role-play launches, incidents, tradeoffs, and stakeholder calls.</p>
-          </motion.div>
-
-          {/* Success Rate Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            viewport={{ once: true }}
-            className="relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
-          >
-            <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/15">
-              <TrendingUp className="h-5 w-5 text-emerald-600" />
-            </div>
-            <h3 className="text-4xl font-bold text-emerald-600">92%</h3>
-            <p className="mt-1 text-sm font-semibold text-foreground/80">Portfolio completion</p>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">Learners finish with case studies, briefs, and decision logs.</p>
-          </motion.div>
-
-          {/* Rating & CTA Combined */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
-            viewport={{ once: true }}
-            className="sm:col-span-2 relative min-h-[150px] overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-amber-500/30 p-5 lg:p-6 group hover:shadow-lg hover:shadow-amber-500/20 transition-all"
-          >
-            <div className="flex h-full flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex-1">
-                <div className="mb-3 flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 text-amber-500 fill-amber-500" />
-                  ))}
-                </div>
-                <h3 className="text-4xl font-bold text-foreground">4.9</h3>
-                <p className="mt-1 text-sm font-semibold text-foreground/80">Learner rating</p>
-              </div>
-              
-              <div className="hidden sm:block w-px h-12 bg-amber-500/20" />
-              <div className="sm:hidden w-full h-px bg-amber-500/20" />
-              
-              <div className="flex-1 flex flex-col justify-center">
-                <h4 className="text-base font-bold text-foreground mb-1">
-                  Ready to start?
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Join the next cohort April 2026
-                </p>
-                <Link
-                  to="/bootcamp"
-                  className="inline-flex items-center justify-center px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
-                >
-                  Learn More
-                  <ArrowRight className="ml-2 h-3 w-3" />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function CompanySection() {
   return (
@@ -446,9 +263,6 @@ function App() {
 
         {/* Company/Organization Section */}
         <CompanySection />
-
-        {/* Program 1 Section */}
-        <ProgramPreview />
 
         {/* Testimonials Section */}
         <section id="testimonials">
@@ -768,7 +582,7 @@ function FAQSection() {
     },
     {
       question: "How long do I have access to the simulations?",
-      answer: "You get unlimited access to all simulations during your active subscription. Even after completing the 5-week bootcamp, you can revisit scenarios to practice and refine your skills. Plus, new simulations are added monthly."
+      answer: "You get unlimited access to all simulations during your active subscription. You can revisit scenarios anytime to practice, compare decisions, and refine your skills. Plus, new simulations are added monthly."
     },
     {
       question: "Will this help me get a job?",

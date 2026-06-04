@@ -44,7 +44,6 @@ import ProjectBriefingPage from '../pages/ProjectBriefingPage';
 import SignUpPage from '../pages/auth/SignUpPage';
 import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage';
 import { NotFound } from '../pages/NotFoundPage';
-import Program1Page from '../pages/program1/Program1Page';
 import FAQPage from '../pages/FAQPage';
 import ContactPage from '../pages/ContactPage';
 // Organization marketing page
@@ -92,7 +91,6 @@ const router = createBrowserRouter([
     children: [
       // ── Public / Marketing ──────────────────────────────────────
       { path: '/', element: <LandingPage /> },
-      { path: '/bootcamp', element: <Program1Page /> },
       { path: '/organization', element: <OrganizationPage /> },
       { path: '/faq', element: <FAQPage /> },
       { path: '/contact', element: <ContactPage /> },

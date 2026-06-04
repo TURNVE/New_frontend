@@ -1,35 +1,10 @@
 import { motion } from 'framer-motion';
 import { Header } from '../components/layout/Header';
 import { Footer7 } from '../components/ui/footer-7';
-import { Facebook, Instagram, Linkedin, Twitter, Rocket, Calendar, Users, Award, ArrowRight, Briefcase, Code, Palette, Settings, CheckCircle2 } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Twitter, Rocket, Calendar, Users, Award, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const programs = [
-  {
-    id: 'program-1',
-    title: 'Program 1: Practical Bootcamp',
-    subtitle: 'Live Online Intensive',
-    description: '5-week immersive simulation where you operate inside a structured startup lifecycle. Make real decisions, handle stakeholders, and build defensible portfolio pieces.',
-    duration: '5 Weeks',
-    format: 'Live + Remote',
-    cohort: 'April 2025',
-    features: [
-      'Real startup simulation',
-      '1:1 mentorship sessions',
-      'Weekly live workshops',
-      'AI-powered feedback',
-      'Certificate on completion'
-    ],
-    tracks: [
-      { name: 'Business', icon: Briefcase, color: 'bg-primary/10 text-primary' },
-      { name: 'Technical', icon: Code, color: 'bg-[#c3faf5]/50 dark:bg-[#187574]/30 text-[#187574]' },
-      { name: 'Creative', icon: Palette, color: 'bg-[#ffc6c6]/50 dark:bg-[#600000]/30 text-[#600000]' },
-      { name: 'Operations', icon: Settings, color: 'bg-[#ffe6cd]/50 dark:bg-[#746019]/30 text-[#746019]' }
-    ],
-    cta: 'Explore Program 1',
-    link: '/bootcamp',
-    featured: true
-  },
   {
     id: 'program-2',
     title: 'Program 2: Self-Paced Simulation',
@@ -51,29 +26,6 @@ const programs = [
     cta: 'Start Learning',
     link: '/sign-up',
     featured: false
-  },
-  {
-    id: 'program-3',
-    title: 'Program 3: Career Accelerator',
-    subtitle: 'Intensive 12-Week Program',
-    description: 'Comprehensive program combining simulations, interview prep, and career coaching. Designed for professionals making major career transitions.',
-    duration: '12 Weeks',
-    format: 'Hybrid',
-    cohort: 'June 2025',
-    features: [
-      'Full simulation library access',
-      'Weekly group coaching',
-      'Mock interview sessions',
-      'Resume & portfolio review',
-      'Job placement support'
-    ],
-    tracks: [
-      { name: 'Transition Track', icon: Rocket, color: 'bg-primary/10 text-primary' }
-    ],
-    cta: 'Coming Soon',
-    link: '#',
-    featured: false,
-    comingSoon: true
   }
 ];
 
@@ -97,11 +49,11 @@ export default function ProgramsPage() {
                 Our Programs
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">
-                Choose your path to<br/>
-                <span className="text-primary">career success</span>
+                Start with flexible<br/>
+                <span className="text-primary">career simulations</span>
               </h1>
               <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-                Whether you need intensive live training or flexible self-paced learning, we have a program that fits your goals.
+                Learn at your own pace with practical workplace simulations, AI coaching, and portfolio-building tools.
               </p>
             </motion.div>
           </div>
@@ -111,7 +63,7 @@ export default function ProgramsPage() {
         <section className="py-16 lg:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="space-y-16">
-              {programs.map((program, index) => (
+              {programs.map((program) => (
                 <motion.div
                   key={program.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -126,11 +78,6 @@ export default function ProgramsPage() {
                       <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                         {program.subtitle}
                       </span>
-                      {program.comingSoon && (
-                        <span className="px-3 py-1 rounded-full bg-[#ffe6cd]/50 dark:bg-[#746019]/30 text-[#746019] dark:text-[#ffe6cd] text-xs font-semibold">
-                          Coming Soon
-                        </span>
-                      )}
                     </div>
 
                     <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
@@ -168,20 +115,6 @@ export default function ProgramsPage() {
                     </ul>
 
                     {/* Tracks */}
-                    {program.featured && (
-                      <div className="mb-8">
-                        <p className="text-sm font-semibold text-muted-foreground mb-3">Available Tracks:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {program.tracks.map((track) => (
-                            <div key={track.name} className={`flex items-center gap-2 px-3 py-2 rounded-xl ${track.color}`}>
-                              <track.icon className="h-4 w-4" />
-                              <span className="text-sm font-medium">{track.name}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     {/* CTA */}
                     <Link
                       to={program.link}
@@ -192,76 +125,8 @@ export default function ProgramsPage() {
                     </Link>
                   </div>
 
-                  {/* Visual - Only for featured */}
-                  {program.featured && (
-                    <div className="relative">
-                      <div className="rounded-3xl overflow-hidden border border-border bg-card shadow-xl">
-                        <img
-                          src="/images/hero-briefing.png"
-                          alt={program.title}
-                          className="w-full h-auto object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                      </div>
-
-                      {/* Decorative */}
-                      <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#ffc6c6]/30 dark:bg-[#600000]/20 rounded-full blur-2xl" />
-                      <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-[#c3faf5]/30 dark:bg-[#187574]/20 rounded-full blur-2xl" />
-                    </div>
-                  )}
                 </motion.div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Compare */}
-        <section className="py-16 lg:py-24 bg-secondary/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center max-w-3xl mx-auto mb-12"
-            >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-                Compare Programs
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Find the right program based on your schedule, goals, and learning style
-              </p>
-            </motion.div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="p-4 text-left font-semibold text-foreground">Feature</th>
-                    <th className="p-4 text-center font-semibold text-primary">Program 1</th>
-                    <th className="p-4 text-center font-semibold text-foreground">Program 2</th>
-                    <th className="p-4 text-center font-semibold text-muted-foreground">Program 3</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ['Duration', '5 Weeks', 'Flexible', '12 Weeks'],
-                    ['Live Sessions', 'Weekly', 'Optional', 'Bi-weekly'],
-                    ['Mentorship', '1:1 Included', 'Community', 'Group + 1:1'],
-                    ['Simulations', 'Focused Track', 'Full Library', 'Full Library'],
-                    ['Interview Prep', 'Included', 'Self-study', 'Intensive'],
-                    ['Certificate', '✓', '✓', '✓'],
-                    ['Job Support', '-', '-', 'Included']
-                  ].map((row, index) => (
-                    <tr key={index} className="border-b border-border">
-                      <td className="p-4 text-muted-foreground">{row[0]}</td>
-                      <td className="p-4 text-center text-primary font-medium">{row[1]}</td>
-                      <td className="p-4 text-center text-foreground">{row[2]}</td>
-                      <td className="p-4 text-center text-muted-foreground">{row[3]}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         </section>
@@ -283,10 +148,9 @@ export default function ProgramsPage() {
 
             <div className="space-y-6">
               {[
-                { q: 'I\'m new to management simulations', a: 'Start with Program 2 (Self-Paced) to explore simulations at your own speed. Upgrade to Program 1 when you\'re ready for intensive live training.' },
-                { q: 'I need to make a career transition quickly', a: 'Program 3 (Career Accelerator) is designed for major transitions. It combines simulations, interview prep, and job placement support.' },
+                { q: 'I\'m new to management simulations', a: 'Start with Program 2 to explore simulations at your own speed and build confidence through guided workplace practice.' },
                 { q: 'I have limited time availability', a: 'Program 2 offers complete flexibility. Learn whenever you have time, with AI coaching available 24/7.' },
-                { q: 'I want live interaction with mentors', a: 'Program 1 includes weekly live workshops and 1:1 mentorship sessions. Perfect if you learn better with real-time guidance.' }
+                { q: 'What do I get when I complete simulations?', a: 'You build portfolio-ready artifacts, progress records, and practical examples you can use to explain your experience.' }
               ].map((faq, index) => (
                 <motion.div
                   key={index}
