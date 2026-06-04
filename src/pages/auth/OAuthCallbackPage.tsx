@@ -32,8 +32,30 @@ function OAuthCallbackPage() {
             if (isMounted) setError(exchangeError.message)
             return
           }
-        } else if (!hash) {
-          if (isMounted) setError('Authentication callback is missing a session code.')
+        } else if (hash) {
+          const hashParams = new URLSearchParams(hash.replace(/^#/, ''))
+          const accessToken = hashParams.get('access_token')
+          const refreshToken = hashParams.get('refresh_token')
+
+          if (accessToken && refreshToken) {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            })
+
+            if (sessionError) {
+              if (isMounted) setError(sessionError.message)
+              return
+            }
+          }
+        }
+
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (!code && !hash && !session) {
+          navigate(getPortalLoginPath(authPortal), { replace: true })
           return
         }
 

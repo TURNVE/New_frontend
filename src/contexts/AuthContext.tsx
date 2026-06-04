@@ -73,19 +73,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
     const authRequestIdRef = useRef(0)
 
-    const applySession = useCallback(async (nextSession: Session | null) => {
-        const requestId = ++authRequestIdRef.current
-        setSession(nextSession)
-        setUser(nextSession?.user ?? null)
+    const cacheSession = useCallback((nextSession: Session | null) => {
+        if (typeof window === 'undefined') return
 
         if (nextSession) {
             window.localStorage.setItem('turnve_cached_session', JSON.stringify(nextSession))
             window.localStorage.setItem('turnve_cached_user', JSON.stringify(nextSession.user))
-        } else {
-            window.localStorage.removeItem('turnve_cached_session')
-            window.localStorage.removeItem('turnve_cached_user')
-            window.localStorage.removeItem('turnve_cached_profile')
+            return
         }
+
+        window.localStorage.removeItem('turnve_cached_session')
+        window.localStorage.removeItem('turnve_cached_user')
+        window.localStorage.removeItem('turnve_cached_profile')
+    }, [])
+
+    const refreshProfileForSession = useCallback(async (nextSession: Session | null) => {
+        const requestId = ++authRequestIdRef.current
 
         if (!nextSession?.user) {
             setProfile(null)
@@ -102,19 +105,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (nextProfile) {
             window.localStorage.setItem('turnve_cached_profile', JSON.stringify(nextProfile))
         }
+
         return nextProfile
     }, [])
 
+    const applySession = useCallback(async (nextSession: Session | null) => {
+        setSession(nextSession)
+        setUser(nextSession?.user ?? null)
+        cacheSession(nextSession)
+        return refreshProfileForSession(nextSession)
+    }, [cacheSession, refreshProfileForSession])
+
     useEffect(() => {
+        let isMounted = true
+
         const initializeAuth = async () => {
             try {
                 const { data: { session: currentSession } } = await supabase.auth.getSession()
-                await applySession(currentSession)
+                if (!isMounted) return
+
+                setSession(currentSession)
+                setUser(currentSession?.user ?? null)
+                cacheSession(currentSession)
+                setIsLoading(false)
+
+                void refreshProfileForSession(currentSession).catch((err) => {
+                    console.error('Failed to refresh auth profile:', err)
+                    if (isMounted) {
+                        setProfileError(err instanceof Error ? err : new Error(AUTH_ERRORS.GENERIC))
+                    }
+                })
             } catch (err) {
                 console.error('Failed to initialize auth:', err)
                 setProfileError(err instanceof Error ? err : new Error(AUTH_ERRORS.GENERIC))
-            } finally {
-                setIsLoading(false)
+                if (isMounted) setIsLoading(false)
             }
         }
 
@@ -122,18 +146,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (_event, newSession) => {
-                // If it is a silent token refresh, don't show full page loading spinner
-                const isRefresh = _event === 'TOKEN_REFRESH'
-                if (!isRefresh) setIsLoading(true)
-                await applySession(newSession)
-                if (!isRefresh) setIsLoading(false)
+                setSession(newSession)
+                setUser(newSession?.user ?? null)
+                cacheSession(newSession)
+                setIsLoading(false)
+
+                await refreshProfileForSession(newSession)
             }
         )
 
         return () => {
+            isMounted = false
             authListener.subscription.unsubscribe()
         }
-    }, [applySession])
+    }, [cacheSession, refreshProfileForSession])
 
     const signUp = useCallback(
         async (email: string, password: string, options?: { data?: Record<string, unknown> }): Promise<AuthResponse> => {
