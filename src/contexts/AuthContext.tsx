@@ -39,17 +39,53 @@ export interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null)
-    const [session, setSession] = useState<Session | null>(null)
-    const [profile, setProfile] = useState<Profile | null>(null)
+    const [session, setSession] = useState<Session | null>(() => {
+        if (typeof window === 'undefined') return null
+        try {
+            const cached = window.localStorage.getItem('turnve_cached_session')
+            return cached ? JSON.parse(cached) : null
+        } catch {
+            return null
+        }
+    })
+    const [user, setUser] = useState<User | null>(() => {
+        if (typeof window === 'undefined') return null
+        try {
+            const cached = window.localStorage.getItem('turnve_cached_user')
+            return cached ? JSON.parse(cached) : null
+        } catch {
+            return null
+        }
+    })
+    const [profile, setProfile] = useState<Profile | null>(() => {
+        if (typeof window === 'undefined') return null
+        try {
+            const cached = window.localStorage.getItem('turnve_cached_profile')
+            return cached ? JSON.parse(cached) : null
+        } catch {
+            return null
+        }
+    })
     const [profileError, setProfileError] = useState<Error | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(() => {
+        if (typeof window === 'undefined') return true
+        return !window.localStorage.getItem('turnve_cached_session')
+    })
     const authRequestIdRef = useRef(0)
 
     const applySession = useCallback(async (nextSession: Session | null) => {
         const requestId = ++authRequestIdRef.current
         setSession(nextSession)
         setUser(nextSession?.user ?? null)
+
+        if (nextSession) {
+            window.localStorage.setItem('turnve_cached_session', JSON.stringify(nextSession))
+            window.localStorage.setItem('turnve_cached_user', JSON.stringify(nextSession.user))
+        } else {
+            window.localStorage.removeItem('turnve_cached_session')
+            window.localStorage.removeItem('turnve_cached_user')
+            window.localStorage.removeItem('turnve_cached_profile')
+        }
 
         if (!nextSession?.user) {
             setProfile(null)
@@ -62,6 +98,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setProfile(nextProfile)
         setProfileError(error ?? null)
+
+        if (nextProfile) {
+            window.localStorage.setItem('turnve_cached_profile', JSON.stringify(nextProfile))
+        }
         return nextProfile
     }, [])
 
@@ -82,9 +122,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (_event, newSession) => {
-                setIsLoading(true)
+                // If it is a silent token refresh, don't show full page loading spinner
+                const isRefresh = _event === 'TOKEN_REFRESH'
+                if (!isRefresh) setIsLoading(true)
                 await applySession(newSession)
-                setIsLoading(false)
+                if (!isRefresh) setIsLoading(false)
             }
         )
 
@@ -181,6 +223,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signOut = useCallback(async () => {
         await supabase.auth.signOut()
+        window.localStorage.removeItem('turnve_cached_session')
+        window.localStorage.removeItem('turnve_cached_user')
+        window.localStorage.removeItem('turnve_cached_profile')
         setSession(null)
         setUser(null)
         setProfile(null)

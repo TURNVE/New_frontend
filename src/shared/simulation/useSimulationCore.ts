@@ -219,12 +219,34 @@ export interface UseSimulationCoreReturn {
 }
 
 // ─── Hook ─────────────────────────────────────────────────────
-export default function useSimulationCore(config: SimulationConfig): UseSimulationCoreReturn {
-    const [gameState, setGameState] = useState<GameStateSnapshot | null>(null);
-    const [isRunning, setIsRunning] = useState(false);
+export default function useSimulationCore(
+    config: SimulationConfig,
+    initialSavedState?: GameStateSnapshot | null
+): UseSimulationCoreReturn {
+    const [gameState, setGameState] = useState<GameStateSnapshot | null>(() => {
+        return initialSavedState || null;
+    });
+    const [isRunning, setIsRunning] = useState(() => !!initialSavedState);
     const [isPaused, setIsPaused] = useState(false);
-    const [isCompleted, setIsCompleted] = useState(false);
-    const [score, setScore] = useState<SimulationScore | null>(null);
+    const [isCompleted, setIsCompleted] = useState(() => {
+        if (!initialSavedState) return false;
+        return initialSavedState.week > initialSavedState.totalWeeks;
+    });
+    const [score, setScore] = useState<SimulationScore | null>(() => {
+        if (!initialSavedState || initialSavedState.week <= initialSavedState.totalWeeks) return null;
+        return computeScore(initialSavedState, config);
+    });
+
+    useEffect(() => {
+        if (initialSavedState && !gameState) {
+            setGameState(initialSavedState);
+            setIsRunning(true);
+            if (initialSavedState.week > initialSavedState.totalWeeks) {
+                setIsCompleted(true);
+                setScore(computeScore(initialSavedState, config));
+            }
+        }
+    }, [initialSavedState, config]);
 
     const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 

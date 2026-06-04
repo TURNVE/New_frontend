@@ -25,6 +25,7 @@ import { enableSounds } from '../utils/sounds';
 import { ProjectReferencePanel } from '../components/simulation/ProjectReferencePanel';
 import { useBriefing } from '../hooks/useBriefing';
 import { useSimulationNotifications } from '../hooks/useSimulationNotifications';
+import { useSimulation } from '../hooks/useSimulation';
 import type { ArtifactType, Artifact } from '../../../src/artifacts/types';
 import { ArtifactGenerator } from '../../../src/artifacts/ArtifactGenerator';
 import { ArtifactSubmissionModal } from '../components/simulation/ArtifactSubmissionModal';
@@ -110,9 +111,6 @@ const SimulationPage = () => {
 
   // Get simulation template based on route ID
   const simulationScenario = useMemo(() => {
-    if (simulationId === 'web-dev-01') {
-      return webDev01Scenario;
-    }
     if (simulationId) {
       const template = getSimulationByRoute(simulationId);
       if (template) {
