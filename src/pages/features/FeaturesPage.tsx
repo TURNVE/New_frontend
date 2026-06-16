@@ -49,6 +49,12 @@ const featureTiles = [
 function FeaturesHero() {
   return (
     <section className="relative isolate overflow-hidden bg-[#071126] px-5 py-24 text-white sm:py-28 lg:min-h-[82dvh] lg:py-32">
+      <img
+        src="/images/video-posters/hero-fallback.svg"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 h-full w-full object-cover"
+      />
       <AutoplayVideo
         src={heroVideo}
         aria-hidden="true"

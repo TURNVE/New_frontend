@@ -43,6 +43,12 @@ const stats = [
 function AboutHero() {
   return (
     <section className="relative isolate overflow-hidden bg-slate-950 px-5 py-24 text-white sm:py-28 lg:min-h-[88dvh] lg:py-32">
+      <img
+        src="/images/video-posters/hero-fallback.svg"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 h-full w-full object-cover"
+      />
       <AutoplayVideo
         src={aboutHeroMedia.video}
         aria-hidden="true"

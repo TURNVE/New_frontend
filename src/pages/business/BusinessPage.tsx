@@ -11,6 +11,12 @@ const BUSINESS_HERO_VIDEO =
 function BusinessHero() {
   return (
     <section className="relative isolate overflow-hidden bg-[#07162f] text-white">
+      <img
+        src="/images/video-posters/cta-fallback.svg"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
       <AutoplayVideo
         src={BUSINESS_HERO_VIDEO}
         className="absolute inset-0 h-full w-full object-cover opacity-100"

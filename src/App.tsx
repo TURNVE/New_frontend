@@ -153,6 +153,12 @@ function App() {
 
         {/* CTA Section */}
         <section id="pricing" className="relative min-h-[520px] overflow-hidden px-5 py-24 text-white sm:py-28">
+          <img
+            src="/images/video-posters/cta-fallback.svg"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
           <AutoplayVideo
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4"
             className="absolute inset-0 h-full w-full object-cover"
@@ -183,6 +189,12 @@ function App() {
 function Hero() {
   return (
     <section className="relative min-h-[100dvh] overflow-hidden bg-gray-950 text-white">
+      <img
+        src="/images/video-posters/hero-fallback.svg"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
       <AutoplayVideo
         src={heroMedia.video}
         className="absolute inset-0 h-full w-full object-cover opacity-100"
@@ -193,8 +205,11 @@ function Hero() {
         <div className="relative z-20 text-center sm:mx-auto">
           <AnimatedGroup preset="fade">
             <h1 className="mx-auto mt-8 max-w-[760px] text-balance text-[1.75rem] font-normal leading-[1.04] tracking-[-0.05em] text-white min-[390px]:text-[2.05rem] sm:text-[3rem] lg:mt-12 lg:text-[4.2rem]">
-              <span className="block whitespace-nowrap">Gain Real World Experience</span>
-              <span className="block whitespace-nowrap">Before You Get Hired.</span>
+              <span className="block sm:hidden">Gain Real World</span>
+              <span className="block sm:hidden">Experience Before</span>
+              <span className="block sm:hidden">You Get Hired.</span>
+              <span className="hidden whitespace-nowrap sm:block">Gain Real World Experience</span>
+              <span className="hidden whitespace-nowrap sm:block">Before You Get Hired.</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-pretty text-[15px] leading-7 text-white/72 sm:text-[16px]">
               Turn your career knowledge into demonstrable management experience with AI-guided simulations and real projects.

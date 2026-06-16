@@ -1,0 +1,17 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#061225"/>
+  <radialGradient id="blueGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(760 220) rotate(90) scale(560 820)">
+    <stop stop-color="#1D65D8" stop-opacity="0.72"/>
+    <stop offset="0.48" stop-color="#0A2B5E" stop-opacity="0.46"/>
+    <stop offset="1" stop-color="#061225" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1600" height="900" fill="url(#blueGlow)"/>
+  <path d="M0 0H1600V900H0V0Z" fill="#061225" opacity="0.22"/>
+  <path d="M0 700C210 600 360 620 540 660C740 704 920 720 1110 640C1290 565 1430 540 1600 610V900H0V700Z" fill="#072A51" opacity="0.72"/>
+  <path d="M0 590C220 500 420 530 650 590C850 642 1040 650 1235 575C1385 518 1500 500 1600 530V900H0V590Z" fill="#0C3F79" opacity="0.36"/>
+  <radialGradient id="warmGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1190 500) rotate(90) scale(360 520)">
+    <stop stop-color="#B46B52" stop-opacity="0.34"/>
+    <stop offset="1" stop-color="#061225" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1600" height="900" fill="url(#warmGlow)"/>
+</svg>
