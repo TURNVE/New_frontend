@@ -1,6 +1,8 @@
 import { ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { Header } from '../../components/layout/Header';
+import { AutoplayVideo } from '../../components/media/AutoplayVideo';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const BUSINESS_HERO_VIDEO =
@@ -12,11 +14,7 @@ const BUSINESS_HERO_POSTER =
 function BusinessHero() {
   return (
     <section className="relative isolate overflow-hidden bg-[#07162f] text-white">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
+      <AutoplayVideo
         poster={BUSINESS_HERO_POSTER}
         src={BUSINESS_HERO_VIDEO}
         className="absolute inset-0 h-full w-full object-cover opacity-80"
@@ -40,19 +38,19 @@ function BusinessHero() {
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="/sign-up"
+          <Link
+            to="/sign-up"
             className="inline-flex items-center gap-2 rounded-full bg-[#1675ff] px-7 py-3.5 text-sm font-normal text-white transition-colors hover:bg-[#0f66e6]"
           >
             Get Started Now
             <ArrowUpRight className="h-4 w-4" />
-          </a>
-          <a
-            href="/services"
+          </Link>
+          <Link
+            to="/services"
             className="inline-flex items-center rounded-full border border-white/18 bg-white/6 px-7 py-3.5 text-sm font-normal text-white/88 transition-colors hover:bg-white/10"
           >
             Explore Services
-          </a>
+          </Link>
         </div>
       </ScrollReveal>
     </section>

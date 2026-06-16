@@ -1,5 +1,6 @@
 import React from "react";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { ScrollReveal } from "./scroll-reveal";
 
@@ -78,10 +79,12 @@ const defaultLegalLinks = [
   { name: "Privacy Policy", href: "#" },
 ];
 
+const isInternalHref = (href: string) => href.startsWith("/") && !href.startsWith("//");
+
 export const Footer7 = ({
   logo = {
     url: "/",
-    src: "/turnve-logo-original.jpg",
+    src: "/turnve-logo-navy.svg",
     alt: "Turnve logo",
     title: "",
   },
@@ -98,14 +101,14 @@ export const Footer7 = ({
         <div className="flex w-full flex-col justify-between gap-10 lg:flex-row lg:items-start lg:text-left">
           <ScrollReveal className="flex w-full flex-col justify-between gap-6 lg:items-start">
             <div className="flex items-center gap-2 lg:justify-start">
-              <a href={logo.url}>
+              <Link to={logo.url}>
                 <img
                   src={logo.src}
                   alt={logo.alt}
                   title={logo.title}
                   className="h-10 w-auto"
                 />
-              </a>
+              </Link>
               {logo.title ? <h2 className="text-xl font-black">{logo.title}</h2> : null}
             </div>
             <p className="max-w-sm text-sm font-medium leading-6 text-slate-600">
@@ -131,11 +134,12 @@ export const Footer7 = ({
                 <h3 className="mb-4 font-black">{section.title}</h3>
                 <ul className="space-y-3 text-sm text-slate-600">
                   {section.links.map((link) => (
-                    <li
-                      key={link.name}
-                    className="font-semibold hover:text-[#0b6bff]"
-                    >
-                      <a href={link.href}>{link.name}</a>
+                    <li key={link.name} className="font-semibold hover:text-[#0b6bff]">
+                      {isInternalHref(link.href) ? (
+                        <Link to={link.href}>{link.name}</Link>
+                      ) : (
+                        <a href={link.href}>{link.name}</a>
+                      )}
                     </li>
                   ))}
                 </ul>

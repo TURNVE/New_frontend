@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const menuItems = [
   { name: 'About', href: '/about' },
@@ -18,6 +19,8 @@ export function Header({ variant = 'light' }: HeaderProps) {
   const [menuState, setMenuState] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const isDark = variant === 'dark';
+  const navigate = useNavigate();
+  const logoSrc = isDark && !scrolled ? '/turnve-logo.svg' : '/turnve-logo-navy.svg';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -25,17 +28,44 @@ export function Header({ variant = 'light' }: HeaderProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const target = event.target as HTMLElement | null;
+      const anchor = target?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!anchor || anchor.target && anchor.target !== '_self') return;
+
+      const href = anchor.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+        return;
+      }
+
+      const url = new URL(anchor.href, window.location.origin);
+      if (url.origin !== window.location.origin) return;
+
+      event.preventDefault();
+      navigate(`${url.pathname}${url.search}${url.hash}`);
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+    return () => document.removeEventListener('click', handleDocumentClick);
+  }, [navigate]);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="border-b border-transparent bg-transparent transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between lg:h-[72px]">
             {/* Logo */}
-            <a href="/" className="flex items-center gap-3 group">
-              <span className="rounded-sm bg-white/58 px-2 py-1 backdrop-blur-sm">
-                <img src="/turnve-logo-original.jpg" alt="TURNVE" className="h-8 w-auto transition-transform lg:h-9" />
-              </span>
-            </a>
+            <Link to="/" className="flex items-center">
+              <img
+                src={logoSrc}
+                alt="TURNVE"
+                className="h-8 w-auto transition-transform lg:h-9"
+              />
+            </Link>
 
             {/* Desktop Navigation - Centered */}
             <div className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2">
@@ -44,8 +74,8 @@ export function Header({ variant = 'light' }: HeaderProps) {
               }`}>
                 {menuItems.map((item) => (
                   <li key={item.name}>
-                    <a
-                      href={item.href}
+                    <Link
+                      to={item.href}
                       className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
                         isDark && !scrolled
                           ? 'text-white/72 hover:bg-white/12 hover:text-white'
@@ -53,7 +83,7 @@ export function Header({ variant = 'light' }: HeaderProps) {
                       }`}
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -62,8 +92,8 @@ export function Header({ variant = 'light' }: HeaderProps) {
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-3">
               {/* Login */}
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className={`hidden lg:inline-flex rounded-full px-4 py-2 text-sm transition-colors ${
                   isDark && !scrolled
                     ? 'text-white/72 hover:bg-white/12 hover:text-white'
@@ -71,15 +101,15 @@ export function Header({ variant = 'light' }: HeaderProps) {
                 }`}
               >
                 Login
-              </a>
+              </Link>
 
               {/* CTA Button */}
-              <a
-                href="/sign-up"
+              <Link
+                to="/sign-up"
                 className="rounded-full border border-[#0b6bff] bg-[#0b6bff] px-5 py-2.5 text-sm text-white transition-all hover:bg-[#0758d8]"
               >
                 Get Started
-              </a>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -90,9 +120,9 @@ export function Header({ variant = 'light' }: HeaderProps) {
               }`}
               aria-label="Toggle menu"
             >
-              {menuState ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+                {menuState ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
 
           {/* Mobile Menu */}
           {menuState && (
@@ -102,13 +132,13 @@ export function Header({ variant = 'light' }: HeaderProps) {
                 <ul className="space-y-2">
                   {menuItems.map((item) => (
                     <li key={item.name}>
-                      <a
-                        href={item.href}
+                      <Link
+                        to={item.href}
                         onClick={() => setMenuState(false)}
                         className="block rounded-lg px-4 py-3 text-base text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
                       >
                         {item.name}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -118,18 +148,18 @@ export function Header({ variant = 'light' }: HeaderProps) {
 
                 {/* Auth Buttons */}
                 <div className="space-y-3 pt-4">
-                  <a
-                    href="/login"
+                  <Link
+                    to="/login"
                     className="block w-full rounded-xl border border-gray-300 px-4 py-3 text-center text-gray-700 transition-colors hover:bg-gray-50"
                   >
                     Login
-                  </a>
-                  <a
-                    href="/sign-up"
+                  </Link>
+                  <Link
+                    to="/sign-up"
                     className="block w-full rounded-xl bg-blue-600 px-4 py-3 text-center text-white transition-all hover:bg-blue-700"
                   >
                     Get Started
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

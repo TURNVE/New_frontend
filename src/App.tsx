@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   BadgeCheck,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import { AnimatedGroup } from './components/ui/animated-group';
+import { AutoplayVideo } from './components/media/AutoplayVideo';
 import { Header } from './components/layout/Header';
 import { PublicFooter } from './components/layout/PublicFooter';
 import { MissionPanel } from './components/marketing/MissionPanel';
@@ -29,7 +31,7 @@ const heroMedia = {
 const featureCards = [
   {
     title: 'Team collaboration',
-    description: 'Practise with realistic work rooms and team decisions.',
+    description: 'Experience realistic work rooms and team decisions.',
     image:
       'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=82',
   },
@@ -66,9 +68,9 @@ const stackCards = [
     label: 'Simulation 02',
     title: 'For individuals',
     description:
-      'Practise real workplace decisions, get AI feedback, and turn your work into a portfolio story.',
+      'Experience real workplace decisions, get AI feedback, and turn your work into a portfolio story.',
     bullets: ['AI feedback', 'Portfolio proof', 'Interview confidence'],
-    tags: ['Practice', 'Proof', 'Growth'],
+    tags: ['Experience', 'Proof', 'Growth'],
     image:
       'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=82',
     icon: UserRound,
@@ -161,11 +163,7 @@ function App() {
 
         {/* CTA Section */}
         <section id="pricing" className="relative min-h-[520px] overflow-hidden px-5 py-24 text-white sm:py-28">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
+          <AutoplayVideo
             poster="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1800&q=82"
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4"
             className="absolute inset-0 h-full w-full object-cover"
@@ -177,15 +175,15 @@ function App() {
               Ready to transform your career?
             </h2>
             <p className="mt-6 max-w-2xl text-lg font-semibold leading-8 text-white/76">
-              Practise real work, get feedback, and build proof employers can trust.
+              Experience real work, get feedback, and build proof employers can trust.
             </p>
-            <a
-              href="/sign-up"
+            <Link
+              to="/sign-up"
               className="mt-10 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-8 py-4 text-base font-black text-[#0a142f] transition hover:-translate-y-0.5 hover:bg-blue-50"
             >
               Get Started Free
               <ArrowRight className="h-5 w-5" />
-            </a>
+            </Link>
           </ScrollReveal>
         </section>
       </main>
@@ -197,35 +195,31 @@ function App() {
 
 function Hero() {
   return (
-    <section className="relative min-h-[560px] overflow-hidden bg-gray-950 py-16 text-white">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
+    <section className="relative min-h-[100dvh] overflow-hidden bg-gray-950 text-white">
+      <AutoplayVideo
         poster={heroMedia.poster}
         src={heroMedia.video}
         className="absolute inset-0 h-full w-full object-cover opacity-70"
       />
       <div className="absolute inset-0 bg-gray-950/72" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(37,99,235,0.28),transparent_42%)]" />
-      <div className="mx-auto flex min-h-[420px] max-w-4xl items-center px-6">
-        <div className="sm:mx-auto text-center relative z-20">
+      <div className="mx-auto flex min-h-[100dvh] max-w-5xl items-center px-6 pb-16 pt-28 sm:pb-20 sm:pt-32">
+        <div className="relative z-20 text-center sm:mx-auto">
           <AnimatedGroup preset="fade">
-            <h1 className="mx-auto mt-8 max-w-3xl text-balance text-white lg:mt-12">
-              Theory Gets You Noticed. Practice Gets You Hired.
+            <h1 className="mx-auto mt-8 max-w-4xl text-balance text-[clamp(2.9rem,7vw,5.9rem)] font-normal leading-[0.96] tracking-[-0.055em] text-white lg:mt-12">
+              Theory Gets You Noticed. Experience Gets You Hired.
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-pretty text-[15px] text-white/72">
+            <p className="mx-auto mt-5 max-w-2xl text-pretty text-[15px] leading-7 text-white/72 sm:text-[16px]">
               Turn your career knowledge into demonstrable management experience with AI-guided simulations and real projects.
             </p>
             <div className="mt-9 flex justify-center">
               <div className="bg-white/15 rounded-[14px] border border-white/20 p-0.5">
-                <a 
-                  href="/sign-up" 
+                <Link
+                  to="/sign-up"
                   className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm text-gray-950 transition-all hover:bg-blue-50 whitespace-nowrap"
                 >
                   Get Started
-                </a>
+                </Link>
               </div>
             </div>
           </AnimatedGroup>
@@ -265,13 +259,20 @@ function IntegrationsSection() {
       <ScrollReveal className="border border-gray-100 p-8 md:p-12 rounded-3xl bg-white">
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <ScrollReveal className="space-y-6">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">Learn from top organizations</h2>
+            <h2 className="text-2xl font-semibold tracking-[-0.04em] text-gray-900 sm:text-3xl lg:text-4xl">
+              Model organization-style workspaces
+            </h2>
             <p className="text-gray-600 mb-6 text-base leading-relaxed">
-              Turnve provides AI-powered simulations that mirror real-world scenarios used by top companies. 
-              Gain practical experience in project management, team collaboration, and strategic decision-making.
+              TURNVE recreates the way strong teams plan, review, and decide so learners can build proof inside
+              realistic company-style workspaces without needing access to the actual organizations.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a href="#" className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all whitespace-nowrap">Start Learning</a>
+              <Link
+                to="/services"
+                className="inline-flex items-center whitespace-nowrap rounded-xl bg-blue-600 px-6 py-3 font-medium text-white transition-all hover:bg-blue-700"
+              >
+                Explore workspaces
+              </Link>
             </div>
           </ScrollReveal>
           <ScrollReveal className="grid grid-cols-4 gap-4" direction="left">
@@ -577,15 +578,15 @@ function HomeBlogSection() {
         </div>
 
         <ScrollReveal className="mt-14 flex justify-center">
-          <a
-            href="/blog"
+          <Link
+            to="/blog"
             className="inline-flex items-center gap-5 rounded-md bg-[#222b4b] py-2 pl-8 pr-2 text-sm font-black text-white shadow-[0_18px_48px_-32px_rgba(9,35,67,0.9)] transition hover:-translate-y-0.5 hover:bg-[#0a142f]"
           >
             View More News
             <span className="grid h-12 w-12 place-items-center rounded-md bg-[#d8eaff] text-[#10213f]">
               <ArrowRight className="h-5 w-5" />
             </span>
-          </a>
+          </Link>
         </ScrollReveal>
       </div>
     </section>

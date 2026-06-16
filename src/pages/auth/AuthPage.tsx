@@ -90,7 +90,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
         <section className="flex items-center justify-center px-5 py-10 sm:px-8">
           <ScrollReveal className="w-full max-w-[430px]">
             <Link to="/" className="mb-10 inline-flex items-center">
-              <img src="/turnve-logo-original.jpg" alt="TURNVE" className="h-10 w-auto" />
+              <img src="/turnve-logo-navy.svg" alt="TURNVE" className="h-10 w-auto" />
             </Link>
 
             <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_-56px_rgba(10,20,47,0.5)] sm:p-8">

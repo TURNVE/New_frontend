@@ -1,11 +1,12 @@
 import { Headphones } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { ScrollReveal } from '../ui/scroll-reveal';
 
 const missionItems = [
   {
     title: 'Our mission',
-    text: 'Help Nigerian talent practise real workplace tasks, get clear feedback, and build proof employers can trust.',
+    text: 'Help Nigerian talent experience real workplace tasks, get clear feedback, and build proof employers can trust.',
     tone: 'bg-[#d9ecff]',
   },
   {
@@ -38,9 +39,9 @@ export function MissionPanel() {
             </span>
             <div>
               <p className="text-sm font-semibold text-[#667b92]">Talk to us anytime</p>
-              <a href="/organization" className="text-[28px] font-black tracking-[-0.035em] text-[#222b4b]">
+              <Link to="/organization" className="text-[28px] font-black tracking-[-0.035em] text-[#222b4b]">
                 Contact Sales
-              </a>
+              </Link>
             </div>
           </div>
         </ScrollReveal>

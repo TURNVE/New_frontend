@@ -37,7 +37,7 @@ export function PublicFooter() {
     <Footer7
       logo={{
         url: '/',
-        src: '/turnve-logo-original.jpg',
+        src: '/turnve-logo-navy.svg',
         alt: 'TURNVE logo',
         title: '',
       }}
