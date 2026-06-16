@@ -16,17 +16,9 @@ interface HeaderProps {
 }
 
 export function Header({ variant = 'light' }: HeaderProps) {
+  void variant;
   const [menuState, setMenuState] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const isDark = variant === 'dark';
   const navigate = useNavigate();
-  const logoSrc = isDark && !scrolled ? '/turnve-logo.svg' : '/turnve-logo-navy.svg';
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     const handleDocumentClick = (event: MouseEvent) => {
@@ -55,32 +47,26 @@ export function Header({ variant = 'light' }: HeaderProps) {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      <nav className="border-b border-transparent bg-transparent transition-all duration-300">
+      <nav className="border-b border-slate-200/80 bg-white text-[#0a142f]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between lg:h-[72px]">
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <img
-                src={logoSrc}
+                src="/turnve-logo-original.jpg"
                 alt="TURNVE"
-                className="h-8 w-auto transition-transform lg:h-9"
+                className="h-9 w-auto object-contain lg:h-10"
               />
             </Link>
 
             {/* Desktop Navigation - Centered */}
             <div className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2">
-              <ul className={`flex items-center gap-0.5 rounded-full border px-2 py-1 backdrop-blur-md ${
-                isDark && !scrolled ? 'border-white/15 bg-white/8' : 'border-slate-200/70 bg-white/12'
-              }`}>
+              <ul className="flex items-center gap-0.5 rounded-full border border-slate-200 bg-white px-2 py-1">
                 {menuItems.map((item) => (
                   <li key={item.name}>
                     <Link
                       to={item.href}
-                      className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
-                        isDark && !scrolled
-                          ? 'text-white/72 hover:bg-white/12 hover:text-white'
-                          : 'text-slate-600 hover:bg-white/70 hover:text-slate-950'
-                      }`}
+                      className="rounded-full px-3 py-1.5 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950"
                     >
                       {item.name}
                     </Link>
@@ -94,11 +80,7 @@ export function Header({ variant = 'light' }: HeaderProps) {
               {/* Login */}
               <Link
                 to="/login"
-                className={`hidden lg:inline-flex rounded-full px-4 py-2 text-sm transition-colors ${
-                  isDark && !scrolled
-                    ? 'text-white/72 hover:bg-white/12 hover:text-white'
-                    : 'text-slate-600 hover:bg-white/70 hover:text-slate-950'
-                }`}
+                className="hidden rounded-full px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 lg:inline-flex"
               >
                 Login
               </Link>
@@ -115,14 +97,12 @@ export function Header({ variant = 'light' }: HeaderProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMenuState(!menuState)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ${
-                isDark && !scrolled ? 'text-white hover:bg-white/12' : 'text-slate-700 hover:bg-white/70'
-              }`}
+              className="rounded-lg p-2 text-slate-800 transition-colors hover:bg-slate-100 lg:hidden"
               aria-label="Toggle menu"
             >
-                {menuState ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
+              {menuState ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
 
           {/* Mobile Menu */}
           {menuState && (
