@@ -1,19 +1,49 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '@/lib/supabase'
-import { AUTH_ROUTES } from '@/contexts/AuthContext'
-import { consumeAuthPortal, getPortalLoginPath, getProfileForUser, normalizeRole, validatePortalAccess } from '@/lib/auth'
+import { supabase } from '../../lib/supabase'
+import {
+  AUTH_ROUTES,
+  consumeAuthPortal,
+  getPortalLoginPath,
+  getPostAuthRedirectPath,
+  getProfileForUser,
+  normalizeRole,
+  type AuthPortal,
+} from '../../lib/auth'
+
+const AUTH_TIMEOUT_MS = 15000
+const PROFILE_TIMEOUT_MS = 3500
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(message)), timeoutMs)
+
+    promise
+      .then(resolve)
+      .catch(reject)
+      .finally(() => window.clearTimeout(timer))
+  })
+}
+
+function getStoredPortal(): AuthPortal {
+  try {
+    return consumeAuthPortal()
+  } catch {
+    return 'individual'
+  }
+}
 
 function OAuthCallbackPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const [details, setDetails] = useState<string | null>(null)
   const [returnPath, setReturnPath] = useState(AUTH_ROUTES.SIGN_IN)
 
   useEffect(() => {
     let isMounted = true
 
     const handleOAuthCallback = async () => {
-      const authPortal = consumeAuthPortal()
+      const authPortal = getStoredPortal()
       setReturnPath(getPortalLoginPath(authPortal))
 
       try {
@@ -26,60 +56,95 @@ function OAuthCallbackPage() {
           return
         }
 
+        let sessionUserId: string | undefined
+        let metadataRole: string | undefined
+
         if (code) {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+          const { data, error: exchangeError } = await withTimeout(
+            supabase.auth.exchangeCodeForSession(code),
+            AUTH_TIMEOUT_MS,
+            'Authentication took too long. Please go back and try signing in again.',
+          )
+
           if (exchangeError) {
             if (isMounted) setError(exchangeError.message)
             return
           }
+
+          sessionUserId = data.session?.user.id
+          metadataRole =
+            typeof data.session?.user.user_metadata?.role === 'string'
+              ? data.session.user.user_metadata.role
+              : undefined
         } else if (hash) {
           const hashParams = new URLSearchParams(hash.replace(/^#/, ''))
           const accessToken = hashParams.get('access_token')
           const refreshToken = hashParams.get('refresh_token')
 
           if (accessToken && refreshToken) {
-            const { error: sessionError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            })
+            const { data, error: sessionError } = await withTimeout(
+              supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              }),
+              AUTH_TIMEOUT_MS,
+              'Authentication took too long. Please go back and try signing in again.',
+            )
 
             if (sessionError) {
               if (isMounted) setError(sessionError.message)
               return
             }
+
+            sessionUserId = data.session?.user.id
+            metadataRole =
+              typeof data.session?.user.user_metadata?.role === 'string'
+                ? data.session.user.user_metadata.role
+                : undefined
           }
         }
 
         const {
           data: { session },
-        } = await supabase.auth.getSession()
+        } = await withTimeout(
+          supabase.auth.getSession(),
+          AUTH_TIMEOUT_MS,
+          'Could not confirm your session. Please try signing in again.',
+        )
 
         if (!code && !hash && !session) {
           navigate(getPortalLoginPath(authPortal), { replace: true })
           return
         }
 
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
+        const userId = sessionUserId ?? session?.user.id
+        let profileRole: string | undefined
 
-        const { profile } = user ? await getProfileForUser(user.id) : { profile: null }
-        if (authPortal === 'organization' && normalizeRole(profile?.role) !== 'COMPANY') {
-          navigate(`${AUTH_ROUTES.ORG_SIGN_UP}?upgrade=1`, { replace: true })
-          return
+        if (userId) {
+          try {
+            const { profile } = await withTimeout(
+              getProfileForUser(userId),
+              PROFILE_TIMEOUT_MS,
+              'Profile lookup timed out.',
+            )
+            profileRole = profile?.role
+          } catch (profileError) {
+            console.warn('OAuth profile lookup skipped:', profileError)
+            if (isMounted) setDetails('Signed in. Loading your workspace...')
+          }
         }
 
-        const access = validatePortalAccess(profile, authPortal)
+        const nextRole = normalizeRole(profileRole ?? metadataRole ?? session?.user.user_metadata?.role)
+        const redirectPath =
+          authPortal === 'organization'
+            ? AUTH_ROUTES.COMPANY
+            : getPostAuthRedirectPath(nextRole, authPortal)
 
-        if (access.error) {
-          await supabase.auth.signOut()
-          if (isMounted) setError(access.error)
-          return
+        navigate(redirectPath, { replace: true })
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Failed to complete authentication. Please try again.')
         }
-
-        navigate(access.redirectPath, { replace: true })
-      } catch {
-        if (isMounted) setError('Failed to complete authentication. Please try again.')
       }
     }
 
@@ -117,6 +182,7 @@ function OAuthCallbackPage() {
       <div className="text-center">
         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
         <p className="text-gray-600">Completing authentication...</p>
+        {details && <p className="mt-2 text-sm text-gray-500">{details}</p>}
       </div>
     </div>
   )
