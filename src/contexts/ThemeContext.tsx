@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
@@ -8,12 +9,19 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const THEME_STORAGE_KEY = 'theme';
+const THEME_EXPLICIT_KEY = 'turnve_theme_explicit';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem('theme');
-    // Default to dark for Linear design system
-    return (stored as Theme) || 'dark';
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    const hasExplicitPreference = localStorage.getItem(THEME_EXPLICIT_KEY) === 'true';
+
+    if (hasExplicitPreference && (stored === 'light' || stored === 'dark')) {
+      return stored;
+    }
+
+    return 'light';
   });
 
   // Apply theme immediately on mount and whenever theme changes
@@ -31,6 +39,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const toggleTheme = () => {
+    localStorage.setItem(THEME_EXPLICIT_KEY, 'true');
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 

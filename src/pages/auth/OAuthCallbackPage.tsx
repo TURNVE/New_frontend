@@ -10,6 +10,7 @@ import {
   normalizeRole,
   type AuthPortal,
 } from '../../lib/auth'
+import type { Session } from '../../lib/auth'
 
 const AUTH_TIMEOUT_MS = 15000
 const PROFILE_TIMEOUT_MS = 3500
@@ -31,6 +32,17 @@ function getStoredPortal(): AuthPortal {
   } catch {
     return 'individual'
   }
+}
+
+function cacheSessionForApp(session: Session | null) {
+  if (!session) return
+
+  window.localStorage.setItem('turnve_cached_session', JSON.stringify(session))
+  window.localStorage.setItem('turnve_cached_user', JSON.stringify(session.user))
+}
+
+function completeRedirect(path: string) {
+  window.location.replace(path)
 }
 
 function OAuthCallbackPage() {
@@ -112,8 +124,10 @@ function OAuthCallbackPage() {
           'Could not confirm your session. Please try signing in again.',
         )
 
+        cacheSessionForApp(session)
+
         if (!code && !hash && !session) {
-          navigate(getPortalLoginPath(authPortal), { replace: true })
+          completeRedirect(getPortalLoginPath(authPortal))
           return
         }
 
@@ -140,7 +154,7 @@ function OAuthCallbackPage() {
             ? AUTH_ROUTES.COMPANY
             : getPostAuthRedirectPath(nextRole, authPortal)
 
-        navigate(redirectPath, { replace: true })
+        completeRedirect(redirectPath)
       } catch (err) {
         if (isMounted) {
           setError(err instanceof Error ? err.message : 'Failed to complete authentication. Please try again.')

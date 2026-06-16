@@ -219,9 +219,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 } as AuthResponse
             }
 
-            return await supabase.auth.signInWithPassword({ email: normalizeAuthEmail(email), password })
+            const response = await supabase.auth.signInWithPassword({
+                email: normalizeAuthEmail(email),
+                password,
+            })
+
+            if (!response.error && response.data.session) {
+                await applySession(response.data.session)
+            }
+
+            return response
         },
-        []
+        [applySession]
     )
 
     const signInWithOAuth = useCallback(
