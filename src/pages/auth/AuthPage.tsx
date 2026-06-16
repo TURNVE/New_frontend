@@ -12,8 +12,11 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '../../hooks/useAuth';
-import { isSupabaseConfigured, supabaseConfigError } from '../../lib/supabase';
-import { cn } from '../../lib/organization/utils';
+import {
+  isSupabaseConfigured,
+  SUPABASE_CONFIG_ERROR as supabaseConfigError,
+} from '../../lib/supabase';
+import { cn } from '../../lib/utils';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 type AuthMode = 'sign-in' | 'sign-up';

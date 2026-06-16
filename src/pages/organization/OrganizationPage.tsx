@@ -9,7 +9,6 @@ import {
   Rocket, ArrowUpRight, LogIn
 } from 'lucide-react';
 import { Header as MarketingHeader } from '../../components/layout/Header';
-import { PublicFooter } from '../../components/layout/PublicFooter';
 
 const BRAND = '#5e6ad2';
 const BRAND_LIGHT = '#7170ff';
@@ -113,7 +112,7 @@ function OrganizationPage() {
         <CTASection />
       </main>
 
-      <PublicFooter />
+      <Footer />
     </div>
   );
 }
