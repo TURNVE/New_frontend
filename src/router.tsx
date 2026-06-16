@@ -12,10 +12,13 @@ import SignUpPage from './pages/auth/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
 
 // ── Lazy loaded pages (to improve dev server performance) ─────
-const FeaturesPage = lazy(() => import('./pages/FeaturesPage'));
+const FeaturesPage = lazy(() => import('./pages/features/FeaturesPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
-const AboutPage = lazy(() => import('./pages/AboutPage'));
-const BlogPage = lazy(() => import('./pages/BlogPage'));
+const AboutPage = lazy(() => import('./pages/about/AboutPage'));
+const BlogPage = lazy(() => import('./pages/blog/BlogPage'));
+const BusinessPage = lazy(() => import('./pages/business/BusinessPage'));
+const ServicesPage = lazy(() => import('./pages/services/ServicesPage'));
+const PublicTeamPage = lazy(() => import('./pages/team/TeamPage'));
 const ProgramsPage = lazy(() => import('./pages/ProgramsPage'));
 const DevelopersPage = lazy(() => import('./pages/DevelopersPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
@@ -28,7 +31,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
 const AchievementsPage = lazy(() => import('./pages/AchievementsPage'));
-const TeamPage = lazy(() => import('./pages/TeamPage'));
+const DashboardTeamPage = lazy(() => import('./pages/TeamPage'));
 const ConfirmationPage = lazy(() => import('./pages/ConfirmationPage'));
 const StartSimulationPage = lazy(() => import('./pages/StartSimulationPage'));
 const ProjectBriefingPage = lazy(() => import('./pages/ProjectBriefingPage'));
@@ -86,6 +89,10 @@ function Router() {
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/blog" element={<BlogPage />} />
+            <Route path="/business" element={<BusinessPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/service" element={<ServicesPage />} />
+            <Route path="/team" element={<PublicTeamPage />} />
             <Route path="/programs" element={<ProgramsPage />} />
             <Route path="/developers" element={<DevelopersPage />} />
             <Route path="/faq" element={<FAQPage />} />
@@ -114,7 +121,7 @@ function Router() {
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/achievements" element={<AchievementsPage />} />
-              <Route path="/team" element={<TeamPage />} />
+              <Route path="/dashboard/team" element={<DashboardTeamPage />} />
               <Route path="/tracks" element={<Navigate to="/simulations" replace />} />
               <Route path="/industries" element={<Navigate to="/simulations" replace />} />
               <Route path="/confirmation" element={<ConfirmationPage />} />

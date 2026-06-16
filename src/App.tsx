@@ -1,700 +1,601 @@
-import { Footer7 } from './components/ui/footer-7';
-import { Facebook, Instagram, Linkedin, Twitter, ArrowRight, Users, Award, Zap, Sparkles, CheckCircle2, PlayCircle, Briefcase, Target, Globe, Rocket, Star, HelpCircle, Mail, Building2, ChevronDown } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { AnimatedGroup } from './components/ui/animated-group';
-import { Header } from './components/layout/Header';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  BadgeCheck,
+  Building2,
+  ClipboardCheck,
+  FileText,
+  Network,
+  School,
+  TrendingUp,
+  UserRound,
+  UsersRound,
+} from 'lucide-react';
 
-function CompanySection() {
-  return (
-    <section className="py-20 lg:py-32 bg-gradient-to-b from-secondary/30 to-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-              <Building2 className="h-3 w-3 mr-1" />
-              Company Simulation Studio
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Build Custom Simulations for Your Users
-            </h2>
-            <p className="text-base sm:text-lg text-muted-foreground mb-6 leading-relaxed">
-              Give your company a dedicated dashboard for creating scenario-based simulations, publishing live links, and tracking how users perform across each experience.
-            </p>
-            
-            <div className="space-y-3 mb-8">
-              {[
-                'Create simulations from scratch',
-                'Publish shareable links for your users',
-                'Track learner starts, completions, and scores',
-                'Manage company branding and scenario details'
-              ].map((item, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                  <span className="text-sm sm:text-base text-muted-foreground">{item}</span>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link 
-                to="/contact" 
-                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:opacity-90 transition-all whitespace-nowrap"
-              >
-                  Request a Demo
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-              <Link 
-                to="/contact" 
-                className="inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground text-sm font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
-              >
-                  Talk to Sales
-              </Link>
-            </div>
-          </motion.div>
-          
-          {/* Visual */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="relative"
-          >
-            <div className="relative rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-6 sm:p-8">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-card border border-border">
-                  <Users className="h-6 w-6 text-primary mb-2" />
-                  <p className="text-2xl font-bold text-foreground">500+</p>
-                  <p className="text-xs text-muted-foreground">Team Members</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-card border border-border">
-                  <Award className="h-6 w-6 text-emerald-500 mb-2" />
-                  <p className="text-2xl font-bold text-foreground">95%</p>
-                  <p className="text-xs text-muted-foreground">Skill Improvement</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-card border border-border">
-                  <Zap className="h-6 w-6 text-amber-500 mb-2" />
-                  <p className="text-2xl font-bold text-foreground">3x</p>
-                  <p className="text-xs text-muted-foreground">Faster Onboarding</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-card border border-border">
-                  <Star className="h-6 w-6 text-rose-500 mb-2" />
-                  <p className="text-2xl font-bold text-foreground">4.9</p>
-                  <p className="text-xs text-muted-foreground">Rating</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
+import { AnimatedGroup } from './components/ui/animated-group';
+import { AutoplayVideo } from './components/media/AutoplayVideo';
+import { MarketingPageShell } from './components/marketing/MarketingPageShell';
+import { MissionPanel } from './components/marketing/MissionPanel';
+import { ScrollReveal } from './components/ui/scroll-reveal';
+
+const heroMedia = {
+  poster:
+    'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1800&q=82',
+  video:
+    'https://ik.imagekit.io/lrigu76hy/tailark/dna-video.mp4?updatedAt=1745736251477',
+};
+
+const featureCards = [
+  {
+    title: 'Team collaboration',
+    description: 'Experience realistic work rooms and team decisions.',
+    image:
+      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=82',
+  },
+  {
+    title: 'Skill development',
+    description: 'Build proof through briefs, tradeoffs, and work samples.',
+    image:
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=82',
+  },
+  {
+    title: 'AI-powered insights',
+    description: 'Get feedback that helps you improve before interviews.',
+    image:
+      'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=900&q=82',
+  },
+];
+
+const stackCards = [
+  {
+    label: 'Simulation 01',
+    title: 'For companies',
+    description:
+      'Screen candidates with practical tasks, review decision logs, and compare readiness before interviews.',
+    bullets: ['Candidate simulations', 'Comparable scorecards', 'Hiring proof reports'],
+    tags: ['Screening', 'Hiring', 'Reports'],
+    image:
+      'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=82',
+    icon: Building2,
+    tint: 'bg-[#d8eaff]',
+    ring: 'ring-[#afc8e3]',
+    tagTone: 'bg-[#c1d0e3]',
+  },
+  {
+    label: 'Simulation 02',
+    title: 'For individuals',
+    description:
+      'Experience real workplace decisions, get AI feedback, and turn your work into a portfolio story.',
+    bullets: ['AI feedback', 'Portfolio proof', 'Interview confidence'],
+    tags: ['Experience', 'Proof', 'Growth'],
+    image:
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=82',
+    icon: UserRound,
+    tint: 'bg-[#e4e8f8]',
+    ring: 'ring-[#c5cae4]',
+    tagTone: 'bg-[#ccd1e9]',
+  },
+  {
+    label: 'Simulation 03',
+    title: 'For institutions',
+    description:
+      'Run practical career programs for cohorts, bootcamps, schools, and workforce development teams.',
+    bullets: ['Cohort rooms', 'Progress tracking', 'Graduate readiness'],
+    tags: ['Cohorts', 'Schools', 'Programs'],
+    image:
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=82',
+    icon: School,
+    tint: 'bg-[#dff3ee]',
+    ring: 'ring-[#b8d9d2]',
+    tagTone: 'bg-[#c5e2dc]',
+  },
+];
+
+const homeBlogPosts = [
+  {
+    title: 'How to prove workplace readiness without years of experience',
+    author: 'Amina Okafor',
+    date: 'Jun 12, 2026',
+    image:
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=82',
+  },
+  {
+    title: 'Why companies should test practical judgment before interviews',
+    author: 'Chinedu Eze',
+    date: 'Jun 12, 2026',
+    image:
+      'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=82',
+  },
+  {
+    title: 'How institutions can run better career-readiness programs',
+    author: 'Zainab Bello',
+    date: 'Jun 12, 2026',
+    image:
+      'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1000&q=82',
+  },
+];
 
 function App() {
-  useEffect(() => {
-    import('aos').then((AOS) => {
-      AOS.init({
-        duration: 600,
-        easing: 'ease-out',
-        once: true,
-        offset: 50,
-      });
-    });
-  }, []);
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-20">
+    <MarketingPageShell headerVariant="dark">
+      <main>
         <Hero />
         
-        {/* How It Works Section */}
-        <HowItWorks />
+        {/* Integrations Section */}
+        <IntegrationsSection />
 
-        {/* Features Section - Horizontal Marquee */}
-        <section id="features" className="py-16 lg:py-24 bg-gradient-to-b from-background to-secondary/30 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-            <div className="text-center max-w-2xl mx-auto">
-              <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-3">
+        {/* Features Section */}
+        <section id="features" className="py-20 lg:py-32 bg-gradient-to-b from-white to-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold uppercase tracking-wider mb-4">
                 Why Choose TURNVE
               </div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                 Everything you need to succeed
               </h2>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Practical career platform for professionals
+              <p className="text-lg text-gray-600">
+                Practical career platform for entry-level and transitioning professionals
               </p>
             </div>
-          </div>
-          
-          {/* Marquee Container */}
-          <div className="relative">
-            {/* Gradient Masks */}
-            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
             
-            {/* Scrolling Track */}
-            <motion.div 
-              className="flex gap-4"
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{
-                x: {
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  duration: 30,
-                  ease: "linear",
-                },
-              }}
-            >
-              {/* Set 1 - Original cards */}
-              <CompactFeatureCard
-                icon={<Users className="w-5 h-5" />}
-                title="Team Collaboration"
-                description="Work with your team on projects"
-                accent="coral"
-              />
-              <CompactFeatureCard
-                icon={<Award className="w-5 h-5" />}
-                title="Skill Development"
-                description="Build management experience"
-                accent="teal"
-              />
-              <CompactFeatureCard
-                icon={<Zap className="w-5 h-5" />}
-                title="AI-Powered Insights"
-                description="Get personalized feedback"
-                accent="orange"
-              />
-              <CompactFeatureCard
-                icon={<Target className="w-5 h-5" />}
-                title="Goal Tracking"
-                description="Monitor your progress daily"
-                accent="coral"
-              />
-              <CompactFeatureCard
-                icon={<Briefcase className="w-5 h-5" />}
-                title="Portfolio Builder"
-                description="Showcase your achievements"
-                accent="teal"
-              />
-              <CompactFeatureCard
-                icon={<Globe className="w-5 h-5" />}
-                title="Global Network"
-                description="Connect with professionals"
-                accent="orange"
-              />
-              <CompactFeatureCard
-                icon={<Rocket className="w-5 h-5" />}
-                title="Career Launch"
-                description="Fast-track your promotion"
-                accent="coral"
-              />
-              <CompactFeatureCard
-                icon={<PlayCircle className="w-5 h-5" />}
-                title="Live Simulations"
-                description="Practice real scenarios"
-                accent="teal"
-              />
-              
-              {/* Set 2 - Duplicate for seamless loop */}
-              <CompactFeatureCard
-                icon={<Users className="w-5 h-5" />}
-                title="Team Collaboration"
-                description="Work with your team on projects"
-                accent="coral"
-              />
-              <CompactFeatureCard
-                icon={<Award className="w-5 h-5" />}
-                title="Skill Development"
-                description="Build management experience"
-                accent="teal"
-              />
-              <CompactFeatureCard
-                icon={<Zap className="w-5 h-5" />}
-                title="AI-Powered Insights"
-                description="Get personalized feedback"
-                accent="orange"
-              />
-              <CompactFeatureCard
-                icon={<Target className="w-5 h-5" />}
-                title="Goal Tracking"
-                description="Monitor your progress daily"
-                accent="coral"
-              />
-              <CompactFeatureCard
-                icon={<Briefcase className="w-5 h-5" />}
-                title="Portfolio Builder"
-                description="Showcase your achievements"
-                accent="teal"
-              />
-              <CompactFeatureCard
-                icon={<Globe className="w-5 h-5" />}
-                title="Global Network"
-                description="Connect with professionals"
-                accent="orange"
-              />
-              <CompactFeatureCard
-                icon={<Rocket className="w-5 h-5" />}
-                title="Career Launch"
-                description="Fast-track your promotion"
-                accent="coral"
-              />
-              <CompactFeatureCard
-                icon={<PlayCircle className="w-5 h-5" />}
-                title="Live Simulations"
-                description="Practice real scenarios"
-                accent="teal"
-              />
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Company/Organization Section */}
-        <CompanySection />
-
-        {/* FAQ Section */}
-        <FAQSection />
-
-        {/* CTA Section */}
-        <section id="pricing" className="py-20 lg:py-32">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-indigo-800 rounded-3xl px-8 py-16 sm:px-16 sm:py-20 text-center shadow-2xl shadow-primary/25">
-              <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-              </div>
-              
-              <div className="relative z-10">
-                <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">
-                  Ready to gain real-world experience?
-                </h2>
-                <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-                  Start Program 2 and build portfolio proof through practical simulations designed for early-career, junior, and career-switching talent.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a 
-                    href="/sign-up" 
-                    className="inline-flex items-center justify-center px-8 py-4 bg-primary-foreground text-primary text-base font-semibold rounded-xl hover:bg-primary-foreground/90 transition-all hover:shadow-lg whitespace-nowrap"
-                  >
-                    Start a Simulation
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </a>
-                </div>
-                
-              </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {featureCards.map((feature) => (
+                <FeatureCard
+                  key={feature.title}
+                  title={feature.title}
+                  description={feature.description}
+                  image={feature.image}
+                />
+              ))}
             </div>
           </div>
         </section>
-      </main>
 
-      <Footer7
-        logo={{
-          url: "/",
-          src: "/logo.png",
-          alt: "TURNVE logo",
-          title: "TURNVE",
-        }}
-        sections={[
-          {
-            title: "Product",
-            links: [
-              { name: "Features", href: "/features" },
-              { name: "Programs", href: "/programs" },
-              { name: "Pricing", href: "/pricing" },
-              { name: "PM Simulator", href: "/simulations" },
-            ],
-          },
-          {
-            title: "Company",
-            links: [
-              { name: "About Us", href: "/about" },
-              { name: "Organizations", href: "/company/start" },
-              { name: "Blog", href: "/blog" },
-              { name: "Contact", href: "/contact" },
-            ],
-          },
-          {
-            title: "Resources",
-            links: [
-              { name: "FAQ", href: "/faq" },
-              { name: "Developers", href: "/developers" },
-              { name: "Simulations", href: "/simulations" },
-              { name: "Dashboard", href: "/dashboard" },
-            ],
-          },
-        ]}
-        description="AI-powered practical career platform helping professionals gain management experience, build portfolios, and land managerial roles."
-        socialLinks={[
-          { icon: <Instagram className="size-5" />, href: "#", label: "Instagram" },
-          { icon: <Facebook className="size-5" />, href: "#", label: "Facebook" },
-          { icon: <Twitter className="size-5" />, href: "#", label: "Twitter" },
-          { icon: <Linkedin className="size-5" />, href: "#", label: "LinkedIn" },
-        ]}
-        copyright="© 2026 TURNVE. All rights reserved."
-        legalLinks={[
-          { name: "Privacy & Terms", href: "/privacy" },
-        ]}
-      />
-    </div>
+        <SuperiorFeaturesSection />
+        <SimulationStackSection />
+        <HomeBlogSection />
+        <MissionPanel />
+
+        {/* CTA Section */}
+        <section id="pricing" className="relative min-h-[520px] overflow-hidden px-5 py-24 text-white sm:py-28">
+          <AutoplayVideo
+            poster="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1800&q=82"
+            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[#0a142f]/74" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(11,107,255,0.38),transparent_42%)]" />
+          <ScrollReveal className="relative mx-auto flex min-h-[340px] max-w-5xl flex-col items-center justify-center text-center">
+            <h2 className="max-w-3xl text-5xl font-black leading-[1.02] tracking-[-0.05em] sm:text-6xl">
+              Ready to transform your career?
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg font-semibold leading-8 text-white/76">
+              Experience real work, get feedback, and build proof employers can trust.
+            </p>
+            <Link
+              to="/sign-up"
+              className="mt-10 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-8 py-4 text-base font-black text-[#0a142f] transition hover:-translate-y-0.5 hover:bg-blue-50"
+            >
+              Get Started Free
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          </ScrollReveal>
+        </section>
+      </main>
+    </MarketingPageShell>
   );
 }
 
 function Hero() {
   return (
-    <section className="relative pt-24 pb-16 overflow-hidden">
-      <div className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--color-background)_75%)]"></div>
-      
-      <div className="absolute top-20 left-1/4 w-72 h-72 bg-[#ffc6c6]/30 dark:bg-[#600000]/20 rounded-full blur-3xl animate-blob"></div>
-      <div className="absolute top-40 right-1/4 w-72 h-72 bg-[#c3faf5]/30 dark:bg-[#187574]/20 rounded-full blur-3xl animate-blob animation-delay-200"></div>
-      <div className="absolute bottom-20 left-1/3 w-72 h-72 bg-[#ffe6cd]/30 dark:bg-[#746019]/20 rounded-full blur-3xl animate-blob animation-delay-400"></div>
-      
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="sm:mx-auto text-center relative z-20">
+    <section className="relative min-h-[100dvh] overflow-hidden bg-gray-950 text-white">
+      <AutoplayVideo
+        poster={heroMedia.poster}
+        src={heroMedia.video}
+        className="absolute inset-0 h-full w-full object-cover opacity-70"
+      />
+      <div className="absolute inset-0 bg-gray-950/72" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(37,99,235,0.28),transparent_42%)]" />
+      <div className="mx-auto flex min-h-[100dvh] max-w-5xl items-center px-6 pb-16 pt-28 sm:pb-20 sm:pt-32">
+        <div className="relative z-20 text-center sm:mx-auto">
           <AnimatedGroup preset="fade">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
-              <Sparkles className="h-4 w-4" />
-              Built for early-career, junior, and switching talent
-            </div>
-            <h1 className="mt-8 max-w-3xl text-balance text-5xl font-bold md:text-6xl lg:mt-16 text-foreground mx-auto tracking-tight">
-              Gain Real-World Experience<br/>
-              <span className="text-primary">Before You Get Hired.</span>
+            <h1 className="mx-auto mt-8 max-w-4xl text-balance text-[clamp(2.9rem,7vw,5.9rem)] font-normal leading-[0.96] tracking-[-0.055em] text-white lg:mt-12">
+              Theory Gets You Noticed. Experience Gets You Hired.
             </h1>
-            <p className="mt-8 max-w-2xl text-pretty text-lg text-muted-foreground mx-auto">
-              Program 2 helps early-career talent, junior professionals, and career switchers practice workplace decisions, receive AI feedback, and build portfolio proof employers can inspect.
+            <p className="mx-auto mt-5 max-w-2xl text-pretty text-[15px] leading-7 text-white/72 sm:text-[16px]">
+              Turn your career knowledge into demonstrable management experience with AI-guided simulations and real projects.
             </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-              {['Early-career talent', 'Junior-level talent', 'Career switchers'].map((audience) => (
-                <span
-                  key={audience}
-                  className="rounded-full border border-border bg-card/70 px-4 py-2 text-sm font-semibold text-foreground"
+            <div className="mt-9 flex justify-center">
+              <div className="bg-white/15 rounded-[14px] border border-white/20 p-0.5">
+                <Link
+                  to="/sign-up"
+                  className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm text-gray-950 transition-all hover:bg-blue-50 whitespace-nowrap"
                 >
-                  {audience}
-                </span>
-              ))}
-            </div>
-            <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
-              <a 
-                href="/sign-up" 
-                className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
-              >
-                Start Program 2
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </a>
-              <a 
-                href="/contact"
-                className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
-              >
-                <PlayCircle className="mr-2 h-5 w-5" />
-                Request Organization Demo
-              </a>
+                  Get Started
+                </Link>
+              </div>
             </div>
           </AnimatedGroup>
         </div>
-        <AnimatedGroup preset="slide">
-          {/* Hero image removed */}
-        </AnimatedGroup>
-        
-        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-secondary/30 to-transparent -z-10 pointer-events-none" />
       </div>
+    </section>
+
+  );
+}
+
+
+
+
+function IntegrationsSection() {
+
+  const integrations = [
+    { name: "Google", url: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
+    { name: "LinkedIn", url: "https://cdn-icons-png.flaticon.com/512/174/174857.png" },
+    { name: "Slack", url: "https://cdn-icons-png.flaticon.com/512/2111/2111615.png" },
+    { name: "Microsoft", url: "https://cdn-icons-png.flaticon.com/512/174/174872.png" },
+    { name: "Facebook", url: "https://cdn-icons-png.flaticon.com/512/733/733547.png" },
+    { name: "Stripe", url: "https://cdn-icons-png.flaticon.com/512/5968/5968381.png" },
+    { name: "Dropbox", url: "https://cdn-icons-png.flaticon.com/512/888/888853.png" },
+    { name: "Jira", url: "https://cdn-icons-png.flaticon.com/512/906/906324.png" },
+    { name: "Netflix", url: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" },
+    { name: "Square", url: "https://cdn-icons-png.flaticon.com/512/5968/5968705.png" },
+    { name: "Shopify", url: "https://cdn-icons-png.flaticon.com/512/732/732218.png" },
+    { name: "Zapier", url: "https://cdn-icons-png.flaticon.com/512/5968/5968755.png" },
+    { name: "Google Drive", url: "https://cdn-icons-png.flaticon.com/512/5968/5968520.png" },
+    { name: "YouTube", url: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png" },
+    { name: "Airtable", url: "https://cdn-icons-png.flaticon.com/512/5968/5968885.png" },
+    { name: "Discord", url: "https://cdn-icons-png.flaticon.com/512/2111/2111370.png" },
+  ];
+
+  return (
+    <section className="max-w-7xl mx-auto my-20 px-6">
+      <ScrollReveal className="border border-gray-100 p-8 md:p-12 rounded-3xl bg-white">
+        <div className="grid md:grid-cols-2 gap-10 items-center">
+          <ScrollReveal className="space-y-6">
+            <h2 className="text-2xl font-semibold tracking-[-0.04em] text-gray-900 sm:text-3xl lg:text-4xl">
+              Model organization-style workspaces
+            </h2>
+            <p className="text-gray-600 mb-6 text-base leading-relaxed">
+              TURNVE recreates the way strong teams plan, review, and decide so learners can build proof inside
+              realistic company-style workspaces without needing access to the actual organizations.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link
+                to="/services"
+                className="inline-flex items-center whitespace-nowrap rounded-xl bg-blue-600 px-6 py-3 font-medium text-white transition-all hover:bg-blue-700"
+              >
+                Explore workspaces
+              </Link>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal className="grid grid-cols-4 gap-4" direction="left">
+            {integrations.map((integration, idx) => (
+              <div key={idx} className="w-14 h-14 p-3 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center hover:scale-110 hover:shadow-md transition-all duration-300">
+                <img src={integration.url} alt={integration.name} className="w-full h-full object-contain" loading="lazy" />
+              </div>
+            ))}
+          </ScrollReveal>
+        </div>
+      </ScrollReveal>
     </section>
   );
 }
 
-function HowItWorks() {
-  const steps = [
-    {
-      number: "01",
-      title: "Choose Your Path",
-      description: "Select your industry and role across Tech, Marketing, Finance, and more.",
-      icon: Target,
-      lightBg: "bg-blue-50 dark:bg-blue-500/5",
-      borderColor: "border-blue-200 dark:border-blue-500/20",
-      iconBg: "bg-blue-100 dark:bg-blue-500/15",
-      iconColor: "text-blue-600 dark:text-blue-400",
-      aos: "fade-up"
-    },
-    {
-      number: "02",
-      title: "Run Simulations",
-      description: "Experience realistic scenarios and solve real business problems.",
-      icon: PlayCircle,
-      lightBg: "bg-teal-50 dark:bg-teal-500/5",
-      borderColor: "border-teal-200 dark:border-teal-500/20",
-      iconBg: "bg-teal-100 dark:bg-teal-500/15",
-      iconColor: "text-teal-600 dark:text-teal-400",
-      aos: "fade-up"
-    },
-    {
-      number: "03",
-      title: "Get AI Feedback",
-      description: "Receive instant feedback to improve your management skills.",
-      icon: Zap,
-      lightBg: "bg-amber-50 dark:bg-amber-500/5",
-      borderColor: "border-amber-200 dark:border-amber-500/20",
-      iconBg: "bg-amber-100 dark:bg-amber-500/15",
-      iconColor: "text-amber-600 dark:text-amber-400",
-      aos: "fade-up"
-    },
-    {
-      number: "04",
-      title: "Build Portfolio",
-      description: "Showcase proven experience to employers with real outcomes.",
-      icon: Briefcase,
-      lightBg: "bg-rose-50 dark:bg-rose-500/5",
-      borderColor: "border-rose-200 dark:border-rose-500/20",
-      iconBg: "bg-rose-100 dark:bg-rose-500/15",
-      iconColor: "text-rose-600 dark:text-rose-400",
-      aos: "fade-up"
-    },
-    {
-      number: "05",
-      title: "Land Your Role",
-      description: "Walk into interviews with confidence and demonstrable experience.",
-      icon: Rocket,
-      lightBg: "bg-violet-50 dark:bg-violet-500/5",
-      borderColor: "border-violet-200 dark:border-violet-500/20",
-      iconBg: "bg-violet-100 dark:bg-violet-500/15",
-      iconColor: "text-violet-600 dark:text-violet-400",
-      aos: "fade-up"
-    }
-  ];
-
+function SuperiorFeaturesSection() {
   return (
-    <section id="how-it-works" className="py-16 sm:py-20 lg:py-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-            How It Works
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Build experience in 5 steps
+    <section className="bg-[#d8eaff] px-5 py-16 text-[#10213f] sm:py-20">
+      <div className="mx-auto max-w-[1180px]">
+        <ScrollReveal className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+          <h2 className="max-w-3xl">
+            Superior simulation features that raise real readiness
           </h2>
-          <p className="text-base sm:text-lg text-muted-foreground">
-            Turn knowledge into real-world practice, feedback, and portfolio proof.
+          <p className="max-w-xl text-base font-semibold leading-8 text-[#5a718b] lg:pt-4">
+            TURNVE helps companies, individuals, and institutions run practical tasks,
+            review decisions, and build trusted career proof.
           </p>
+        </ScrollReveal>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1.14fr_0.86fr]">
+          <ScrollReveal as="article" className="relative min-h-[315px] overflow-hidden rounded-[20px] bg-[#07798a] p-7 text-white sm:p-10">
+            <div className="relative z-10 max-w-xl">
+              <h3 className="max-w-lg text-white">
+                Our mission is to look after talent readiness with practical proof
+              </h3>
+              <p className="mt-5 max-w-md text-[15px] font-semibold leading-7 text-white/74">
+                15k+ learners and teams move from claims to work samples,
+                decision logs, and readiness reports.
+              </p>
+            </div>
+            <div className="absolute -right-4 top-8 hidden w-[300px] space-y-4 opacity-34 sm:block">
+              {['Companies', 'Individuals', 'Institutions', 'Talent teams'].map((item, index) => (
+                <div
+                  key={item}
+                  className="rounded-2xl bg-white/18 px-6 py-4 text-lg font-black backdrop-blur-sm"
+                  style={{ transform: `translateX(${index * 24}px)` }}
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal as="article" direction="left" className="rounded-[20px] bg-[#cbe9e8] p-7 sm:p-10">
+            <h3 className="max-w-md">
+              Simulate and plan your career-readiness success
+            </h3>
+            <p className="mt-5 text-[15px] font-semibold leading-7 text-[#5a718b]">
+              Match role tracks with tasks, rubrics, feedback, and clear portfolio outputs.
+            </p>
+            <p className="mt-10 text-[48px] font-black tracking-[-0.05em] text-[#d18473]">
+              78% <span className="text-base font-black tracking-normal text-[#10213f]">yearly growth</span>
+            </p>
+          </ScrollReveal>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.number}
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-              viewport={{ once: true, margin: "-50px" }}
-              whileHover={{ y: -8, transition: { duration: 0.3, type: "spring", stiffness: 300 } }}
-              data-aos={step.aos}
-              data-aos-delay={index * 100}
-              data-aos-duration="600"
-              className="relative group"
-            >
-              {/* Card with light background */}
-              <div className={`relative ${step.lightBg} rounded-2xl sm:rounded-3xl border-2 ${step.borderColor} p-5 sm:p-6 lg:p-7 hover:shadow-xl transition-all duration-300 h-full min-h-[200px] sm:min-h-[220px] lg:min-h-[260px] flex flex-col overflow-hidden`}>
-                {/* Animated shimmer effect */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                </div>
-                
-                {/* Step Number Badge */}
-                <div className="relative z-10 mb-4 flex">
-                  <div className={`inline-flex h-7 min-w-[76px] items-center justify-center rounded-full ${step.iconBg} border ${step.borderColor} px-3 text-xs font-bold uppercase tracking-wide ${step.iconColor}`}>
-                    Step {step.number}
-                  </div>
-                </div>
-                
-                {/* Icon */}
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${step.iconBg} flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 z-10`}>
-                  <step.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${step.iconColor}`} />
-                </div>
-                
-                {/* Content */}
-                <h3 className="text-lg sm:text-xl lg:text-xl font-bold text-foreground mb-2 sm:mb-3 leading-tight z-10">
-                  {step.title}
+        <div className="mt-6 hidden gap-6 lg:grid lg:grid-cols-[0.95fr_1.05fr]">
+          <ScrollReveal as="article" className="relative min-h-[310px] overflow-hidden rounded-[20px] bg-[#d7d8e8] p-4 sm:p-5">
+            <img
+              src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1000&q=82"
+              alt="Talent and hiring teams reviewing practical work"
+              className="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] rounded-2xl object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-4 rounded-2xl bg-gradient-to-r from-[#10213f]/78 via-[#10213f]/28 to-transparent" />
+            <div className="relative flex min-h-[280px] max-w-xs flex-col justify-between p-4 text-white sm:p-6">
+              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-black text-[#10213f] shadow-[0_16px_42px_-34px_rgba(9,35,67,0.9)]">
+                <Network className="h-4 w-4 text-[#0b6bff]" />
+                Proof network
+              </span>
+              <div>
+                <h3 className="text-white">
+                  3 paths. 1 proof trail.
                 </h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed flex-grow z-10">
-                  {step.description}
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {['Briefs', 'Feedback', 'Scorecards'].map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full bg-white/88 px-4 py-2 text-xs font-black text-[#10213f]"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="absolute bottom-8 right-8 hidden rounded-2xl bg-white/90 p-3 backdrop-blur sm:block">
+              <div className="flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-[#0b6bff] text-white">
+                  <UsersRound className="h-5 w-5" />
+                </span>
+                <p className="max-w-28 text-sm font-black leading-5 text-[#10213f]">
+                  Talent + teams linked
                 </p>
               </div>
-              
-              {/* Connector arrows (desktop only) */}
-              {index < steps.length - 1 && (
-                <div className="hidden lg:flex absolute top-1/2 -right-3 z-10">
-                  <motion.div
-                    animate={{ x: [0, 4, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    className={`w-6 h-6 rounded-full ${step.iconBg} border ${step.borderColor} flex items-center justify-center`}
-                  >
-                    <ArrowRight className={`h-3 w-3 ${step.iconColor}`} />
-                  </motion.div>
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </div>
+            </div>
+          </ScrollReveal>
 
-        {/* Bottom CTA */}
-        <div className="mt-12 sm:mt-16 text-center">
-          <Link
-            to="/start-simulation"
-            className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
-          >
-            Start Program 2
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
+          <ScrollReveal as="article" direction="left" className="relative min-h-[310px] overflow-hidden rounded-[20px] bg-[#cde8ff] p-4 sm:p-5">
+            <div className="grid h-full min-h-[280px] gap-4 lg:grid-cols-[1.08fr_0.92fr]">
+              <div className="relative overflow-hidden rounded-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1000&q=82"
+                  alt="Career readiness score review"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-[#10213f]/34" />
+                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-[#10213f]">
+                  <TrendingUp className="h-4 w-4 text-[#087989]" />
+                  Readiness score
+                </div>
+                <div className="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2">
+                  {[
+                    { label: 'Decision', Icon: ClipboardCheck },
+                    { label: 'Proof', Icon: FileText },
+                    { label: 'Ready', Icon: BadgeCheck },
+                  ].map(({ label, Icon }) => (
+                    <div
+                      key={label}
+                      className="rounded-2xl bg-white/90 p-3 text-center"
+                    >
+                      <Icon className="mx-auto h-5 w-5 text-[#0b6bff]" />
+                      <p className="mt-2 text-xs font-black text-[#10213f]">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative grid place-items-center rounded-2xl bg-[#b8dcff]">
+                <div className="absolute h-48 w-48 rounded-[42%] border-[22px] border-[#087989]" />
+                <div className="relative rounded-2xl bg-white px-7 py-5 text-center">
+                  <p className="text-sm font-bold text-slate-500">proof score</p>
+                  <p className="text-5xl font-black tracking-[-0.06em] text-[#10213f]">92%</p>
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-[#0b6bff]">
+                    Interview ready
+                  </p>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>
   );
 }
 
-function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  
-  const faqs = [
-    {
-      question: "How does TURNVE's AI-powered simulation work?",
-      answer: "Our AI creates realistic workplace scenarios based on real industry challenges. You'll make decisions, manage projects, and interact with virtual stakeholders. The AI provides instant feedback on your choices and tracks your progress over time."
-    },
-    {
-      question: "Do I need prior management experience to join?",
-      answer: "Not at all! TURNVE is designed for entry-level professionals and career transitioners. Our simulations adapt to your skill level, starting with foundational scenarios and progressively increasing complexity as you grow."
-    },
-    {
-      question: "How long do I have access to the simulations?",
-      answer: "You get unlimited access to all simulations during your active subscription. You can revisit scenarios anytime to practice, compare decisions, and refine your skills. Plus, new simulations are added monthly."
-    },
-    {
-      question: "Will this help me get a job?",
-      answer: "Yes! 92% of our graduates land jobs within 6 months. You'll build a portfolio of completed projects, earn certificates, and gain demonstrable experience you can discuss in interviews. Many hiring managers specifically value practical simulation experience."
-    }
-  ];
-
-  const toggleFAQ = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+function SimulationStackSection() {
+  const stackRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: stackRef,
+    offset: ['start start', 'end end'],
+  });
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-background to-secondary/20">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 sm:mb-14">
-          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-            Got Questions?
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Frequently Asked Questions
+    <section className="bg-white px-5 py-24 sm:py-28">
+      <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto mb-14 max-w-3xl text-center">
+          <h2 className="text-[clamp(2.2rem,8vw,4rem)] font-black leading-[1.05] tracking-[-0.05em] text-[#10213f] sm:text-[64px]">
+            One platform, three practical paths
           </h2>
-          <p className="text-base sm:text-lg text-muted-foreground">
-            Everything you need to know about transforming your career with TURNVE
+          <p className="mx-auto mt-5 max-w-2xl text-base font-semibold leading-7 text-[#5a718b] sm:text-lg sm:leading-8">
+            Scroll through practical simulations for companies, individuals, and institutions.
           </p>
         </div>
 
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-card rounded-2xl border border-border overflow-hidden"
-            >
-              <button
-                onClick={() => toggleFAQ(index)}
-                className="w-full flex items-center justify-between p-5 sm:p-6 text-left hover:bg-secondary/50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <HelpCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold text-foreground pr-4">
-                    {faq.question}
-                  </h3>
-                </div>
-                <ChevronDown 
-                  className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`} 
-                />
-              </button>
-              <motion.div
-                initial={false}
-                animate={{ 
-                  height: openIndex === index ? 'auto' : 0,
-                  opacity: openIndex === index ? 1 : 0
-                }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="overflow-hidden"
-              >
-                <div className="px-5 sm:px-6 pb-5 sm:pb-6 pl-[68px] sm:pl-[80px]">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {faq.answer}
-                  </p>
-                </div>
-              </motion.div>
-            </motion.div>
-          ))}
+        <div ref={stackRef} className="relative h-[280vh] sm:h-[300vh] lg:h-[330vh]">
+          <div className="sticky top-20 h-[calc(100vh-5rem)] sm:top-24 sm:h-[calc(100vh-7rem)]">
+            {stackCards.map((card, index) => (
+              <StackMotionCard key={card.title} card={card} index={index} progress={scrollYProgress} />
+            ))}
+          </div>
         </div>
-
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="mt-10 sm:mt-14 flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <Link
-            to="/faq"
-            className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 whitespace-nowrap"
-          >
-            View All FAQs
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
-          <Link
-            to="/contact"
-            className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-foreground text-base font-semibold rounded-xl hover:bg-secondary/80 transition-all whitespace-nowrap"
-          >
-            <Mail className="mr-2 h-5 w-5" />
-            Contact Us
-          </Link>
-        </motion.div>
       </div>
     </section>
   );
 }
 
-
-
-function CompactFeatureCard({ icon, title, description, accent }: { icon: React.ReactNode; title: string; description: string; accent?: 'coral' | 'teal' | 'orange' }) {
-  const accentColors = {
-    coral: 'bg-[#ffc6c6]/30 dark:bg-[#600000]/20 border-[#ffc6c6]/50 dark:border-[#600000]/30',
-    teal: 'bg-[#c3faf5]/30 dark:bg-[#187574]/20 border-[#c3faf5]/50 dark:border-[#187574]/30',
-    orange: 'bg-[#ffe6cd]/30 dark:bg-[#746019]/20 border-[#ffe6cd]/50 dark:border-[#746019]/30',
-  };
-  
-  const iconColors = {
-    coral: 'bg-[#ffc6c6] dark:bg-[#600000] text-[#600000] dark:text-[#ffc6c6]',
-    teal: 'bg-[#c3faf5] dark:bg-[#187574] text-[#187574] dark:text-[#c3faf5]',
-    orange: 'bg-[#ffe6cd] dark:bg-[#746019] text-[#746019] dark:text-[#ffe6cd]',
-  };
-
+function StackMotionCard({
+  card,
+  index,
+  progress,
+}: {
+  card: (typeof stackCards)[number];
+  index: number;
+  progress: MotionValue<number>;
+}) {
+  const Icon = card.icon;
+  const enterStart = index === 0 ? 0 : index * 0.28 - 0.08;
+  const enterEnd = index === 0 ? 0.18 : index * 0.28 + 0.16;
+  const y = useTransform(
+    progress,
+    [enterStart, enterEnd],
+    [index === 0 ? 0 : 820, index * 24],
+  );
+  const scale = useTransform(
+    progress,
+    [0, 0.35, 0.7, 1],
+    [
+      index === 0 ? 1 : 0.985,
+      index === 0 ? 0.97 : 1,
+      index === 0 ? 0.94 : index === 1 ? 0.97 : 1,
+      1 - (stackCards.length - 1 - index) * 0.018,
+    ],
+  );
   return (
-    <div className={`group shrink-0 w-[280px] sm:w-[320px] p-4 sm:p-5 rounded-xl border hover:border-primary/50 hover:shadow-lg transition-all duration-300 ${accent ? accentColors[accent] : 'bg-card border-border hover:shadow-primary/25'}`}>
-      <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform ${accent ? iconColors[accent] : 'bg-primary/10 text-primary'}`}>
-          {icon}
+    <motion.article
+      className={`absolute inset-x-0 top-0 isolate mx-auto min-h-[520px] overflow-hidden rounded-[18px] p-5 ring-1 sm:min-h-[575px] sm:p-8 lg:p-10 ${card.tint} ${card.ring}`}
+      style={{
+        y,
+        scale,
+        zIndex: index + 1,
+      }}
+    >
+      <div className="grid min-h-[auto] gap-5 lg:min-h-[495px] lg:grid-cols-[1.05fr_0.95fr] lg:gap-0">
+        <div className="order-2 flex flex-col justify-between lg:order-1 lg:pr-7">
+          <div>
+            <span className="inline-flex rounded-md bg-white/72 px-4 py-2 text-xs font-black text-slate-700 sm:text-sm">
+              {card.label}
+            </span>
+            <h3 className="mt-5 text-[clamp(2.2rem,8vw,3.65rem)] font-black leading-[1.03] tracking-[-0.055em] text-[#222b4b] sm:mt-16 sm:text-[58px]">
+              {card.title}
+            </h3>
+            <p className="mt-4 max-w-xl text-[15px] font-semibold leading-7 text-[#5f748c] sm:mt-5 sm:text-[17px] sm:leading-8">
+              {card.description}
+            </p>
+            <ul className="mt-6 space-y-3 sm:mt-10 sm:space-y-4">
+              {card.bullets.map((bullet) => (
+                <li key={bullet} className="flex items-center gap-3 text-base font-black text-[#222b4b] sm:text-lg">
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  {bullet}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-2 sm:mt-10 sm:gap-3">
+            {card.tags.map((tag) => (
+              <span key={tag} className={`rounded-md px-3 py-2 text-xs font-black text-slate-700 sm:px-4 sm:text-sm ${card.tagTone}`}>
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
-        <div>
-          <h3 className="text-sm sm:text-base font-bold text-foreground leading-tight">{title}</h3>
-          <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+        <div className="order-1 overflow-hidden rounded-[14px] lg:order-2">
+          <img
+            src={card.image}
+            alt={card.title}
+            className="h-[240px] w-full object-cover sm:h-[340px] lg:h-full lg:min-h-[485px]"
+            loading="lazy"
+          />
         </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function HomeBlogSection() {
+  return (
+    <section className="bg-[#d8eaff] px-5 py-20 text-[#10213f] sm:py-24">
+      <div className="mx-auto max-w-[1280px]">
+        <ScrollReveal className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex rounded-md bg-[#c4d8ee] px-4 py-2 text-sm font-black text-slate-700">
+            News & Insights
+          </span>
+          <h2 className="mt-6 text-[44px] font-black leading-[1.04] tracking-[-0.05em] sm:text-[64px]">
+            Latest career proof insights and trends
+          </h2>
+        </ScrollReveal>
+
+        <div className="mt-16 grid gap-9 md:grid-cols-3">
+          {homeBlogPosts.map((post, index) => (
+            <ScrollReveal key={post.title} as="article" delay={index * 0.08} className="group">
+              <div className="overflow-hidden rounded-[9px] shadow-[0_20px_70px_-52px_rgba(9,35,67,0.9)]">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="h-[295px] w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3 border-b border-[#a9c0d8] pb-4 text-[15px] font-black text-[#5f748c]">
+                <span>• {post.author}</span>
+                <span>{post.date}</span>
+              </div>
+              <h3 className="mt-6 text-[27px] font-black leading-[1.16] tracking-[-0.035em] text-[#222b4b]">
+                {post.title}
+              </h3>
+              <p className="mt-4 text-[16px] font-semibold leading-7 text-[#5f748c]">
+                Practical notes for learners, companies, and institutions building career readiness.
+              </p>
+            </ScrollReveal>
+          ))}
+        </div>
+
+        <ScrollReveal className="mt-14 flex justify-center">
+          <Link
+            to="/blog"
+            className="inline-flex items-center gap-5 rounded-md bg-[#222b4b] py-2 pl-8 pr-2 text-sm font-black text-white shadow-[0_18px_48px_-32px_rgba(9,35,67,0.9)] transition hover:-translate-y-0.5 hover:bg-[#0a142f]"
+          >
+            View More News
+            <span className="grid h-12 w-12 place-items-center rounded-md bg-[#d8eaff] text-[#10213f]">
+              <ArrowRight className="h-5 w-5" />
+            </span>
+          </Link>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+}
+
+function FeatureCard({ title, description, image }: { title: string; description: string; image: string }) {
+  return (
+    <div className="group overflow-hidden rounded-2xl bg-white border border-blue-100 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-100/50 transition-all duration-300">
+      <img src={image} alt="" className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+        <p className="text-gray-600 leading-relaxed">{description}</p>
       </div>
     </div>
   );
