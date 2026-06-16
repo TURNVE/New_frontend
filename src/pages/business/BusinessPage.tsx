@@ -8,14 +8,10 @@ import { ScrollReveal } from '../../components/ui/scroll-reveal';
 const BUSINESS_HERO_VIDEO =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4';
 
-const BUSINESS_HERO_POSTER =
-  'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1800&q=82';
-
 function BusinessHero() {
   return (
     <section className="relative isolate overflow-hidden bg-[#07162f] text-white">
       <AutoplayVideo
-        poster={BUSINESS_HERO_POSTER}
         src={BUSINESS_HERO_VIDEO}
         className="absolute inset-0 h-full w-full object-cover opacity-100"
       />

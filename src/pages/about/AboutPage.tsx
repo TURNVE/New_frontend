@@ -6,8 +6,6 @@ import { MissionPanel } from '../../components/marketing/MissionPanel';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const aboutHeroMedia = {
-  poster:
-    'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1800&q=82',
   video:
     'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_115655_b4d9cd77-feed-43cd-a198-af78ebdf1f7a.mp4',
 };
@@ -46,7 +44,6 @@ function AboutHero() {
   return (
     <section className="relative isolate overflow-hidden bg-slate-950 px-5 py-24 text-white sm:py-28 lg:min-h-[88dvh] lg:py-32">
       <AutoplayVideo
-        poster={aboutHeroMedia.poster}
         src={aboutHeroMedia.video}
         aria-hidden="true"
         className="absolute inset-0 -z-20 h-full w-full object-cover opacity-80"

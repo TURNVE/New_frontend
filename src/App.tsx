@@ -15,8 +15,6 @@ import { MissionPanel } from './components/marketing/MissionPanel';
 import { ScrollReveal } from './components/ui/scroll-reveal';
 
 const heroMedia = {
-  poster:
-    'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1800&q=82',
   video:
     'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_115655_b4d9cd77-feed-43cd-a198-af78ebdf1f7a.mp4',
 };
@@ -156,7 +154,6 @@ function App() {
         {/* CTA Section */}
         <section id="pricing" className="relative min-h-[520px] overflow-hidden px-5 py-24 text-white sm:py-28">
           <AutoplayVideo
-            poster="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1800&q=82"
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_131941_d136af49-e243-493a-be14-6ff3f24e09e6.mp4"
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -187,7 +184,6 @@ function Hero() {
   return (
     <section className="relative min-h-[100dvh] overflow-hidden bg-gray-950 text-white">
       <AutoplayVideo
-        poster={heroMedia.poster}
         src={heroMedia.video}
         className="absolute inset-0 h-full w-full object-cover opacity-100"
       />
