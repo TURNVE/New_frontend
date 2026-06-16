@@ -16,22 +16,20 @@ interface HeaderProps {
 }
 
 export function Header({ variant = 'light' }: HeaderProps) {
+  void variant;
   const [menuState, setMenuState] = useState(false);
   const navigate = useNavigate();
-  const isDark = variant === 'dark';
-  const navClass = isDark
-    ? 'border-b border-white/20 bg-[#07162f]/70 text-white backdrop-blur-lg'
-    : 'border-b border-slate-200/80 bg-white text-[#0a142f]';
-  const logoClass = isDark ? 'h-9 w-auto object-contain brightness-0 invert lg:h-10' : 'h-9 w-auto object-contain lg:h-10';
-  const menuListClass = isDark ? 'border border-white/20 bg-white/10 flex items-center gap-0.5 rounded-full px-2 py-1' : 'border border-slate-200 bg-white flex items-center gap-0.5 rounded-full px-2 py-1';
-  const navItemClass = isDark ? 'rounded-full px-3 py-1.5 text-sm text-white/90 transition-colors hover:bg-white/10 hover:text-white' : 'rounded-full px-3 py-1.5 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950';
-  const desktopLoginClass = isDark ? 'hidden rounded-full px-4 py-2 text-sm text-white/90 transition-colors hover:bg-white/10 hover:text-white lg:inline-flex' : 'hidden rounded-full px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 lg:inline-flex';
-  const desktopCtaClass = isDark ? 'rounded-full border border-white/80 bg-white text-[#0a142f] px-5 py-2.5 text-sm transition-all hover:bg-white/85' : 'rounded-full border border-[#0b6bff] bg-[#0b6bff] px-5 py-2.5 text-sm text-white transition-all hover:bg-[#0758d8]';
-  const menuButtonClass = isDark ? 'rounded-lg p-2 transition-colors text-white hover:bg-white/10 lg:hidden' : 'rounded-lg p-2 transition-colors text-slate-800 hover:bg-slate-100 lg:hidden';
-  const mobileNavClass = isDark ? 'md:hidden absolute top-full left-0 right-0 border-b border-white/20 bg-[#07162f]/90' : 'md:hidden absolute top-full left-0 right-0 border-b border-gray-200 bg-white';
-  const mobileLinkClass = isDark ? 'block rounded-lg px-4 py-3 text-base text-white/90 transition-colors hover:bg-white/10 hover:text-white' : 'block rounded-lg px-4 py-3 text-base text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900';
-  const mobileLoginClass = isDark ? 'block w-full rounded-xl border border-white/20 text-white/90 px-4 py-3 text-center transition-colors hover:bg-white/10' : 'block w-full rounded-xl border border-gray-300 text-gray-700 px-4 py-3 text-center transition-colors hover:bg-gray-50';
-  const mobileCtaClass = isDark ? 'block w-full rounded-xl bg-white text-[#0a142f] px-4 py-3 text-center transition-all hover:bg-white/85' : 'block w-full rounded-xl bg-blue-600 text-white px-4 py-3 text-center transition-all hover:bg-blue-700';
+  const navClass = 'border-b border-slate-200/80 bg-white text-[#0a142f]';
+  const logoClass = 'h-8 w-auto max-w-[132px] object-contain lg:h-9';
+  const menuListClass = 'flex items-center gap-0.5 rounded-full border border-slate-200 bg-white px-2 py-1';
+  const navItemClass = 'rounded-full px-3 py-1.5 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950';
+  const desktopLoginClass = 'hidden rounded-full px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 lg:inline-flex';
+  const desktopCtaClass = 'rounded-full border border-[#0b6bff] bg-[#0b6bff] px-5 py-2.5 text-sm text-white transition-all hover:bg-[#0758d8]';
+  const menuButtonClass = 'rounded-lg p-2 text-slate-800 transition-colors hover:bg-slate-100 lg:hidden';
+  const mobileNavClass = 'md:hidden absolute top-full left-0 right-0 border-b border-gray-200 bg-white';
+  const mobileLinkClass = 'block rounded-lg px-4 py-3 text-base text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900';
+  const mobileLoginClass = 'block w-full rounded-xl border border-gray-300 px-4 py-3 text-center text-gray-700 transition-colors hover:bg-gray-50';
+  const mobileCtaClass = 'block w-full rounded-xl bg-blue-600 px-4 py-3 text-center text-white transition-all hover:bg-blue-700';
 
   useEffect(() => {
     const handleDocumentClick = (event: MouseEvent) => {
@@ -66,7 +64,7 @@ export function Header({ variant = 'light' }: HeaderProps) {
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <img
-                src="/turnve-logo-original.jpg"
+                src="/turnve-logo-navy.svg"
                 alt="TURNVE"
                 className={logoClass}
               />
@@ -125,11 +123,11 @@ export function Header({ variant = 'light' }: HeaderProps) {
                 <ul className="space-y-2">
                   {menuItems.map((item) => (
                     <li key={item.name}>
-                    <Link
-                      to={item.href}
-                      onClick={() => setMenuState(false)}
-                      className={mobileLinkClass}
-                    >
+                      <Link
+                        to={item.href}
+                        onClick={() => setMenuState(false)}
+                        className={mobileLinkClass}
+                      >
                         {item.name}
                       </Link>
                     </li>
