@@ -26,20 +26,20 @@ export function MissionPanel() {
     <section className="bg-white px-5 py-20 text-[#222b4b] sm:py-24">
       <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[0.78fr_1fr] lg:gap-20">
         <ScrollReveal className="lg:pr-8">
-          <span className="inline-flex rounded-md bg-[#c2d6ec] px-4 py-2 text-sm font-black text-[#4f6680]">
+          <span className="inline-flex rounded-md bg-[#c2d6ec] px-4 py-2 text-sm font-medium text-[#4f6680]">
             Serving since 2025
           </span>
-          <h2 className="mt-7 max-w-[470px] text-[46px] font-black leading-[1.04] tracking-[-0.055em] sm:text-[64px]">
+          <h2 className="mt-7 max-w-[430px] text-[34px] font-normal leading-[1.08] tracking-[-0.035em] sm:text-[44px]">
             Building proof for real careers
           </h2>
 
-          <div className="mt-20 flex items-center gap-5">
+          <div className="mt-14 flex items-center gap-5">
             <span className="grid h-16 w-16 place-items-center rounded-full bg-[#222b4b] text-white">
               <Headphones className="h-8 w-8" strokeWidth={2.5} />
             </span>
             <div>
-              <p className="text-sm font-semibold text-[#667b92]">Talk to us anytime</p>
-              <Link to="/organization" className="text-[28px] font-black tracking-[-0.035em] text-[#222b4b]">
+              <p className="text-sm font-medium text-[#667b92]">Talk to us anytime</p>
+              <Link to="/organization" className="text-[23px] font-normal tracking-[-0.02em] text-[#222b4b]">
                 Contact Sales
               </Link>
             </div>
@@ -54,8 +54,8 @@ export function MissionPanel() {
               delay={index * 0.08}
               className={`rounded-[9px] p-8 shadow-[0_22px_74px_-58px_rgba(9,35,67,0.75)] sm:p-9 ${item.tone}`}
             >
-              <h3 className="text-[34px] font-black tracking-[-0.045em] text-[#222b4b]">{item.title}</h3>
-              <p className="mt-4 max-w-2xl text-[17px] font-semibold leading-8 text-[#60758c]">
+              <h3 className="text-[26px] font-normal tracking-[-0.025em] text-[#222b4b]">{item.title}</h3>
+              <p className="mt-4 max-w-2xl text-[16px] font-medium leading-7 text-[#60758c]">
                 {item.text}
               </p>
             </ScrollReveal>

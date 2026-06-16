@@ -21,7 +21,7 @@ export function TurnveLogo({ className = 'h-9 w-auto', variant = 'full' }: Turnv
 
   return (
     <img
-      src={variant === 'mark' ? '/logo.png' : '/logo.svg'}
+      src={variant === 'mark' ? '/turnve-logo-navy.svg' : '/turnve-logo-original.jpg'}
       alt="TURNVE"
       className={`block object-contain ${className}`}
       onError={() => setFailed(true)}

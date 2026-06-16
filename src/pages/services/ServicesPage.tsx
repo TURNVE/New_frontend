@@ -1,61 +1,36 @@
 import {
   ArrowRight,
   BadgeCheck,
-  BarChart3,
-  BrainCircuit,
   BriefcaseBusiness,
-  ClipboardCheck,
-  FileText,
   ShieldCheck,
-  Sparkles,
   UsersRound,
 } from 'lucide-react';
 
 import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
-const services = [
+const servicePanels = [
   {
-    title: 'Career Proof Planning',
-    description: 'Turn your goals into a clear practice path with outputs employers can inspect.',
-    icon: ClipboardCheck,
-    tone: 'bg-[#eaf4ff] border-[#bfe0ff]',
-    accent: 'bg-[#0a142f]',
-  },
-  {
-    title: 'Simulation Rooms',
-    description: 'Practise product, operations, analyst, and business decisions in realistic rooms.',
+    eyebrow: 'For learners',
+    title: 'Gain experience by doing real work.',
+    description:
+      'Use TURNVE simulations to practise workplace tasks. Make decisions, submit work, get feedback, and build proof for jobs.',
+    image:
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=82',
     icon: BriefcaseBusiness,
-    tone: 'bg-[#eef1fb] border-[#d4d9f1]',
-    accent: 'bg-[#23305f]',
+    cta: 'Start practising',
+    href: '/sign-up',
   },
   {
-    title: 'AI Feedback',
-    description: 'Get simple notes on your judgment, tradeoffs, writing, and next best action.',
-    icon: BrainCircuit,
-    tone: 'bg-[#e9f7f3] border-[#bfe2d9]',
-    accent: 'bg-[#087989]',
-  },
-  {
-    title: 'Portfolio Reports',
-    description: 'Convert your work into decision logs, briefs, and interview-ready case proof.',
-    icon: FileText,
-    tone: 'bg-[#f2f5ff] border-[#d3ddfb]',
-    accent: 'bg-[#0b6bff]',
-  },
-  {
-    title: 'Talent Screening',
-    description: 'Help teams in Nigeria compare practical readiness before final interviews.',
+    eyebrow: 'For organizations',
+    title: 'Create simulations for teams and talent.',
+    description:
+      'Train staff, test job candidates, and run internship programs with practical simulations your team can review.',
+    image:
+      'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=82',
     icon: UsersRound,
-    tone: 'bg-[#f5f7fa] border-[#dce4ec]',
-    accent: 'bg-[#111827]',
-  },
-  {
-    title: 'Readiness Analytics',
-    description: 'Track skill signals across communication, prioritization, and business thinking.',
-    icon: BarChart3,
-    tone: 'bg-[#e8f2ff] border-[#c7ddf8]',
-    accent: 'bg-[#123a6f]',
+    cta: 'Build simulations',
+    href: '/business',
   },
 ];
 
@@ -66,36 +41,6 @@ const processSteps = [
   ['04. Review', 'Get feedback and improve your proof.'],
 ];
 
-function ServiceMockup({ index, accent }: { index: number; accent: string }) {
-  return (
-    <div className="relative flex h-[255px] items-center justify-center overflow-hidden rounded-[22px]">
-      <div className="absolute inset-5 rounded-[18px] border border-white/70 bg-white/36" />
-      {index % 3 === 0 ? (
-        <div className={`relative w-44 rounded-2xl p-5 text-white shadow-[0_26px_70px_-38px_rgba(9,35,67,0.85)] ${accent}`}>
-          <p className="text-xs font-black">TURNVE</p>
-          <div className="mt-12 h-2 w-20 rounded bg-white/30" />
-          <div className="mt-3 h-2 w-28 rounded bg-white/70" />
-        </div>
-      ) : index % 3 === 1 ? (
-        <div className="relative w-48 space-y-4">
-          {['Brief', 'Decision', 'Report'].map((label) => (
-            <div key={label} className="rounded-xl bg-white p-4 shadow-[0_18px_45px_-30px_rgba(9,35,67,0.75)]">
-              <p className="text-sm font-black text-slate-950">{label}</p>
-              <div className="mt-2 h-2 w-28 rounded bg-[#b8d7ff]" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="relative grid h-40 w-40 place-items-center rounded-2xl border border-white/80 bg-white shadow-[0_24px_58px_-35px_rgba(9,35,67,0.78)]">
-          <div className="grid h-24 w-24 place-items-center rounded-full border-8 border-double border-slate-950">
-            <Sparkles className="h-8 w-8 text-[#0b6bff]" />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function ServicesPage() {
   return (
     <MarketingPageShell className="bg-white">
@@ -103,13 +48,13 @@ function ServicesPage() {
         <section className="relative overflow-hidden bg-[linear-gradient(115deg,#f3f7ff_0%,#fff7f0_58%,#ffffff_100%)] px-5 py-20 text-center">
           <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(#0a142f10_1px,transparent_1px),linear-gradient(90deg,#0a142f10_1px,transparent_1px)] [background-size:72px_72px]" />
           <ScrollReveal className="relative mx-auto max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#0b6bff]">
+            <p className="text-xs font-medium uppercase tracking-[0.24em] text-[#0b6bff]">
               Services
             </p>
-            <h1 className="mt-5 text-5xl font-black tracking-tight text-slate-950 sm:text-6xl">
+            <h1 className="mt-5 text-4xl font-normal tracking-[-0.035em] text-slate-950 sm:text-5xl">
               Practical career services for real proof.
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-base font-semibold leading-7 text-slate-600">
+            <p className="mx-auto mt-6 max-w-2xl text-base font-normal leading-7 text-slate-600">
               TURNVE helps Nigerian talent practise workplace tasks, receive AI feedback,
               build portfolio proof, and show employers they are ready.
             </p>
@@ -117,38 +62,47 @@ function ServicesPage() {
         </section>
 
         <section className="bg-white px-5 py-16 sm:py-24">
-          <div className="mx-auto grid max-w-6xl gap-7 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((service, index) => {
+          <div className="mx-auto max-w-6xl space-y-8">
+            {servicePanels.map((service, index) => {
               const Icon = service.icon;
+              const imageFirst = index % 2 === 1;
+
               return (
                 <ScrollReveal
                   key={service.title}
                   as="article"
                   delay={index * 0.08}
-                  className="group overflow-hidden rounded-[28px] border border-[#dbe7f6] bg-white p-4 shadow-[0_24px_80px_-58px_rgba(9,35,67,0.78)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_34px_90px_-56px_rgba(9,35,67,0.92)]"
+                  className="grid overflow-hidden rounded-[30px] border border-[#dbe7f6] bg-white lg:grid-cols-2"
                 >
-                  <div className={`rounded-[24px] border p-4 ${service.tone}`}>
-                    <ServiceMockup index={index} accent={service.accent} />
+                  <div className={`relative min-h-[320px] ${imageFirst ? 'lg:order-1' : ''}`}>
+                    <img
+                      src={service.image}
+                      alt=""
+                      className="absolute inset-0 h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-[#061225]/16" />
                   </div>
-                  <div className="flex items-start gap-4 px-2 pb-2 pt-6">
-                    <span className={`grid h-11 w-11 flex-none place-items-center rounded-xl text-white shadow-[0_14px_34px_-22px_rgba(9,35,67,0.9)] ${service.accent}`}>
+                  <div className="flex min-h-[320px] flex-col justify-center p-7 sm:p-10 lg:p-12">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#0b6bff] text-white">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <div>
-                      <h2 className="text-[25px] font-black leading-tight tracking-[-0.04em] text-[#0a142f]">
-                        {service.title}
-                      </h2>
-                      <p className="mt-3 text-[15px] font-semibold leading-7 text-[#5f748c]">
-                        {service.description}
-                      </p>
-                      <a
-                        href="/sign-up"
-                        className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#bfd4ec] px-4 py-2 text-sm font-black text-[#0a142f] transition hover:border-[#0b6bff] hover:text-[#0b6bff]"
-                      >
-                        Learn More
-                        <ArrowRight className="h-4 w-4" />
-                      </a>
-                    </div>
+                    <p className="mt-7 text-xs font-medium uppercase tracking-[0.2em] text-[#0b6bff]">
+                      {service.eyebrow}
+                    </p>
+                    <h2 className="mt-4 max-w-md text-2xl font-normal leading-tight tracking-[-0.025em] text-[#0a142f] sm:text-3xl">
+                      {service.title}
+                    </h2>
+                    <p className="mt-5 max-w-md text-base font-normal leading-7 text-[#5f748c]">
+                      {service.description}
+                    </p>
+                    <a
+                      href={service.href}
+                      className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-[#0b6bff] px-5 py-3 text-sm font-normal text-white transition hover:bg-[#0758d8]"
+                    >
+                      {service.cta}
+                      <ArrowRight className="h-4 w-4" />
+                    </a>
                   </div>
                 </ScrollReveal>
               );
@@ -158,8 +112,8 @@ function ServicesPage() {
 
         <section className="mx-5 rounded-[2rem] border border-[#dbe7f6] bg-white px-5 py-20 text-center shadow-[0_28px_100px_-76px_rgba(9,35,67,0.75)] sm:mx-8">
           <ScrollReveal className="mx-auto max-w-3xl">
-            <h2 className="text-4xl font-black tracking-tight text-slate-950">The best process</h2>
-            <p className="mt-4 text-sm font-semibold leading-6 text-slate-600">
+            <h2 className="text-3xl font-normal tracking-[-0.025em] text-slate-950">The best process</h2>
+            <p className="mt-4 text-sm font-normal leading-6 text-slate-600">
               We keep the work simple: set a goal, practise a real task, get feedback, then
               turn the result into proof.
             </p>
@@ -175,7 +129,7 @@ function ServicesPage() {
                 <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-white text-[#0b6bff] shadow-[0_18px_40px_-30px_rgba(9,35,67,0.8)]">
                   <BadgeCheck className="h-6 w-6" />
                 </span>
-                <h3 className="mt-6 text-sm font-black text-slate-950">{title}</h3>
+                <h3 className="mt-6 text-sm font-medium text-slate-950">{title}</h3>
                 <p className="mt-3 text-sm font-medium leading-6 text-slate-600">{description}</p>
               </ScrollReveal>
             ))}
@@ -186,7 +140,7 @@ function ServicesPage() {
           <ScrollReveal className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-slate-950 p-8 text-white sm:p-12 lg:p-16">
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
-                <h2 className="max-w-2xl text-4xl font-black tracking-tight sm:text-5xl">
+                <h2 className="max-w-2xl text-3xl font-normal tracking-[-0.025em] sm:text-4xl">
                   We provide high quality and cost effective career proof.
                 </h2>
                 <p className="mt-6 max-w-2xl text-sm font-medium leading-7 text-white/70">
@@ -203,7 +157,7 @@ function ServicesPage() {
                 </div>
                 <a
                   href="/business"
-                  className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-slate-950 transition hover:bg-blue-50"
+                  className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-normal text-slate-950 transition hover:bg-blue-50"
                 >
                   View Projects
                   <ArrowRight className="h-4 w-4" />

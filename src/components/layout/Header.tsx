@@ -3,12 +3,12 @@ import { Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const menuItems = [
-  { name: 'About', href: '/about' },
   { name: 'Blog', href: '/blog' },
   { name: 'Services', href: '/services' },
   { name: 'Company', href: '/business' },
   { name: 'Team', href: '/team' },
   { name: 'Features', href: '/features' },
+  { name: 'About', href: '/about' },
 ];
 
 interface HeaderProps {

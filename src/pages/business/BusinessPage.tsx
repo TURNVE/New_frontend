@@ -17,11 +17,11 @@ function BusinessHero() {
       <AutoplayVideo
         poster={BUSINESS_HERO_POSTER}
         src={BUSINESS_HERO_VIDEO}
-        className="absolute inset-0 h-full w-full object-cover opacity-80"
+        className="absolute inset-0 h-full w-full object-cover opacity-100"
       />
-      <div className="absolute inset-0 bg-[#07162f]/74" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(11,107,255,0.24),transparent_42%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07162f]/20 via-[#07162f]/58 to-[#07162f]/92" />
+      <div className="absolute inset-0 bg-[#07162f]/42" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(11,107,255,0.12),transparent_42%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07162f]/10 via-[#07162f]/26 to-[#07162f]/58" />
 
       <ScrollReveal className="relative mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center justify-center px-6 pb-16 pt-28 text-center sm:pb-20 sm:pt-32">
         <div className="inline-flex items-center rounded-full border border-white/15 bg-white/8 px-4 py-1.5 text-xs tracking-[0.22em] text-white/78">

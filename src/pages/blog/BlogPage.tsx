@@ -60,8 +60,8 @@ function BlogPage() {
           />
           <div className="absolute inset-0 bg-slate-950/72" />
           <ScrollReveal className="relative mx-auto max-w-3xl">
-            <h1 className="text-5xl font-black tracking-tight sm:text-6xl">Blog & insights</h1>
-            <p className="mx-auto mt-5 max-w-2xl text-base font-semibold leading-7 text-white/78">
+            <h1 className="text-4xl font-normal tracking-[-0.035em] sm:text-5xl">Blog & insights</h1>
+            <p className="mx-auto mt-5 max-w-2xl text-base font-normal leading-7 text-white/78">
               Simple ideas on career proof, practical simulations, hiring signals, and how
               Nigerian talent can show real readiness.
             </p>
@@ -85,15 +85,15 @@ function BlogPage() {
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
-                    <span className="absolute bottom-0 right-0 rounded-tl-2xl bg-[#0b6bff] px-5 py-3 text-sm font-black uppercase tracking-wide text-white">
+                    <span className="absolute bottom-0 right-0 rounded-tl-2xl bg-[#0b6bff] px-5 py-3 text-sm font-medium uppercase tracking-wide text-white">
                       {post.category}
                     </span>
                   </div>
                 </a>
-                <h2 className="mt-6 text-2xl font-black leading-tight tracking-tight text-slate-950">
+                <h2 className="mt-6 text-xl font-normal leading-tight tracking-[-0.02em] text-slate-950 sm:text-2xl">
                   {post.title}
                 </h2>
-                <div className="mt-4 flex flex-wrap items-center gap-4 text-sm font-black uppercase tracking-wide">
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-sm font-medium uppercase tracking-wide">
                   <span className="text-[#0b6bff]">Jun 12, 2026</span>
                   <span className="text-slate-400">By</span>
                   <span className="text-slate-700">{post.author}</span>
@@ -105,7 +105,7 @@ function BlogPage() {
           <ScrollReveal className="mt-16 flex justify-center">
             <a
               href="#"
-              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-8 py-4 text-sm font-black uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-[#0b6bff]"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-8 py-4 text-sm font-medium uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-[#0b6bff]"
             >
               Load more
               <ArrowRight className="h-4 w-4" />

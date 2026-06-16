@@ -18,7 +18,6 @@ import {
   TrendingUp,
   LogOut
 } from 'lucide-react';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { TurnveLogo } from '../brand/TurnveLogo';
 import { profiles, supabase } from '../../lib/supabase';
@@ -28,7 +27,6 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { theme } = useTheme();
   const { user, signOut } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -91,7 +89,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f7f9fc] text-[#0a142f]">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
@@ -99,16 +97,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-card shadow-2xl"
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-2xl"
             style={{ animation: 'slideInLeft 0.3s ease-out forwards' }}
           >
-            <div className="flex items-center justify-between h-16 px-4 border-b border-border shrink-0">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 shrink-0">
               <Link to="/" className="flex h-10 items-center" onClick={() => setSidebarOpen(false)} aria-label="TURNVE home">
-                <TurnveLogo className="h-8 w-auto max-w-[132px]" />
+                <TurnveLogo className="h-8 w-auto max-w-[132px] object-contain" />
               </Link>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-lg text-muted-foreground hover:bg-secondary tap-target"
+                className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 tap-target"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -120,24 +118,24 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   to={item.href}
                   className={`flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-colors tap-target ${
                     isActiveRoute(item.href)
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-foreground hover:bg-secondary'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <IconComponent 
                     iconName={item.icon} 
-                    className={`mr-3 h-5 w-5 ${isActiveRoute(item.href) ? 'text-primary' : 'text-muted-foreground'}`} 
+                    className={`mr-3 h-5 w-5 ${isActiveRoute(item.href) ? 'text-blue-700' : 'text-slate-400'}`} 
                   />
                   {item.name}
                 </Link>
               ))}
             </nav>
             {/* Mobile sidebar footer */}
-            <div className="p-4 border-t border-border shrink-0">
+            <div className="p-4 border-t border-slate-200 shrink-0">
               <button
                 onClick={() => { signOut?.(); setSidebarOpen(false); }}
-                className="w-full flex items-center px-3 py-3 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-950 transition-colors tap-target"
+                className="w-full flex items-center px-3 py-3 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors tap-target"
               >
                 <LogOut className="mr-3 h-5 w-5" />
                 Sign Out
@@ -149,10 +147,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
       {/* Desktop Sidebar - Fixed */}
       <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 lg:w-72 md:flex-col z-40">
-        <div className="flex flex-col flex-grow bg-card border-r border-border overflow-y-auto">
-          <div className="flex items-center h-16 px-6 border-b border-border">
+        <div className="flex flex-col flex-grow bg-white border-r border-slate-200 overflow-y-auto">
+          <div className="flex items-center h-16 px-6 border-b border-slate-200">
             <Link to="/" className="flex h-10 items-center" aria-label="TURNVE home">
-              <TurnveLogo className="h-8 w-auto max-w-[132px]" />
+              <TurnveLogo className="h-8 w-auto max-w-[132px] object-contain" />
             </Link>
           </div>
           <nav className="flex-1 px-4 py-4 space-y-1">
@@ -162,32 +160,32 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 to={item.href}
                 className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors tap-target ${
                   isActiveRoute(item.href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-foreground hover:bg-secondary'
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
                 }`}
               >
                 <IconComponent 
                   iconName={item.icon} 
-                  className={`mr-3 h-5 w-5 ${isActiveRoute(item.href) ? 'text-primary' : 'text-muted-foreground'}`} 
+                  className={`mr-3 h-5 w-5 ${isActiveRoute(item.href) ? 'text-blue-700' : 'text-slate-400'}`} 
                 />
                 {item.name}
               </Link>
             ))}
           </nav>
-          <div className="p-4 border-t border-border">
-            <div className="bg-gradient-to-br from-[#5e6ad2] to-[#7170ff] rounded-xl p-4 text-white mb-4">
+          <div className="p-4 border-t border-slate-200">
+            <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-[#0a142f] mb-4">
               <div className="flex items-center space-x-2 mb-2">
-                <Zap className="h-5 w-5" />
+                <Zap className="h-5 w-5 text-blue-600" />
                 <span className="font-semibold text-sm">Pro Plan</span>
               </div>
-              <p className="text-xs text-white/80 mb-3">Get unlimited access to all simulations</p>
-              <button className="w-full py-2 bg-white text-[#5e6ad2] text-xs font-semibold rounded-lg hover:bg-white/90 transition-colors whitespace-nowrap">
+              <p className="text-xs text-slate-600 mb-3">Get unlimited access to all simulations</p>
+              <button className="w-full py-2 bg-[#0b6bff] text-white text-xs font-semibold rounded-lg hover:bg-[#0758d8] transition-colors whitespace-nowrap">
                 Upgrade Now
               </button>
             </div>
             <button
               onClick={() => signOut?.()}
-              className="w-full flex items-center px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-950 transition-colors tap-target"
+              className="w-full flex items-center px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors tap-target"
             >
               <LogOut className="mr-3 h-5 w-5" />
               Sign Out
@@ -199,30 +197,30 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       {/* Main Content Area */}
       <div className="md:pl-64 lg:pl-72">
         {/* Header - Fixed/Sticky */}
-        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
+        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md">
           <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 lg:px-6">
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 mr-2 rounded-lg text-muted-foreground hover:bg-secondary md:hidden tap-target"
+                className="p-2 mr-2 rounded-lg text-slate-600 hover:bg-slate-100 md:hidden tap-target"
               >
                 <Menu className="h-6 w-6" />
               </button>
               <Link to="/dashboard" className="flex h-10 items-center" aria-label="TURNVE dashboard">
-                <TurnveLogo className="h-7 w-auto max-w-[124px] sm:h-8" />
+                <TurnveLogo className="h-7 w-auto max-w-[124px] object-contain sm:h-8" />
               </Link>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <button className="relative p-2 rounded-xl text-muted-foreground hover:bg-secondary transition-colors tap-target">
+              <button className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors tap-target">
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full"></span>
               </button>
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-semibold text-foreground">{userName}</p>
+                  <p className="text-sm font-semibold text-slate-900">{userName}</p>
                 </div>
                 <Link to="/profile">
-                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-primary-foreground font-semibold text-sm sm:text-base cursor-pointer hover:opacity-90 transition-opacity">
+                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-[#0b6bff] flex items-center justify-center text-white font-semibold text-sm sm:text-base cursor-pointer hover:bg-[#0758d8] transition-colors">
                     {userInitials}
                   </div>
                 </Link>

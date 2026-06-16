@@ -1,13 +1,11 @@
 import { ArrowRight, BarChart3, BrainCircuit, BriefcaseBusiness, FileText, Sparkles, UsersRound } from 'lucide-react';
 
+import { AutoplayVideo } from '../../components/media/AutoplayVideo';
 import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
-const heroImages = [
-  'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=82',
-  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=82',
-  'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=82',
-];
+const heroVideo =
+  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_115655_b4d9cd77-feed-43cd-a198-af78ebdf1f7a.mp4';
 
 const featureTiles = [
   {
@@ -50,37 +48,33 @@ const featureTiles = [
 
 function FeaturesHero() {
   return (
-    <section className="bg-[#0a142f] px-5 pb-20 pt-20 text-white sm:pt-24">
-      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <ScrollReveal className="lg:pr-4">
-          <span className="inline-flex rounded-full border border-white/10 bg-white/8 px-4 py-2 text-sm font-black text-[#7db7ff]">
+    <section className="relative isolate overflow-hidden bg-[#071126] px-5 py-24 text-white sm:py-28 lg:min-h-[82dvh] lg:py-32">
+      <AutoplayVideo
+        src={heroVideo}
+        aria-hidden="true"
+        className="absolute inset-0 -z-20 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 -z-10 bg-[#071126]/78" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_30%,rgba(11,107,255,0.26),transparent_34%),linear-gradient(90deg,rgba(7,17,38,0.96),rgba(7,17,38,0.76)_46%,rgba(7,17,38,0.62))]" />
+
+      <div className="mx-auto flex min-h-[58dvh] max-w-6xl items-center">
+        <ScrollReveal className="max-w-3xl">
+          <span className="inline-flex rounded-full border border-white/14 bg-white/10 px-4 py-2 text-sm font-normal text-[#9bc7ff] backdrop-blur">
             Practical proof features
           </span>
-          <h1 className="mt-6 max-w-2xl text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-7xl">
+          <h1 className="mt-7 max-w-2xl text-5xl font-normal leading-[0.98] tracking-[-0.065em] sm:text-6xl lg:text-7xl">
             See skill before the interview.
           </h1>
-          <p className="mt-6 max-w-xl text-lg font-semibold leading-8 text-white/68">
+          <p className="mt-6 max-w-xl text-lg font-normal leading-8 text-white/72">
             Simulations, feedback, and proof for people, companies, and institutions.
           </p>
           <a
             href="/program1"
-            className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-[#0b6bff] px-6 py-4 text-sm font-black text-white shadow-lg shadow-blue-500/25 transition hover:-translate-y-0.5 hover:bg-[#0758d8]"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#0b6bff] px-6 py-4 text-sm font-normal text-white transition hover:-translate-y-0.5 hover:bg-[#0758d8]"
           >
             Try TURNVE
             <ArrowRight className="h-4 w-4" />
           </a>
-        </ScrollReveal>
-
-        <ScrollReveal className="grid gap-4 sm:grid-cols-5" direction="left">
-          <img
-            src={heroImages[0]}
-            alt="Team reviewing practical work"
-            className="h-80 w-full rounded-3xl object-cover sm:col-span-3 sm:h-[430px]"
-          />
-          <div className="space-y-4 sm:col-span-2">
-            <img src={heroImages[1]} alt="Learner practicing online" className="h-48 w-full rounded-3xl object-cover" />
-            <img src={heroImages[2]} alt="Company team collaboration" className="h-48 w-full rounded-3xl object-cover" />
-          </div>
         </ScrollReveal>
       </div>
     </section>
@@ -92,7 +86,7 @@ function FeatureGrid() {
     <section className="bg-white px-5 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal as="section" className="max-w-3xl">
-          <h2 className="max-w-3xl text-4xl font-black leading-tight tracking-[-0.045em] text-[#0a142f] sm:text-6xl">
+          <h2 className="max-w-2xl text-3xl font-normal leading-tight tracking-[-0.03em] text-[#0a142f] sm:text-4xl">
           Less theory. More visible work.
           </h2>
         </ScrollReveal>
@@ -119,8 +113,8 @@ function FeatureGrid() {
                   </span>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-black tracking-[-0.035em] text-[#0a142f]">{feature.title}</h3>
-                  <p className="mt-2 text-base font-semibold text-slate-600">{feature.text}</p>
+                  <h3 className="text-xl font-normal tracking-[-0.02em] text-[#0a142f]">{feature.title}</h3>
+                  <p className="mt-2 text-base font-normal text-slate-600">{feature.text}</p>
                 </div>
               </ScrollReveal>
             );
@@ -136,13 +130,13 @@ function FeatureStory() {
     <section className="bg-[#d8eaff] px-5 py-20 sm:py-24">
       <ScrollReveal className="mx-auto grid max-w-6xl overflow-hidden rounded-[2rem] bg-[#0a142f] lg:grid-cols-[0.86fr_1.14fr]">
         <div className="p-8 text-white sm:p-12 lg:p-14">
-          <h2 className="text-4xl font-black leading-tight tracking-[-0.045em] sm:text-5xl">
+          <h2 className="text-3xl font-normal leading-tight tracking-[-0.03em] sm:text-4xl">
             Built for real teams and real job paths.
           </h2>
-          <p className="mt-5 max-w-md text-sm font-semibold leading-7 text-white/66">
+          <p className="mt-5 max-w-md text-sm font-normal leading-7 text-white/66">
             Use TURNVE to assign tasks, review outputs, and see readiness clearly.
           </p>
-          <a href="/services" className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#0a142f]">
+          <a href="/services" className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-normal text-[#0a142f]">
             Explore services
             <ArrowRight className="h-4 w-4" />
           </a>

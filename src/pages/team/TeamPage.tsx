@@ -9,16 +9,16 @@ const teamMembers = [
     role: 'Founder',
     summary:
       'I shape TURNVE around one simple idea: practical proof should be easy to build and easy to trust.',
-    image:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=82',
+    image: '/images/team/emejulu-esther.jpg',
+    imagePosition: 'center 30%',
   },
   {
     name: 'Nwosu Paul',
     role: 'CTO',
     summary:
       'I build the systems that keep our simulations fast, clear, and useful for real teams.',
-    image:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=82',
+    image: '/images/team/paul-light.png',
+    imagePosition: 'center 36%',
   },
 ];
 
@@ -41,28 +41,29 @@ function TeamPage() {
               and the story very human.
             </p>
 
-            <div className="mx-auto mt-16 grid max-w-4xl gap-5 md:grid-cols-2">
+            <div className="mx-auto mt-12 grid w-full max-w-sm gap-5 sm:max-w-2xl md:max-w-3xl md:grid-cols-2">
               {teamMembers.map((member, index) => (
                 <ScrollReveal
                   key={member.name}
                   as="article"
                   delay={index * 0.08}
-                  className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white transition duration-300 hover:-translate-y-1"
+                  className="group overflow-hidden rounded-3xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1"
                 >
-                  <div className="aspect-[4/4.7] overflow-hidden bg-slate-100">
+                  <div className="h-64 overflow-hidden bg-slate-100 sm:h-72 md:h-64 lg:h-72">
                     <img
                       src={member.image}
                       alt={`${member.name}, ${member.role}`}
-                      className="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      style={{ objectPosition: member.imagePosition }}
                       loading="lazy"
                     />
                   </div>
-                  <div className="p-6 text-left">
-                    <h2 className="text-2xl font-normal tracking-[-0.03em] text-slate-950">
+                  <div className="p-5 text-left sm:p-6">
+                    <h2 className="text-xl font-normal tracking-[-0.02em] text-slate-950 sm:text-2xl">
                       {member.name}
                     </h2>
                     <p className="mt-2 text-sm font-normal text-blue-700">{member.role}</p>
-                    <p className="mt-4 max-w-md text-sm font-normal leading-7 text-slate-600">
+                    <p className="mt-4 max-w-sm text-sm font-normal leading-6 text-slate-600">
                       {member.summary}
                     </p>
                   </div>
@@ -83,7 +84,7 @@ function TeamPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/76 to-slate-950/20" />
             <div className="absolute inset-0 flex items-center px-6 sm:px-10 lg:px-14">
               <div className="max-w-2xl text-white">
-                <h2 className="text-4xl font-normal leading-tight tracking-[-0.04em] sm:text-5xl">
+                <h2 className="text-3xl font-normal leading-tight tracking-[-0.03em] sm:text-4xl">
                   For us, growth is a practice.
                 </h2>
                 <p className="mt-5 max-w-xl text-base font-normal leading-7 text-white/76">
