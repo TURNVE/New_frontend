@@ -1,8 +1,7 @@
 import { ArrowRight, BadgeCheck, BrainCircuit, BriefcaseBusiness, ShieldCheck } from 'lucide-react';
 
-import { Header } from '../../components/layout/Header';
+import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { MissionPanel } from '../../components/marketing/MissionPanel';
-import { PublicFooter } from '../../components/layout/PublicFooter';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const heroImages = [
@@ -235,8 +234,7 @@ function ValuesStrip() {
 
 function AboutPage() {
   return (
-    <div id="top" className="marketing-page min-h-screen bg-white font-inter">
-      <Header />
+    <MarketingPageShell id="top" className="bg-white font-inter">
       <main>
         <AboutHero />
         <ProofCards />
@@ -244,8 +242,7 @@ function AboutPage() {
         <MissionPanel />
         <ValuesStrip />
       </main>
-      <PublicFooter />
-    </div>
+    </MarketingPageShell>
   );
 }
 

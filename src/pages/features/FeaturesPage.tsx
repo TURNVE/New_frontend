@@ -1,7 +1,6 @@
 import { ArrowRight, BarChart3, BrainCircuit, BriefcaseBusiness, FileText, Sparkles, UsersRound } from 'lucide-react';
 
-import { Header } from '../../components/layout/Header';
-import { PublicFooter } from '../../components/layout/PublicFooter';
+import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const heroImages = [
@@ -161,15 +160,13 @@ function FeatureStory() {
 
 function FeaturesPage() {
   return (
-    <div className="marketing-page min-h-screen bg-white font-inter">
-      <Header variant="dark" />
+    <MarketingPageShell headerVariant="dark" className="bg-white font-inter">
       <main>
         <FeaturesHero />
         <FeatureGrid />
         <FeatureStory />
       </main>
-      <PublicFooter />
-    </div>
+    </MarketingPageShell>
   );
 }
 

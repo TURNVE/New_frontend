@@ -1,7 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 
-import { Header } from '../../components/layout/Header';
-import { PublicFooter } from '../../components/layout/PublicFooter';
+import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const posts = [
@@ -51,8 +50,7 @@ const posts = [
 
 function BlogPage() {
   return (
-    <div className="marketing-page min-h-screen bg-white">
-      <Header />
+    <MarketingPageShell headerVariant="dark" className="bg-white">
       <main>
         <section className="relative flex min-h-[340px] items-center justify-center overflow-hidden px-5 py-20 text-center text-white">
           <img
@@ -115,8 +113,7 @@ function BlogPage() {
           </ScrollReveal>
         </section>
       </main>
-      <PublicFooter />
-    </div>
+    </MarketingPageShell>
   );
 }
 

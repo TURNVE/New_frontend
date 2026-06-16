@@ -1,6 +1,5 @@
 import { ArrowUpRight, Menu, Quote, Star } from 'lucide-react';
-import { Header } from '../../components/layout/Header';
-import { PublicFooter } from '../../components/layout/PublicFooter';
+import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const avatars = [
@@ -193,14 +192,12 @@ function TestimonialFooter() {
 
 function TestimonialPage() {
   return (
-    <div className="marketing-page min-h-screen bg-white font-inter">
-      <Header />
+    <MarketingPageShell headerVariant="dark" className="bg-white font-inter">
       <main>
         <TrustHero />
         <TestimonialGrid />
       </main>
-      <PublicFooter />
-    </div>
+    </MarketingPageShell>
   );
 }
 

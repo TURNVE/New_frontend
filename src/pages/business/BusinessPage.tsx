@@ -1,8 +1,8 @@
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { Header } from '../../components/layout/Header';
 import { AutoplayVideo } from '../../components/media/AutoplayVideo';
+import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const BUSINESS_HERO_VIDEO =
@@ -59,12 +59,11 @@ function BusinessHero() {
 
 function BusinessPage() {
   return (
-    <div className="marketing-page min-h-screen bg-white">
-      <Header />
+    <MarketingPageShell headerVariant="dark" className="bg-white">
       <main>
         <BusinessHero />
       </main>
-    </div>
+    </MarketingPageShell>
   );
 }
 

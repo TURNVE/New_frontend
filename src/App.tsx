@@ -16,8 +16,7 @@ import {
 
 import { AnimatedGroup } from './components/ui/animated-group';
 import { AutoplayVideo } from './components/media/AutoplayVideo';
-import { Header } from './components/layout/Header';
-import { PublicFooter } from './components/layout/PublicFooter';
+import { MarketingPageShell } from './components/marketing/MarketingPageShell';
 import { MissionPanel } from './components/marketing/MissionPanel';
 import { ScrollReveal } from './components/ui/scroll-reveal';
 
@@ -120,8 +119,7 @@ const homeBlogPosts = [
 
 function App() {
   return (
-    <div className="marketing-page min-h-screen bg-white">
-      <Header variant="dark" />
+    <MarketingPageShell headerVariant="dark">
       <main>
         <Hero />
         
@@ -187,9 +185,7 @@ function App() {
           </ScrollReveal>
         </section>
       </main>
-
-      <PublicFooter />
-    </div>
+    </MarketingPageShell>
   );
 }
 

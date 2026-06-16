@@ -11,8 +11,7 @@ import {
   UsersRound,
 } from 'lucide-react';
 
-import { Header } from '../../components/layout/Header';
-import { PublicFooter } from '../../components/layout/PublicFooter';
+import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const services = [
@@ -99,8 +98,7 @@ function ServiceMockup({ index, accent }: { index: number; accent: string }) {
 
 function ServicesPage() {
   return (
-    <div className="marketing-page min-h-screen bg-white">
-      <Header />
+    <MarketingPageShell className="bg-white">
       <main>
         <section className="relative overflow-hidden bg-[linear-gradient(115deg,#f3f7ff_0%,#fff7f0_58%,#ffffff_100%)] px-5 py-20 text-center">
           <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(#0a142f10_1px,transparent_1px),linear-gradient(90deg,#0a142f10_1px,transparent_1px)] [background-size:72px_72px]" />
@@ -219,8 +217,7 @@ function ServicesPage() {
           </ScrollReveal>
         </section>
       </main>
-      <PublicFooter />
-    </div>
+    </MarketingPageShell>
   );
 }
 

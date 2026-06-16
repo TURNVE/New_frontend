@@ -1,7 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 
-import { Header } from '../../components/layout/Header';
-import { PublicFooter } from '../../components/layout/PublicFooter';
+import { MarketingPageShell } from '../../components/marketing/MarketingPageShell';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
 const teamMembers = [
@@ -25,8 +24,7 @@ const teamMembers = [
 
 function TeamPage() {
   return (
-    <div className="marketing-page min-h-screen bg-white text-slate-950">
-      <Header />
+    <MarketingPageShell className="bg-white text-slate-950">
       <main>
         <section className="relative overflow-hidden bg-[linear-gradient(115deg,#ffffff_0%,#f5f7ff_42%,#eef5ff_100%)] px-5 py-20 sm:py-24 lg:py-28">
           <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(#0b1b3a0d_1px,transparent_1px),linear-gradient(90deg,#0b1b3a0d_1px,transparent_1px)] [background-size:72px_72px]" />
@@ -127,8 +125,7 @@ function TeamPage() {
         </section>
       </main>
 
-      <PublicFooter />
-    </div>
+    </MarketingPageShell>
   );
 }
 
