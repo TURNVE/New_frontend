@@ -8,7 +8,6 @@ import DashboardLayout from './components/layout/DashboardLayout';
 // ── Eager loaded pages (critical path) ────────────────────────
 import App from './App';
 import AuthPage from './pages/auth/AuthPage';
-import SignUpPage from './pages/auth/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
 
 // ── Lazy loaded pages (to improve dev server performance) ─────
@@ -103,12 +102,12 @@ function Router() {
 
             {/* ── Auth ────────────────────────────────────────────────── */}
             <Route path="/login" element={<Navigate to="/sign-in" replace />} />
-            <Route path="/sign-in" element={<AuthPage />} />
+            <Route path="/sign-in" element={<AuthPage mode="sign-in" />} />
             <Route path="/organization/login" element={<Navigate to="/company/login" replace />} />
             <Route path="/organization/sign-up" element={<Navigate to="/company/sign-up" replace />} />
             <Route path="/company/login" element={<OrganizationLoginPage />} />
             <Route path="/company/sign-up" element={<OrganizationSignUpPage />} />
-            <Route path="/sign-up" element={<SignUpPage />} />
+            <Route path="/sign-up" element={<AuthPage mode="sign-up" />} />
             <Route path="/auth/callback" element={<OAuthCallbackPage />} />
 
             {/* ── Protected Routes with Dashboard Layout ───────────────────── */}

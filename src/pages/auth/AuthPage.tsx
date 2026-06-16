@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -12,10 +12,18 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '../../hooks/useAuth';
+import { AUTH_ERRORS } from '../../contexts/AuthContext';
 import {
   isSupabaseConfigured,
   SUPABASE_CONFIG_ERROR as supabaseConfigError,
 } from '../../lib/supabase';
+import {
+  getPostAuthRedirectPath,
+  getProfileForUser,
+  normalizeAuthEmail,
+  normalizeRole,
+  rememberAuthPortal,
+} from '../../lib/auth';
 import { cn } from '../../lib/utils';
 import { ScrollReveal } from '../../components/ui/scroll-reveal';
 
@@ -30,12 +38,42 @@ const accountOptions = [
   { value: 'individual', label: 'Individual', icon: User },
 ] as const;
 
+const GoogleIcon = () => (
+  <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 48 48">
+    <path
+      fill="#FFC107"
+      d="M43.61 20.08H42V20H24v8h11.3c-1.65 4.66-6.08 8-11.3 8-6.63 0-12-5.37-12-12s5.37-12 12-12c3.06 0 5.84 1.15 7.96 3.04l5.66-5.66C34.05 6.05 29.27 4 24 4 12.96 4 4 12.96 4 24s8.96 20 20 20 20-8.96 20-20c0-1.34-.14-2.65-.39-3.92Z"
+    />
+    <path
+      fill="#FF3D00"
+      d="m6.31 14.69 6.57 4.82C14.66 15.11 18.96 12 24 12c3.06 0 5.84 1.15 7.96 3.04l5.66-5.66C34.05 6.05 29.27 4 24 4 16.32 4 9.66 8.34 6.31 14.69Z"
+    />
+    <path
+      fill="#4CAF50"
+      d="M24 44c5.17 0 9.86-1.98 13.41-5.19l-6.19-5.24C29.21 35.09 26.72 36 24 36c-5.2 0-9.62-3.32-11.28-7.95l-6.52 5.03C9.5 39.56 16.23 44 24 44Z"
+    />
+    <path
+      fill="#1976D2"
+      d="M43.61 20.08H42V20H24v8h11.3a12.04 12.04 0 0 1-4.08 5.57l6.19 5.24C36.97 39.2 44 34 44 24c0-1.34-.14-2.65-.39-3.92Z"
+    />
+  </svg>
+);
+
 export default function AuthPage({ mode }: AuthPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signInWithEmail, signUp, isAuthenticated, loading } = useAuth();
+  const {
+    signIn,
+    signInWithOAuth,
+    signUp,
+    isAuthenticated,
+    isLoading,
+    profile,
+    role,
+  } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [accountType, setAccountType] = useState<'individual' | 'organization'>('organization');
   const [form, setForm] = useState({
     fullName: '',
@@ -51,41 +89,91 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
   const destination = useMemo(() => {
     if (from && from !== '/') return from;
-    return accountType === 'organization' ? '/org/create' : '/program1';
-  }, [accountType, from]);
+    if (isAuthenticated) return getPostAuthRedirectPath(role);
+    return getPostAuthRedirectPath(accountType === 'organization' ? 'COMPANY' : 'USER');
+  }, [accountType, from, isAuthenticated, role]);
 
-  if (!loading && isAuthenticated) {
-    return <Navigate to={destination} replace />;
-  }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
     setNotice(null);
 
     try {
+      const normalizedEmail = normalizeAuthEmail(form.email);
+
       if (isSignUp) {
-        const result = await signUp(form.email, form.password, form.fullName, {
-          role: accountType === 'organization' ? 'COMPANY' : 'USER',
-          organization_name: form.organizationName,
+        const nextRole = accountType === 'organization' ? 'COMPANY' : 'USER';
+        const { data, error: signUpError } = await signUp(normalizedEmail, form.password, {
+          data: {
+            full_name: form.fullName.trim(),
+            role: nextRole,
+            organization_name: form.organizationName.trim(),
+          },
         });
 
-        if (result.session) {
-          navigate(destination, { replace: true });
-        } else {
+        if (signUpError) {
+          throw signUpError;
+        }
+
+        if (data.session) {
+          navigate(getPostAuthRedirectPath(nextRole), { replace: true });
+          return;
+        }
+
+        if (data.user) {
           setNotice('Account created. Check your email to confirm your account, then sign in.');
         }
       } else {
-        await signInWithEmail(form.email, form.password);
-        navigate(from || '/org/dashboard', { replace: true });
+        const { data, error: signInError } = await signIn(normalizedEmail, form.password);
+        if (signInError || !data.user) {
+          throw signInError ?? new Error(AUTH_ERRORS.SIGN_IN_FAILED);
+        }
+
+        const { profile: signedInProfile } = await getProfileForUser(data.user.id);
+        const signedInRole = normalizeRole(signedInProfile?.role ?? profile?.role);
+        navigate(from || getPostAuthRedirectPath(signedInRole), { replace: true });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed. Please try again.');
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [
+    accountType,
+    form.email,
+    form.fullName,
+    form.organizationName,
+    form.password,
+    from,
+    isSignUp,
+    navigate,
+    profile?.role,
+    signIn,
+    signUp,
+  ]);
+
+  const handleGoogleSignIn = useCallback(async () => {
+    setOauthLoading(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      rememberAuthPortal(isSignUp && accountType === 'organization' ? 'organization' : 'individual');
+      const { error: oauthError } = await signInWithOAuth('google');
+      if (oauthError) {
+        setError(oauthError.message || AUTH_ERRORS.OAUTH_FAILED);
+        setOauthLoading(false);
+      }
+    } catch {
+      setError(AUTH_ERRORS.GENERIC);
+      setOauthLoading(false);
+    }
+  }, [accountType, isSignUp, signInWithOAuth]);
+
+  if (!isLoading && isAuthenticated) {
+    return <Navigate to={destination} replace />;
+  }
 
   return (
     <main className="min-h-screen bg-[#f6f8fc] text-[#0a142f]">
@@ -140,6 +228,32 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   })}
                 </div>
               )}
+
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={oauthLoading || submitting || !isSupabaseConfigured}
+                title={!isSupabaseConfigured ? supabaseConfigError : undefined}
+                className="mb-5 flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-55"
+              >
+                <GoogleIcon />
+                {oauthLoading
+                  ? 'Opening Google...'
+                  : isSignUp
+                    ? 'Sign up with Google'
+                    : 'Continue with Google'}
+              </button>
+
+              <div className="relative mb-5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-3 font-semibold tracking-[0.12em] text-slate-400">
+                    or use email
+                  </span>
+                </div>
+              </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {isSignUp && (
@@ -214,7 +328,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
               <p className="mt-6 text-center text-sm font-medium text-slate-600">
                 {isSignUp ? 'Already have an account?' : 'Need an account?'}{' '}
-                <Link to={isSignUp ? '/sign-in' : '/sign-up'} className="font-black text-blue-600 hover:text-blue-700">
+                <Link to={isSignUp ? '/sign-in' : '/sign-up'} className="font-bold text-blue-600 hover:text-blue-700">
                   {isSignUp ? 'Sign in' : 'Create one'}
                 </Link>
               </p>
